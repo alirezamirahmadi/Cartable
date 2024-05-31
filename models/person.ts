@@ -44,7 +44,15 @@ const schema = new mongoose.Schema({
   },
   isActive: {
     type: Boolean,
-  }
+    require: true,
+  },
+  account: {
+    username: { type: String, require: true, minLength: 4 },
+    password: { type: String, require: true, minLength: 8, maxLength: 20 },
+    isActive: { type: Boolean, require: true }
+  },
+  refRole: [String]
+
 })
 
 const personModel = mongoose.model('person', schema);
