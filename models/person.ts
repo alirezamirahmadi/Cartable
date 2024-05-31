@@ -55,6 +55,6 @@ const schema = new mongoose.Schema({
 
 })
 
-const personModel = mongoose.model('person', schema);
+const personModel = mongoose.models.person || mongoose.model('person', schema);
 
 export default personModel;
