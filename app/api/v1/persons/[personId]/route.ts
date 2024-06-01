@@ -15,7 +15,7 @@ const PUT = async (request: Request, { params }: { params: { personId: string } 
   const person = await personModel.findByIdAndUpdate(params.personId, { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole });
 
   if (person) {
-    return Response.json({ message: "Person update successfully" }, { status: 201 });
+    return Response.json({ message: "The Person was successfully updated" }, { status: 201 });
   }
   return Response.json({ message: "The person was not updated" }, { status: 500 });
 }
@@ -24,7 +24,7 @@ const DELETE = async (request: Request, { params }: { params: { personId: string
   const person = await personModel.findByIdAndDelete(params.personId);
 
   if (person) {
-    return Response.json({ message: "The person delete successfully" }, { status: 200 });
+    return Response.json({ message: "Person deleted successfully" }, { status: 200 });
   }
   return Response.json({ message: "The person was not deleted" }, { status: 500 });
 }
