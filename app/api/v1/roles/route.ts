@@ -1,6 +1,7 @@
 import roleModel from "@/models/role";
-
+import connectToDB from "@/utils/db";
 const GET = async () => {
+  connectToDB();
   const roles = await roleModel.find();
 
   if (roles) {

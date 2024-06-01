@@ -7,6 +7,6 @@ const schema = new mongoose.Schema({
   }
 })
 
-const urgencyModel = mongoose.model('urgency', schema);
+const urgencyModel = mongoose.models.urgency || mongoose.model('urgency', schema);
 
 export default urgencyModel;

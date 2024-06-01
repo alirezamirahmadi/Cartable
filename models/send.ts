@@ -24,9 +24,6 @@ const schema = new mongoose.Schema({
     type: Date,
     require: true,
   },
-  parentReceive: {
-    type: String,
-  },
   receivers: [
     {
       refPerson: {
@@ -58,6 +55,6 @@ const schema = new mongoose.Schema({
   ]
 })
 
-const sendModel = mongoose.model('send', schema);
+const sendModel = mongoose.models.send || mongoose.model('send', schema);
 
 export default sendModel;

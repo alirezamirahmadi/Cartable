@@ -15,6 +15,6 @@ const schema = new mongoose.Schema({
   }
 })
 
-const loginedModel = mongoose.model('logined', schema);
+const loginedModel = mongoose.models.logined || mongoose.model('logined', schema);
 
 export default loginedModel;
