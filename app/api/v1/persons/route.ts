@@ -15,7 +15,7 @@ const POST = async (request: Request) => {
   const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole });
 
   if (person) {
-    return Response.json({ message: "The person insert successfully" }, { status: 201 });
+    return Response.json({ message: "The person was successfully created" }, { status: 201 });
   }
   return Response.json({ message: "The person was not created" }, { status: 500 });
 }
