@@ -16,7 +16,7 @@ const GET = async (request: Request) => {
     login = await loginedModel.find({ token }).exec();
   }
 
-  login ? response = { json: login, status: 200 } : response = { json: { message: "not found" }, status: 404 }
+  response = login ? { json: login, status: 200 } : { json: { message: "not found" }, status: 404 };
   return Response.json(response.json, { status: response.status });
 }
 

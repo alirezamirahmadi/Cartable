@@ -17,7 +17,7 @@ const GET = async (request: Request) => {
     send = await sendModel.find({ refCollection, refDocument }).exec();
   }
 
-  send ? response = { json: send, status: 200 } : response = { json: { message: "not found" }, status: 404 }
+  response = send ? { json: send, status: 200 } : { json: { message: "not found" }, status: 404 };
   return Response.json(response.json, { status: response.status });
 }
 

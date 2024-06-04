@@ -1,15 +1,24 @@
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
 
-const GET = async () => {
-connectToDB();
+const GET = async (request: Request) => {
+  connectToDB();
 
-const persons = await personModel.find();
+  let response: { json: any, status: number } = { json: null, status: 501 };
+  let person;
+  const { searchParams } = new URL(request.url);
 
-if (persons) {
-  return Response.json(persons, { status: 200 });
-}
-return Response.json({ message: "Persons not found" }, { status: 404 });
+  if (searchParams.size === 0) {
+    person = await personModel.find();
+  }
+  else {
+    let username = searchParams.get("username");
+    let password = searchParams.get("password");
+    person = await personModel.find({ account:{username, password, isActive:true} }).exec();
+  }
+
+  response = person ? { json: person, status: 200 } : { json: { message: "Persons not found" }, status: 404 };
+  return Response.json(response.json, { status: response.status });
 }
 
 const POST = async (request: Request) => {
