@@ -1,13 +1,24 @@
 import sendModel from "@/models/send";
 
-const GET = async () => {
-  const sends = await sendModel.find();
+const GET = async (request: Request) => {
 
-  if (sends) {
-    return Response.json(sends, { status: 200 });
+  let response: { json: any, status: number } = { json: null, status: 501 };
+  const { searchParams } = new URL(request.url);
+  let send;
+
+  if (searchParams.size === 0) {
+    send = await sendModel.find();
   }
-  return Response.json({ message: "not found" }, { status: 404 });
+  else {
+    let refCollection = searchParams.get('refCollection');
+    let refDocument = searchParams.get('refDocument');
+    send = await sendModel.find({ refCollection, refDocument }).exec();
+  }
+  
+  send ? response = { json: send, status: 200 } : response = { json: { message: "not found" }, status: 404 }
+  return Response.json(response.json, { status: response.status });
 }
+
 
 const POST = async (request: Request, { params }: { params: { sendId: string } }) => {
   const { refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, receivers } = await request.json();
