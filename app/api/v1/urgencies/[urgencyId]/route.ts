@@ -1,6 +1,9 @@
 import urgencyModel from "@/models/urgency";
+import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { urgencyId: string } }) => {
+  connectToDB();
+
   const urgency = await urgencyModel.findById(params.urgencyId);
 
   if (urgency) {
@@ -10,6 +13,8 @@ const GET = async (request: Request, { params }: { params: { urgencyId: string }
 }
 
 const PUT = async (request: Request, { params }: { params: { urgencyId: string } }) => {
+  connectToDB();
+
   const { title } = await request.json();
 
   const urgency = await urgencyModel.findByIdAndUpdate(params.urgencyId, { title });
@@ -21,6 +26,8 @@ const PUT = async (request: Request, { params }: { params: { urgencyId: string }
 }
 
 const DELETE = async (request: Request, { params }: { params: { urgencyId: string } }) => {
+  connectToDB();
+
   const urgency = await urgencyModel.findByIdAndDelete(params.urgencyId);
 
   if (urgencyModel) {

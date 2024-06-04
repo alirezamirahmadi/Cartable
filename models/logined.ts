@@ -12,6 +12,10 @@ const schema = new mongoose.Schema({
   loginDate: {
     type: Date,
     require: true,
+  },
+  token:{
+    type:String,
+    require:true,
   }
 })
 

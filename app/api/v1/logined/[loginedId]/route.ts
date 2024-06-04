@@ -1,6 +1,9 @@
 import loginedModel from "@/models/logined";
+import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { loginedId: string } }) => {
+  connectToDB();
+
   const logined = await loginedModel.findById(params.loginedId);
 
   if (logined) {
@@ -10,6 +13,7 @@ const GET = async (request: Request, { params }: { params: { loginedId: string }
 }
 
 const DELETE = async (request: Request, { params }: { params: { loginedId: string } }) => {
+  connectToDB();
   const logined = await loginedModel.findByIdAndDelete(params.loginedId);
 
   if (logined) {

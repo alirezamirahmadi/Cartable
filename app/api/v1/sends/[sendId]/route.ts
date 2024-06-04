@@ -1,19 +1,24 @@
 import sendModel from "@/models/send";
+import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { sendId: string } }) => {
-  const send = await sendModel.findById(params.sendId);
+connectToDB();
 
-  if (send) {
+const send = await sendModel.findById(params.sendId);
+
+if (send) {
     return Response.json(send, { status: 200 });
   }
   return Response.json({ message: "not found" }, { status: 404 });
 }
 
 const PUT = async (request: Request, { params }: { params: { sendId: string } }) => {
+  connectToDB();
+  
   const { refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, receivers } = await request.json();
-
+  
   const send = await sendModel.findByIdAndUpdate(params.sendId, { refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, receivers });
-
+  
   if (send) {
     return Response.json({ message: "The submition was updated successfully" }, { status: 201 });
   }
@@ -21,6 +26,8 @@ const PUT = async (request: Request, { params }: { params: { sendId: string } })
 }
 
 const DELETE = async (request: Request, { params }: { params: { sendId: string } }) => {
+  connectToDB();
+  
   const send = await sendModel.findByIdAndDelete(params.sendId);
 
   if (send) {

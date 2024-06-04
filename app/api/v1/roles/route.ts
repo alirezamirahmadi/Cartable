@@ -1,9 +1,11 @@
 import roleModel from "@/models/role";
 import connectToDB from "@/utils/db";
+
 const GET = async () => {
   connectToDB();
+  
   const roles = await roleModel.find();
-
+  
   if (roles) {
     return Response.json(roles, { status: 200 });
   }
@@ -11,12 +13,14 @@ const GET = async () => {
 }
 
 const POST = async (request: Request) => {
+  connectToDB();
+
   const { title, root, isActive } = await request.json();
 
   const role = await roleModel.create({ title, root, isActive });
 
   if (role) {
-    return Response.json({ message: "The role was successfully created" }, { status: 201 });
+    return Response.json({ message: "The role was created successfully" }, { status: 201 });
   }
   return Response.json({ message: "The role was not created" }, { status: 500 });
 }
