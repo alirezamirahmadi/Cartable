@@ -9,12 +9,13 @@ const GET = async (request: Request) => {
   const { searchParams } = new URL(request.url);
 
   if (searchParams.size === 0) {
-    person = await personModel.find();
+    person = await personModel.aggregate()
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" });
   }
   else {
     let username = searchParams.get("username");
     let password = searchParams.get("password");
-    person = await personModel.find({ account:{username, password, isActive:true} }).exec();
+    person = await personModel.find({ account: { username, password, isActive: true } }).exec();
   }
 
   response = person ? { json: person, status: 200 } : { json: { message: "Persons not found" }, status: 404 };
