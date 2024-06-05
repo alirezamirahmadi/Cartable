@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const schema = new mongoose.Schema({
   refPerson: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
     require: true,
   },
   ipAddress: {
@@ -13,9 +13,9 @@ const schema = new mongoose.Schema({
     type: Date,
     require: true,
   },
-  token:{
-    type:String,
-    require:true,
+  token: {
+    type: String,
+    require: true,
   }
 })
 

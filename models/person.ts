@@ -51,8 +51,7 @@ const schema = new mongoose.Schema({
     password: { type: String, require: true, minLength: 8, maxLength: 20 },
     isActive: { type: Boolean, require: true }
   },
-  refRole: [String]
-
+  refRole: [mongoose.Schema.ObjectId]
 })
 
 const personModel = mongoose.models.person || mongoose.model('person', schema);

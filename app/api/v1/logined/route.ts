@@ -9,7 +9,8 @@ const GET = async (request: Request) => {
   let login;
 
   if (searchParams.size === 0) {
-    login = await loginedModel.find();
+    login = await loginedModel.aggregate()
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" });
   }
   else {
     let token = searchParams.get('token');

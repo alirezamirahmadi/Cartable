@@ -2,19 +2,19 @@ import mongoose from "mongoose";
 
 const schema = new mongoose.Schema({
   refPerson: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
     require: true,
   },
   refRole: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
     require: true,
   },
   refCollection: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
     require: true,
   },
   refDocument: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
     require: true,
   },
   ipAddress: {
@@ -27,15 +27,15 @@ const schema = new mongoose.Schema({
   receivers: [
     {
       refPerson: {
-        type: String,
+        type: mongoose.Schema.ObjectId,
         require: true,
       },
       refRole: {
-        type: String,
+        type: mongoose.Schema.ObjectId,
         require: true,
       },
       refUrgency: {
-        type: String,
+        type: mongoose.Schema.ObjectId,
         require: true,
       },
       viewDate: {

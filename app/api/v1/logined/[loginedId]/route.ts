@@ -1,10 +1,13 @@
 import loginedModel from "@/models/logined";
 import connectToDB from "@/utils/db";
+import mongoose from "mongoose";
 
 const GET = async (request: Request, { params }: { params: { loginedId: string } }) => {
   connectToDB();
 
-  const logined = await loginedModel.findById(params.loginedId);
+  const logined = await loginedModel.aggregate()
+    .match({ _id: { $eq: new mongoose.Types.ObjectId(params.loginedId) } })
+    .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" });
 
   if (logined) {
     return Response.json(logined, { status: 200 });
