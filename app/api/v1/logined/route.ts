@@ -14,7 +14,10 @@ const GET = async (request: Request) => {
   }
   else {
     let token = searchParams.get('token');
-    login = await loginedModel.find({ token }).exec();
+    // login = await loginedModel.find({ token }).exec();
+    login = await loginedModel.aggregate()
+      .match({ token })
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" });
   }
 
   response = login ? { json: login, status: 200 } : { json: { message: "not found" }, status: 404 };

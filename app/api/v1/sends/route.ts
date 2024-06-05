@@ -1,5 +1,6 @@
 import sendModel from "@/models/send";
 import connectToDB from "@/utils/db";
+import mongoose from "mongoose";
 
 const GET = async (request: Request) => {
   connectToDB();
@@ -9,12 +10,24 @@ const GET = async (request: Request) => {
   let send;
 
   if (searchParams.size === 0) {
-    send = await sendModel.find();
+    send = await sendModel.aggregate()
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+      .lookup({ from: "people", localField: "receivers.refPerson", foreignField: "_id", as: "receiver.person" })
+      .lookup({ from: "roles", localField: "receivers.refRole", foreignField: "_id", as: "receiver.role" })
+      .lookup({ from: "urgencies", localField: "receivers.refUrgency", foreignField: "_id", as: "receiver.urgency" });
   }
   else {
     let refCollection = searchParams.get('refCollection');
     let refDocument = searchParams.get('refDocument');
-    send = await sendModel.find({ refCollection, refDocument }).exec();
+    // send = await sendModel.find({ refCollection, refDocument }).exec();
+    send = await sendModel.aggregate()
+      .match({ refCollection: new mongoose.Types.ObjectId(refCollection ?? ''), refDocument: new mongoose.Types.ObjectId(refDocument ?? '') })
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+      .lookup({ from: "people", localField: "receivers.refPerson", foreignField: "_id", as: "receiver.person" })
+      .lookup({ from: "roles", localField: "receivers.refRole", foreignField: "_id", as: "receiver.role" })
+      .lookup({ from: "urgencies", localField: "receivers.refUrgency", foreignField: "_id", as: "receiver.urgency" });
   }
 
   response = send ? { json: send, status: 200 } : { json: { message: "not found" }, status: 404 };
