@@ -7,10 +7,12 @@ const schema = new mongoose.Schema({
   firstName: {
     type: String,
     require: true,
+    minLength: 2,
   },
   lastName: {
     type: String,
     require: true,
+    minLength: 2,
   },
   nationalCode: {
     type: String,
@@ -49,7 +51,6 @@ const schema = new mongoose.Schema({
   account: {
     username: { type: String, require: true, minLength: 4 },
     password: { type: String, require: true, minLength: 8, maxLength: 20 },
-    isActive: { type: Boolean, require: true }
   },
   refRole: [mongoose.Schema.ObjectId]
 })

@@ -19,7 +19,6 @@ type PersonType = {
 type AccountType = {
   username: string,
   password: string,
-  isActive: boolean,
 }
 
 

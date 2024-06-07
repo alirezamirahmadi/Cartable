@@ -1,5 +1,6 @@
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
+import type { PersonType } from "@/types/PersonType";
 
 const GET = async (request: Request) => {
   connectToDB();
@@ -26,8 +27,21 @@ const GET = async (request: Request) => {
 }
 
 const POST = async (request: Request) => {
+
   connectToDB();
-  const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole } = await request.json();
+
+  const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole }: PersonType = await request.json();
+
+  // data check
+  if (firstName.trim().length < 2 || lastName.trim().length < 2 || account.username.trim().length < 4 || account.password.trim().length < 8) {
+    return Response.json({ message: "Data is invalid" }, { status: 422 });
+  }
+
+  // username exist
+  const personExist = await personModel.findOne({ "account.username": account.username });
+  if (personExist) {
+    return Response.json({ message: "Username already exists" }, { status: 422 });
+  }
 
   const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole });
 
