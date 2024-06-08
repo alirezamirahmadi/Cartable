@@ -1,3 +1,5 @@
+import { hashPassword } from "@/utils/crypto";
+
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
 import type { PersonType } from "@/types/PersonType";
@@ -43,7 +45,10 @@ const POST = async (request: Request) => {
     return Response.json({ message: "Username already exists" }, { status: 422 });
   }
 
-  const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole });
+  // hash password
+  const hashedPassword = await hashPassword(account.password);
+
+  const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account: { ...account, password: hashedPassword }, refRole });
 
   if (person) {
     return Response.json({ message: "The person was created successfully" }, { status: 201 });
