@@ -1,5 +1,7 @@
-import { hashPassword } from "@/utils/crypto";
+import { serialize } from "cookie";
 
+import { hashPassword } from "@/utils/crypto";
+import { createToken } from "@/utils/token";
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
 import type { PersonType } from "@/types/PersonType";
@@ -48,10 +50,22 @@ const POST = async (request: Request) => {
   // hash password
   const hashedPassword = await hashPassword(account.password);
 
+  // create token
+  const token = createToken({ username: account.username });
+
   const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account: { ...account, password: hashedPassword }, refRole });
 
   if (person) {
-    return Response.json({ message: "The person was created successfully" }, { status: 201 });
+    return Response.json({ message: "The person was created successfully" }, {
+      status: 201,
+      headers: {
+        "Set-Cookie": serialize("token", token, {
+          httpOnly: true,
+          path: "/",
+          maxAge: 60 * 60 * 24,
+        })
+      }
+    });
   }
   return Response.json({ message: "The person was not created" }, { status: 500 });
 }
