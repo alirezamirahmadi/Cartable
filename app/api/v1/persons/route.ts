@@ -37,7 +37,7 @@ const POST = async (request: Request) => {
   const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole }: PersonType = await request.json();
 
   // data check
-  if (firstName.trim().length < 2 || lastName.trim().length < 2 || account.username.trim().length < 4 || account.password.trim().length < 8) {
+  if (firstName?.trim().length < 2 || lastName?.trim().length < 2 || account?.username?.trim().length < 4 || account?.password?.trim().length < 8) {
     return Response.json({ message: "Data is invalid" }, { status: 422 });
   }
 

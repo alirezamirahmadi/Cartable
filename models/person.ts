@@ -22,7 +22,7 @@ const schema = new mongoose.Schema({
     type: Date,
   },
   gender: {
-    type: Boolean,
+    type: Number,
   },
   maritalStatus: {
     type: Boolean,
