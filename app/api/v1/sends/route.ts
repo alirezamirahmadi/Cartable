@@ -43,9 +43,9 @@ const POST = async (request: Request, { params }: { params: { sendId: string } }
   const send = await sendModel.create({ refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, receivers });
 
   if (send) {
-    return Response.json({ message: "The document was sent successfully" }, { status: 201 });
+    return Response.json({ message: "Document sent successfully" }, { status: 201 });
   }
-  return Response.json({ message: "The document was not sent" }, { status: 500 });
+  return Response.json({ message: "Document was not sent" }, { status: 500 });
 }
 
 export {

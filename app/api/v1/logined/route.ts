@@ -31,9 +31,9 @@ const POST = async (request: Request) => {
   const logined = await loginedModel.create({ refPerson, ipAddress, loginDate, token });
 
   if (logined) {
-    return Response.json({ message: "The person was logined successfully" }, { status: 201 });
+    return Response.json({ message: "Person logged in successfully" }, { status: 201 });
   }
-  return Response.json({ message: "The person was not logined" }, { status: 500 });
+  return Response.json({ message: "The person is not logged in" }, { status: 500 });
 }
 
 export {

@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 
 import "./globals.css";
 import "../dist/tailwind/tailwindOutput.css";
 
 import ThemeRegistry from "@/theme/ThemeRegistry";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Cartable",
@@ -21,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="persian-fa">
-      <body className={inter.className} dir="rtl">
+      <body dir="rtl">
         <ThemeRegistry options={{ key: 'muirtl' }}>{children}</ThemeRegistry>
       </body>
     </html>

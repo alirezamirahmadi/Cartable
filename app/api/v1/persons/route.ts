@@ -56,7 +56,7 @@ const POST = async (request: Request) => {
   const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account: { ...account, password: hashedPassword }, refRole });
 
   if (person) {
-    return Response.json({ message: "The person was created successfully" }, {
+    return Response.json({ message: "Person created successfully" }, {
       status: 201,
       headers: {
         "Set-Cookie": serialize("token", token, {
@@ -67,7 +67,7 @@ const POST = async (request: Request) => {
       }
     });
   }
-  return Response.json({ message: "The person was not created" }, { status: 500 });
+  return Response.json({ message: "Person is not created" }, { status: 500 });
 }
 
 export {

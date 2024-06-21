@@ -49,22 +49,22 @@ export default function PersonModify({ person }: { person?: PersonType }): React
   return (
     <>
       <form>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-4 place-items-center">
-          <TextField {...register("code")} error={errors.code ? true : false} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>کد</Typography>} />
-          <TextField {...register("firstName", { required: true, pattern: regex.flName })} error={errors.firstName ? true : false} required helperText={errors.firstName && "نام می بایست بین 3 تا 50 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام</Typography>} />
-          <TextField {...register("lastName", { required: true, pattern: regex.flName })} error={errors.lastName ? true : false} required helperText={errors.lastName && "نام خانوادگی می بایست بین 3 تا 50 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام خانوادگی</Typography>} />
-          <TextField {...register("nationalCode")} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>کدملی</Typography>} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-2 place-items-center">
+          <TextField {...register("code")} size="small" error={errors.code ? true : false} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>کد</Typography>} />
+          <TextField {...register("firstName", { required: true, pattern: regex.flName })} size="small" error={errors.firstName ? true : false} required helperText={errors.firstName && "نام می بایست بین 3 تا 50 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام</Typography>} />
+          <TextField {...register("lastName", { required: true, pattern: regex.flName })} size="small" error={errors.lastName ? true : false} required helperText={errors.lastName && "نام خانوادگی می بایست بین 3 تا 50 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام خانوادگی</Typography>} />
+          <TextField {...register("nationalCode")} size="small" variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>کدملی</Typography>} />
           <DatePicker
             id="birthday" calendar={persian} locale={persian_fa} calendarPosition="bottom-right" value={birthday} onChange={setBirthday}
-            render={(value, openCalendar) => { return (<TextField variant="outlined" label='تاریخ تولد' value={value} onClick={openCalendar}></TextField>) }}
+            render={(value, openCalendar) => { return (<TextField variant="outlined" label='تاریخ تولد' value={value} onClick={openCalendar} size="small"></TextField>) }}
           />
-          <TextField {...register("education")} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>تحصیلات</Typography>} />
-          <TextField {...register("phone", { pattern: regex.phone })} error={errors.phone ? true : false} helperText={errors.phone && "لطفا شماره موبایل را با فرمت صحیح وارد کنید"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>موبایل</Typography>} />
-          <TextField {...register("email", { pattern: regex.email })} error={errors.email ? true : false} helperText={errors.email && "لطفا ایمیل را با فرمت صحیح وارد کنید"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>ایمیل</Typography>} />
-          <TextField {...register("address")} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>آدرس</Typography>} />
-          <TextField {...register("description")} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>توضیحات</Typography>} />
+          <TextField {...register("education")} size="small" variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>تحصیلات</Typography>} />
+          <TextField {...register("phone", { pattern: regex.phone })} size="small" error={errors.phone ? true : false} helperText={errors.phone && "لطفا شماره موبایل را با فرمت صحیح وارد کنید"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>موبایل</Typography>} />
+          <TextField {...register("email", { pattern: regex.email })} size="small" error={errors.email ? true : false} helperText={errors.email && "لطفا ایمیل را با فرمت صحیح وارد کنید"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>ایمیل</Typography>} />
+          <TextField {...register("address")} size="small" variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>آدرس</Typography>} />
+          <TextField {...register("description")} size="small" variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>توضیحات</Typography>} />
           <FormGroup sx={{ display: "inline" }}>
-            <Select {...register("gender")} defaultValue={person ? getValues("gender") : 1} label="جنسیت" sx={{ width: "fit-content" }}>
+            <Select {...register("gender")} size="small" defaultValue={person ? getValues("gender") : 1} label="جنسیت" sx={{ width: "fit-content" }}>
               <MenuItem value="1">مرد</MenuItem>
               <MenuItem value="2">زن</MenuItem>
             </Select>
@@ -76,8 +76,8 @@ export default function PersonModify({ person }: { person?: PersonType }): React
         <Divider sx={{ width: "85%", mx: "auto", my: "1rem" }} />
 
         <div className="flex justify-center gap-x-8">
-          <TextField {...register("username", { required: true, pattern: regex.username })} error={errors.username ? true : false} required helperText={errors.username && "نام کاربری می بایست بین 4 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام کاربری</Typography>} />
-          <TextField {...register("password", { required: true, pattern: regex.password })} error={errors.password ? true : false} required helperText={errors.password && "رمز عبور می بایست بین 8 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>رمز عبور</Typography>} type="password" />
+          <TextField {...register("username", { required: true, pattern: regex.username })} size="small" error={errors.username ? true : false} required helperText={errors.username && "نام کاربری می بایست بین 4 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام کاربری</Typography>} />
+          <TextField {...register("password", { required: true, pattern: regex.password })} size="small" error={errors.password ? true : false} required helperText={errors.password && "رمز عبور می بایست بین 8 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>رمز عبور</Typography>} type="password" />
         </div>
         <div className="flex justify-center mt-4">
           <Button variant="contained" color="secondary" onClick={handleSubmit(submitPerson)} startIcon={<KeyboardArrowUpOutlinedIcon />}>ذخیره</Button>

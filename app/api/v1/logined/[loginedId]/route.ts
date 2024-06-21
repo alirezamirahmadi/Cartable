@@ -20,9 +20,9 @@ const DELETE = async (request: Request, { params }: { params: { loginedId: strin
   const logined = await loginedModel.findByIdAndDelete(params.loginedId);
 
   if (logined) {
-    return Response.json({ message: "The person was logout" }, { status: 200 });
+    return Response.json({ message: "The person is logged out" }, { status: 200 });
   }
-  return Response.json({ message: "The person was not logout" }, { status: 500 });
+  return Response.json({ message: "The person is not logged out" }, { status: 500 });
 }
 
 export {

@@ -20,9 +20,9 @@ const POST = async (request: Request) => {
   const role = await roleModel.create({ title, root, isActive });
 
   if (role) {
-    return Response.json({ message: "The role was created successfully" }, { status: 201 });
+    return Response.json({ message: "Role created successfully" }, { status: 201 });
   }
-  return Response.json({ message: "The role was not created" }, { status: 500 });
+  return Response.json({ message: "Role was not created" }, { status: 500 });
 }
 
 export {

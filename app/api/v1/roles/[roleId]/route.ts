@@ -20,9 +20,9 @@ const PUT = async (request: Request, { params }: { params: { roleId: string } })
   const role = await roleModel.findByIdAndUpdate(params.roleId, { title, root, isActive });
   
   if (role) {
-    return Response.json({ message: "The role was updated successfully" }, { status: 201 })
+    return Response.json({ message: "Role updated successfully" }, { status: 201 })
   }
-  return Response.json({ message: "The role was not updated" }, { status: 500 });
+  return Response.json({ message: "Role was not updated" }, { status: 500 });
 }
 
 const DELETE = async (request: Request, { params }: { params: { roleId: string } }) => {
@@ -33,7 +33,7 @@ const DELETE = async (request: Request, { params }: { params: { roleId: string }
   if (role) {
     return Response.json({ message: "Role deleted successfully" }, { status: 200 });
   }
-  return Response.json({ message: "The role was not deleted" }, { status: 500 })
+  return Response.json({ message: "Role was not deleted" }, { status: 500 })
 }
 
 export {

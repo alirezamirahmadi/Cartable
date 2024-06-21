@@ -16,12 +16,12 @@ const POST = async (request: Request) => {
 
   const person = await personModel.findOne({ "account.username": username });
   if (!person) {
-    return Response.json({ message: "The username or password is incorrect" }, { status: 404 });
+    return Response.json({ message: "username or password is incorrect" }, { status: 404 });
   }
 
   const isPasswordValid = await verifyPassword(password, person.account.password);
   if (!isPasswordValid) {
-    return Response.json({ message: "The username or password is incorrect" }, { status: 404 });
+    return Response.json({ message: "username or password is incorrect" }, { status: 404 });
   }
 
   const token = createToken({ username });

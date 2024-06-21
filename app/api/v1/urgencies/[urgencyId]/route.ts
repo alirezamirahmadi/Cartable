@@ -20,9 +20,9 @@ const PUT = async (request: Request, { params }: { params: { urgencyId: string }
   const urgency = await urgencyModel.findByIdAndUpdate(params.urgencyId, { title });
 
   if (urgency) {
-    return Response.json({ message: "The urgency was successfully updated" }, { status: 201 });
+    return Response.json({ message: "Urgency updated successfully" }, { status: 201 });
   }
-  return Response.json({ message: "The urgency was not updated" }, { status: 500 });
+  return Response.json({ message: "Urgency was not updated" }, { status: 500 });
 }
 
 const DELETE = async (request: Request, { params }: { params: { urgencyId: string } }) => {
@@ -33,7 +33,7 @@ const DELETE = async (request: Request, { params }: { params: { urgencyId: strin
   if (urgencyModel) {
     return Response.json({ message: "Urgency deleted successfully" }, { status: 200 });
   }
-  return Response.json({ message: "The urgency was not deleted" }, { status: 500 });
+  return Response.json({ message: "Urgency was not deleted" }, { status: 500 });
 }
 
 export {
