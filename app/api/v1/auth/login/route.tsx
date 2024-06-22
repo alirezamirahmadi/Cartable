@@ -28,7 +28,7 @@ const POST = async (request: Request) => {
   return Response.json(person, {
     status: 200,
     headers: {
-      "Set-Cookies": serialize("token", token, {
+      "Set-Cookie": serialize("token", token, {
         httpOnly: true,
         path: "/",
         maxAge: 60 * 60 * 24
