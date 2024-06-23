@@ -1,9 +1,10 @@
+import { serialize } from "cookie";
+
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
 import type { LoginType } from "@/types/AuthType";
 import { verifyPassword } from "@/utils/crypto";
 import { createToken } from "@/utils/token";
-import { serialize } from "cookie";
 
 const POST = async (request: Request) => {
   connectToDB();

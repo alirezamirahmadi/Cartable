@@ -4,6 +4,7 @@ import "./globals.css";
 import "../dist/tailwind/tailwindOutput.css";
 
 import ThemeRegistry from "@/theme/ThemeRegistry";
+import NavBar from "@/components/navbar/NavBar";
 
 export const metadata: Metadata = {
   title: "Cartable",
@@ -19,7 +20,10 @@ export default function RootLayout({
   return (
     <html lang="persian-fa">
       <body dir="rtl">
-        <ThemeRegistry options={{ key: 'muirtl' }}>{children}</ThemeRegistry>
+        <ThemeRegistry options={{ key: 'muirtl' }}>
+          <NavBar />
+          {children}
+        </ThemeRegistry>
       </body>
     </html>
   );
