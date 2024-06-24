@@ -1,17 +1,21 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AdbIcon from "@mui/icons-material/Adb";
 
 import { MainMenuData } from "@/utils/data";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { getMe } from "@/lib/features/me/meSlice";
 
 const settings = ["دارک/لایت", "تغیر رمزعبور", "خروج"];
 
 export default function NavBar() {
 
+  const dispatch = useAppDispatch();
+  const me = useAppSelector(state => state.me);
   const router = useRouter();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -31,6 +35,10 @@ export default function NavBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  useEffect(() => {
+    dispatch(getMe());
+  }, [])
 
   return (
     <AppBar position="static">
@@ -144,9 +152,12 @@ export default function NavBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
+              <MenuItem >
+                <Typography textAlign="right">{me.firstName} {me.lastName}</Typography>
+              </MenuItem>
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                  <Typography textAlign="right">{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>

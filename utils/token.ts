@@ -9,8 +9,13 @@ const createToken = (data: { username: string }) => {
 }
 
 const verifyToken = (token: string) => {
-  const tokenPayload = jwt.verify(token, process.env.privateKey ?? "")
-  return tokenPayload;
+  try {
+    const tokenPayload = jwt.verify(token, process.env.privateKey ?? "")
+    return tokenPayload;
+  }
+  catch (error) {
+    return "";
+  }
 }
 
 export {

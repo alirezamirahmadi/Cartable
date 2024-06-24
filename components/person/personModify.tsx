@@ -43,6 +43,7 @@ export default function PersonModify({ person }: { person?: PersonType }): React
       },
       body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
     });
+
     reset();
   }
 
