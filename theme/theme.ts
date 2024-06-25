@@ -1,16 +1,23 @@
 "use client"
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { createTheme } from "@mui/material/styles";
 import { useCookies } from "react-cookie";
 import localFont from "next/font/local";
 
-const vazir = localFont({src:"./fonts/Vazir.woff2"});
+import { useAppSelector } from "@/lib/hooks";
+
+const vazir = localFont({ src: "./fonts/Vazir.woff2" });
 
 export default function theme() {
 
-  const [cookies, ,] = useCookies(["darkmode"]);
-  const [mode, setMode] = useState<"light" | "dark">("light");
+  const darkMode = useAppSelector(state => state.darkMode);
+  const [cookies, ,] = useCookies(["dark-mode"]);
+  const [mode, setMode] = useState<boolean>(cookies["dark-mode"] ?? false);
+
+  useEffect(() => {
+    setMode(darkMode);
+  }, [darkMode])
 
   let theme = createTheme({});
   theme = useMemo(() =>
@@ -19,15 +26,15 @@ export default function theme() {
       direction: "rtl",
 
       palette: {
-        mode,
+        mode: mode ? "dark" : "light",
 
         primary: {
-          main: mode === "light" ? "#0067A5" : "#AB3924",
+          main: !mode ? "#0067A5" : "#AB3924",
           contrastText: "#fff",
         },
 
         secondary: {
-          main: mode === "light" ? "#AB3924" : "#0067A5",
+          main: !mode ? "#AB3924" : "#0067A5",
           contrastText: "#fff",
         },
       },

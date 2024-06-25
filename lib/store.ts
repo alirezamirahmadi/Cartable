@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import meSlice from "./features/me/meSlice";
+import darkSlice from "./features/darkMode/darkSlice";
 
 export const makeStore = () => {
 
   return configureStore({
     reducer: {
-      me: meSlice
+      me: meSlice,
+      darkMode: darkSlice,
     }
   })
 }

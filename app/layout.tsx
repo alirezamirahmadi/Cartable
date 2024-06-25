@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-
+import { cookies } from "next/headers";
 import "./globals.css";
 import "../dist/tailwind/tailwindOutput.css";
 
@@ -12,9 +12,11 @@ export const metadata: Metadata = {
   description: "Software to view, handle and track current affairs",
 };
 
+const c=cookies();
+console.log(123, c);
+
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
-
 
   return (
     <html lang="persian-fa">

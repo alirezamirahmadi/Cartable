@@ -5,38 +5,52 @@ import { useRouter } from "next/navigation";
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AdbIcon from "@mui/icons-material/Adb";
+import { useCookies } from "react-cookie";
+import { useTheme } from "next-themes";
 
 import { MainMenuData } from "@/utils/data";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getMe } from "@/lib/features/me/meSlice";
+import { changeMode } from "@/lib/features/darkMode/darkSlice";
 
-const settings = ["دارک/لایت", "تغیر رمزعبور", "خروج"];
+const settings = ["تغیر رمزعبور", "خروج"];
 
 export default function NavBar() {
 
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
+  const [cookies, setCookie,] = useCookies(["dark-mode"]);
+  const {resolvedTheme, setTheme} = useTheme();
   const router = useRouter();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
-  };
+  }
+
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
-  };
+  }
 
   const handleCloseNavMenu = (href: string) => {
     setAnchorElNav(null);
     router.replace(href);
-  };
+  }
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
-  };
+  }
+  
+  const handleDarkMode = () => {
+    dispatch(changeMode(!cookies["dark-mode"]));
+    setTheme(resolvedTheme === "light" ? "dark" : "light");
+    setCookie("dark-mode", !cookies["dark-mode"]);
+    setAnchorElUser(null);
+  }
 
   useEffect(() => {
+    dispatch(changeMode(cookies["dark-mode"] ?? false));
     dispatch(getMe());
   }, [])
 
@@ -45,11 +59,7 @@ export default function NavBar() {
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
+          <Typography variant="h6" noWrap component="a" href="#app-bar-with-responsive-menu"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -64,33 +74,17 @@ export default function NavBar() {
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
+            <IconButton size="large" onClick={handleOpenNavMenu} color="inherit">
               <MenuIcon />
             </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              keepMounted
+            <Menu anchorEl={anchorElNav} anchorOrigin={{ vertical: "bottom", horizontal: "left", }} keepMounted
               transformOrigin={{
                 vertical: "top",
                 horizontal: "left",
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: "block", md: "none" },
-              }}
+              sx={{ display: { xs: "block", md: "none" } }}
             >
               {MainMenuData.map((page) => (
                 <MenuItem key={page.id} onClick={() => handleCloseNavMenu(page.href)}>
@@ -100,11 +94,7 @@ export default function NavBar() {
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
+          <Typography variant="h5" noWrap component="a" href="#app-bar-with-responsive-menu"
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -120,11 +110,7 @@ export default function NavBar() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {MainMenuData.map((page) => (
-              <Button
-                key={page.id}
-                onClick={() => handleCloseNavMenu(page.href)}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
+              <Button key={page.id} onClick={() => handleCloseNavMenu(page.href)} sx={{ my: 2, color: "white", display: "block" }}>
                 {page.title}
               </Button>
             ))}
@@ -136,15 +122,7 @@ export default function NavBar() {
                 <Avatar />
               </IconButton>
             </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
+            <Menu sx={{ mt: "45px" }} anchorEl={anchorElUser} anchorOrigin={{ vertical: "top", horizontal: "right" }} keepMounted
               transformOrigin={{
                 vertical: "top",
                 horizontal: "right",
@@ -154,6 +132,9 @@ export default function NavBar() {
             >
               <MenuItem >
                 <Typography textAlign="right">{me.firstName} {me.lastName}</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleDarkMode}>
+                <Typography textAlign="right">دارک/لایت</Typography>
               </MenuItem>
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
