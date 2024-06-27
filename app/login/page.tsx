@@ -17,14 +17,14 @@ export default function Login(): React.JSX.Element {
     }
   });
 
-  const login = (data: LoginType) => {
-    fetch("api/v1/auth/login", {
+  const login = async (data: LoginType) => {
+    await fetch("api/v1/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "Application/json"
       },
       body: JSON.stringify(data)
-    }).then(() => router.replace("/"));
+    }).then(res => res.status === 200 && router.replace("/"));
   }
 
   return (

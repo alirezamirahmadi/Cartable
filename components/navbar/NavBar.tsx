@@ -10,17 +10,17 @@ import { useTheme } from "next-themes";
 
 import { MainMenuData } from "@/utils/data";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { getMe } from "@/lib/features/me/meSlice";
+import { getMe, clearMe } from "@/lib/features/me/meSlice";
 import { changeMode } from "@/lib/features/darkMode/darkSlice";
 
-const settings = ["تغیر رمزعبور", "خروج"];
+const settings = ["تغیر رمزعبور"];
 
 export default function NavBar() {
 
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
   const [cookies, setCookie,] = useCookies(["dark-mode"]);
-  const {resolvedTheme, setTheme} = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const router = useRouter();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -41,11 +41,22 @@ export default function NavBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   }
-  
+
   const handleDarkMode = () => {
     dispatch(changeMode(!cookies["dark-mode"]));
     setTheme(resolvedTheme === "light" ? "dark" : "light");
     setCookie("dark-mode", !cookies["dark-mode"]);
+    setAnchorElUser(null);
+  }
+  
+  const handleLogout = async () => {
+    await fetch("api/v1/auth/logout")
+    .then(res => {
+      if (res.status === 200) {
+        dispatch(clearMe());
+        router.replace("login");
+      }
+    })
     setAnchorElUser(null);
   }
 
@@ -53,6 +64,10 @@ export default function NavBar() {
     dispatch(changeMode(cookies["dark-mode"] ?? false));
     dispatch(getMe());
   }, [])
+  
+  if(!me.isLogin){
+    return(<></>);
+  }
 
   return (
     <AppBar position="static">
@@ -78,13 +93,8 @@ export default function NavBar() {
               <MenuIcon />
             </IconButton>
             <Menu anchorEl={anchorElNav} anchorOrigin={{ vertical: "bottom", horizontal: "left", }} keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: "block", md: "none" } }}
+              transformOrigin={{ vertical: "top", horizontal: "left" }} open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu} sx={{ display: { xs: "block", md: "none" } }}
             >
               {MainMenuData.map((page) => (
                 <MenuItem key={page.id} onClick={() => handleCloseNavMenu(page.href)}>
@@ -135,6 +145,9 @@ export default function NavBar() {
               </MenuItem>
               <MenuItem onClick={handleDarkMode}>
                 <Typography textAlign="right">دارک/لایت</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <Typography textAlign="right">خروج</Typography>
               </MenuItem>
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
