@@ -8,10 +8,11 @@ import { useForm } from "react-hook-form";
 import type { RoleType } from "@/types/RoleType";
 import type { PersonType } from "@/types/PersonType";
 import AutoComplete from "../general/autoComplete/autoComplete";
-const options = [{ id: "1", name: 'Option 1' }, { id: "2", name: 'Option 2' }];
+import Modal from "../general/modal/modal";
+
 export default function RoleModify({ role }: { role?: RoleType }): React.JSX.Element {
 
-  const [inputValue, setInputValue] = useState('');
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const [persons, setPersons] = useState<PersonType[]>([]);
   const { register, handleSubmit, reset, getValues, formState: { errors } } = useForm({
@@ -37,6 +38,13 @@ export default function RoleModify({ role }: { role?: RoleType }): React.JSX.Ele
 
   }
 
+  const openModal = () => {
+    setIsOpenModal(true);
+  }
+
+  const closeModal = () => {
+    setIsOpenModal(false);
+  }
 
   return (
     <>
@@ -50,6 +58,9 @@ export default function RoleModify({ role }: { role?: RoleType }): React.JSX.Ele
       <div className="flex justify-center mt-4">
         <Button variant="contained" color="secondary" startIcon={<KeyboardArrowUpOutlinedIcon />} onClick={handleSubmit(submitRole)}>ذخیره</Button>
       </div>
+      <Modal title="AnnaLena" isOpen={isOpenModal} closeModal={closeModal} body={
+        <Typography></Typography>
+      } />
     </>
   )
 }
