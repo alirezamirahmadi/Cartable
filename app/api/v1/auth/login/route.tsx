@@ -3,11 +3,14 @@ import { serialize } from "cookie";
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
 import type { LoginType } from "@/types/AuthType";
-import { verifyPassword } from "@/utils/crypto";
+import { verifyPassword, hashPassword } from "@/utils/crypto";
 import { createToken } from "@/utils/token";
 
 const POST = async (request: Request) => {
   connectToDB();
+
+  console.log(await hashPassword("22222222"));
+  
 
   const { username, password }: LoginType = await request.json();
 
