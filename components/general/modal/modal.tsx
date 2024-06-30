@@ -16,13 +16,13 @@ const style = {
   px: 4,
 };
 
-export default function Modal({ title, isOpen, body, closeModal }: { title: string, isOpen: boolean, body: React.ReactNode, closeModal: () => void }): React.JSX.Element {
+export default function Modal({ title, isOpen, body, onCloseModal }: { title: string, isOpen: boolean, body: React.ReactNode, onCloseModal: () => void }): React.JSX.Element {
 
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
-    closeModal();
+    onCloseModal();
   }
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function Modal({ title, isOpen, body, closeModal }: { title: stri
               <Close />
             </IconButton>
           </div>
-          <Divider />
+          <Divider sx={{ my:2 }} />
           {body}
         </Box>
       </MUIModal>

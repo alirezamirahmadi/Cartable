@@ -46,20 +46,6 @@ export default function RoleModify({ role }: { role?: RoleType }): React.JSX.Ele
     setIsOpenModal(false);
   }
 
-  const update = async () => {
-    await fetch("api/v1/auth/changepassword", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        oldPassword: "11111111",
-        newPassword: "33333333"
-      })
-    }).then(res => console.log(res)
-    )
-  }
-
   return (
     <>
       <div className="flex flex-wrap gap-4 justify-center">
@@ -72,10 +58,9 @@ export default function RoleModify({ role }: { role?: RoleType }): React.JSX.Ele
       <div className="flex justify-center mt-4">
         <Button variant="contained" color="secondary" startIcon={<KeyboardArrowUpOutlinedIcon />} onClick={handleSubmit(submitRole)}>ذخیره</Button>
       </div>
-      <Modal title="AnnaLena" isOpen={isOpenModal} closeModal={closeModal} body={
+      <Modal title="AnnaLena" isOpen={isOpenModal} onCloseModal={closeModal} body={
         <Typography></Typography>
       } />
-      <button onClick={update}>update</button>
     </>
   )
 }

@@ -9,11 +9,12 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { clearMe } from "@/lib/features/me/meSlice";
 import { changeMode } from "@/lib/features/darkMode/darkSlice";
-
-const settings = ["تغیر رمزعبور"];
+import Modal from "../modal/modal";
+import ChangePassword from "@/components/changePassword/changePassword";
 
 export default function MyAccount(): React.JSX.Element {
 
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
   const [cookies, setCookie,] = useCookies(["dark-mode"]);
@@ -46,6 +47,15 @@ export default function MyAccount(): React.JSX.Element {
       })
     setAnchorElUser(null);
   }
+  
+  const handleCloseModal = () => {
+    setIsOpenModal(false);
+  }
+  
+  const handleChangePassword = () => {
+    setIsOpenModal(true);
+    setAnchorElUser(null);
+  }
 
   useEffect(() => {
     dispatch(changeMode(cookies["dark-mode"] ?? false));
@@ -73,16 +83,15 @@ export default function MyAccount(): React.JSX.Element {
           <MenuItem onClick={handleDarkMode}>
             <Typography textAlign="right">دارک/لایت</Typography>
           </MenuItem>
+          <MenuItem onClick={handleChangePassword}>
+            <Typography textAlign="right">تغییر رمزعبور</Typography>
+          </MenuItem>
           <MenuItem onClick={handleLogout}>
             <Typography textAlign="right">خروج</Typography>
           </MenuItem>
-          {settings.map((setting) => (
-            <MenuItem key={setting} onClick={handleCloseUserMenu}>
-              <Typography textAlign="right">{setting}</Typography>
-            </MenuItem>
-          ))}
         </Menu>
       </Box>
+      <Modal title="تغییر رمزعبور" isOpen={isOpenModal} body={<ChangePassword onChangePassword={handleCloseModal}/>} onCloseModal={handleCloseModal} />
     </>
   )
 }
