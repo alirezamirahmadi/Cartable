@@ -74,7 +74,7 @@ export default function PersonModify({ person }: { person?: PersonType }): React
           </FormGroup>
         </div>
 
-        <Divider sx={{ width: "85%", mx: "auto", my: "1rem" }} />
+        <Divider sx={{ width: "75%", mx: "auto", my: "1rem" }} />
 
         <div className="flex justify-center gap-x-8">
           <TextField {...register("username", { required: true, pattern: regex.username })} size="small" error={errors.username ? true : false} required helperText={errors.username && "نام کاربری می بایست بین 4 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام کاربری</Typography>} />
