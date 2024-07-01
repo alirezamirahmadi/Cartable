@@ -11,9 +11,12 @@ import { clearMe } from "@/lib/features/me/meSlice";
 import { changeMode } from "@/lib/features/darkMode/darkSlice";
 import Modal from "../modal/modal";
 import ChangePassword from "@/components/changePassword/changePassword";
+import Snack from "../snack/snack";
 
 export default function MyAccount(): React.JSX.Element {
 
+  const [isOpenSnack, setIsOpenSnack] = useState<boolean>(false);
+  const [snackContext, setSnackContext] = useState<string>("");
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
@@ -47,19 +50,34 @@ export default function MyAccount(): React.JSX.Element {
       })
     setAnchorElUser(null);
   }
-  
+
   const handleCloseModal = () => {
     setIsOpenModal(false);
   }
-  
+
   const handleChangePassword = () => {
     setIsOpenModal(true);
     setAnchorElUser(null);
   }
-
+  
   useEffect(() => {
     dispatch(changeMode(cookies["dark-mode"] ?? false));
   }, [])
+
+  const handleError = (context: string) => {
+    setSnackContext(context);
+    setIsOpenSnack(true);
+  }
+  
+  const handleCloseSnack = () => {
+    setIsOpenSnack(false);
+  }
+  
+  const changePasswordSuccess = () => {
+    setIsOpenModal(false);
+    setSnackContext("رمزعبور با موفقیت تغییر کرد");
+    setIsOpenSnack(true);
+  }
 
   return (
     <>
@@ -91,7 +109,9 @@ export default function MyAccount(): React.JSX.Element {
           </MenuItem>
         </Menu>
       </Box>
-      <Modal title="تغییر رمزعبور" isOpen={isOpenModal} body={<ChangePassword onChangePassword={handleCloseModal}/>} onCloseModal={handleCloseModal} />
+      <Modal title="تغییر رمزعبور" isOpen={isOpenModal} body={<ChangePassword onChangePassword={changePasswordSuccess} onError={handleError} />} onCloseModal={handleCloseModal} />
+      <Snack context={snackContext} isOpen={isOpenSnack} severity="error" onCloseSnack={handleCloseSnack} />
+      <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={handleCloseSnack} />
     </>
   )
 }

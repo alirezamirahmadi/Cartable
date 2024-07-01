@@ -1,15 +1,19 @@
 "use client"
 
+import { useState } from "react";
 import { TextField, Typography, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 import regex from "@/utils/regex";
+import Snack from "@/components/general/snack/snack";
 import type { LoginType } from "@/types/AuthType";
 
 export default function Login(): React.JSX.Element {
 
   const router = useRouter();
+  const [isOpenSnack, setIsOpenSnack] = useState<boolean>(false);
+  const [snackContext, setSnackContext] = useState<string>("");
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       username: "",
@@ -24,7 +28,20 @@ export default function Login(): React.JSX.Element {
         "Content-Type": "Application/json"
       },
       body: JSON.stringify(data)
-    }).then(res => res.status === 200 && router.replace("/"));
+    }).then(res => {
+      switch (res.status) {
+        case 200:
+          router.replace("/")
+          break;
+        case 404:
+          setSnackContext("نام کاربری یا رمزعبور نادرست است");
+          setIsOpenSnack(true);
+      }
+    });
+  }
+
+  const handleCloseSnack = () => {
+    setIsOpenSnack(false);
   }
 
   return (
@@ -39,6 +56,7 @@ export default function Login(): React.JSX.Element {
           <img src="/svg/pages/login/login.svg" alt="" />
         </div>
       </div>
+      <Snack context={snackContext} isOpen={isOpenSnack} severity="error" onCloseSnack={handleCloseSnack} />
     </>
   )
 }

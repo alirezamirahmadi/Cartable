@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 
 import regex from "@/utils/regex";
 
-export default function ChangePassword({ onChangePassword }: { onChangePassword: (change: boolean) => void }): React.JSX.Element {
+export default function ChangePassword({ onChangePassword, onError }: { onChangePassword: (change: boolean) => void, onError: (context: string) => void }): React.JSX.Element {
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
@@ -17,6 +17,7 @@ export default function ChangePassword({ onChangePassword }: { onChangePassword:
 
   const changePassword = async (data: any) => {
     if (data.newPassword !== data.confirmPassword) {
+      onError("رمزعبور جدید و تکرار آن یکسان نیستند");
       return;
     }
 
@@ -31,8 +32,16 @@ export default function ChangePassword({ onChangePassword }: { onChangePassword:
       })
     })
       .then(res => {
-        if (res.status === 201) {
-          onChangePassword(true);
+        switch (res.status) {
+          case 201:
+            onChangePassword(true);
+            break;
+          case 401:
+            onError("رمزعبور قبلی نادرست است");
+            break;
+          default:
+            onError("خطا نامشخص رخ داده است");
+            break;
         }
       })
   }
