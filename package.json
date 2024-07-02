@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "tailwind": "npx tailwindcss -i ./app/globals.css -o ./dist/tailwind/tailwindOutput.css --watch"
+    "tailwind": "npx tailwindcss -i ./style/tailwind/tailwindInput.css -o ./dist/tailwind/tailwindOutput.css --watch"
   },
   "dependencies": {
     "@emotion/cache": "^11.11.0",

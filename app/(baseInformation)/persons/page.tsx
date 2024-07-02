@@ -8,6 +8,7 @@ import { PersonType } from "@/types/PersonType";
 
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "@/components/general/modal/modal";
+import Delete from "@/components/general/delete/delete";
 
 export default function Persons(): React.JSX.Element {
 
@@ -63,6 +64,7 @@ export default function Persons(): React.JSX.Element {
       <PersonModify />
       <Divider sx={{ mx: "Auto", width: "90%", my: 2 }} />
       <ReactDataTable direction="rtl" rows={personData} columns={columns} />
+      <Modal isOpen={true} body={<Delete message="123 lkjl j kjl jlk lkjj jkjlkjlkj" onDelete={() => { }} />} title="" onCloseModal={() => { }} />
     </>
   )
 }
