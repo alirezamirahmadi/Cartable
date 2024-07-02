@@ -12,7 +12,7 @@ import type { Value as DatePickerType } from "react-multi-date-picker";
 import { PersonType } from "@/types/PersonType";
 import regex from "@/utils/regex";
 
-export default function PersonModify({ person }: { person?: PersonType }): React.JSX.Element {
+export default function PersonModify({ person, onModify }: { person?: PersonType, onModify: (isModify: boolean) => void }): React.JSX.Element {
 
   const [birthday, setBirthday] = useState<DatePickerType>("");
   const { register, handleSubmit, reset, formState: { errors }, getValues } = useForm({
@@ -36,15 +36,31 @@ export default function PersonModify({ person }: { person?: PersonType }): React
   });
 
   const submitPerson = (data: any) => {
-    fetch("api/v1/persons", {
+    person ? putPerson(data) : postPerson(data);
+  }
+
+  const postPerson = async (data: any) => {
+    await fetch("api/v1/persons", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
-    });
+    })
+    .then(res => { onModify(res.status === 201 ? true : false) })
 
     reset();
+  }
+
+  const putPerson = async (data: any) => {
+    await fetch(`api/v1/persons/${person?._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
+    })
+      .then(res => { onModify(res.status === 201 ? true : false) })
   }
 
   return (

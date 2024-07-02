@@ -9,6 +9,7 @@ import { PersonType } from "@/types/PersonType";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "@/components/general/modal/modal";
 import Delete from "@/components/general/delete/delete";
+import Snack from "@/components/general/snack/snack";
 
 export default function Persons(): React.JSX.Element {
 
@@ -17,6 +18,8 @@ export default function Persons(): React.JSX.Element {
   const [rowData, setRowData] = useState<PersonType>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
+  const [isOpenSnack, setIsOpenSnack] = useState<boolean>(false);
+  const [snackContext, setSnackContext] = useState<string>("");
 
   const columns: ColumnType[] = [
     { field: { title: "id" }, label: "ID", options: { display: false } },
@@ -32,6 +35,22 @@ export default function Persons(): React.JSX.Element {
     },
   ]
 
+  useEffect(() => {
+    loadPersonData();
+  }, [])
+
+  const loadPersonData = async () => {
+    setIsLoading(true);
+
+    await fetch("api/v1/persons")
+      .then(res => res.status === 200 && res.json())
+      .then(data => {
+        setPersonData(data);
+        setIsLoading(false);
+      })
+      .catch(() => setIsLoading(false))
+  }
+
   const handleAction = (data: PersonType, action: string) => {
     setRowData(data);
     switch (action) {
@@ -44,14 +63,37 @@ export default function Persons(): React.JSX.Element {
     }
   }
 
-  useEffect(() => {
-    fetch("api/v1/persons")
-      .then(res => res.status === 200 && res.json())
-      .then(data => {
-        setPersonData(data);
-        setIsLoading(false);
-      });
-  }, [])
+  const handleCloseModal = () => {
+    setIsOpenEditModal(false);
+    setIsOpenDeleteModal(false);
+  }
+
+  const handleModify = (isModify: boolean) => {
+    setIsOpenEditModal(false);
+    if (isModify) {
+      loadPersonData();
+      setIsOpenSnack(true);
+      setSnackContext("تغییرات ذخیره شد");
+    }
+  }
+
+  const handleDelete = async (isDelete: boolean) => {
+    setIsOpenDeleteModal(false);
+
+    isDelete && await fetch(`api/v1/persons/${rowData?._id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => {
+        if (res.status === 200) {
+          loadPersonData();
+          setIsOpenSnack(true);
+          setSnackContext("شخص مورد نظر حذف گردید.");
+        }
+      })
+  }
 
   if (isLoading) {
     return (
@@ -61,10 +103,12 @@ export default function Persons(): React.JSX.Element {
 
   return (
     <>
-      <PersonModify />
+      <PersonModify onModify={handleModify} />
       <Divider sx={{ mx: "Auto", width: "90%", my: 2 }} />
       <ReactDataTable direction="rtl" rows={personData} columns={columns} />
-      <Modal isOpen={true} body={<Delete message="123 lkjl j kjl jlk lkjj jkjlkjlkj" onDelete={() => { }} />} title="" onCloseModal={() => { }} />
+      <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={() => setIsOpenSnack(false)} />
+      <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify onModify={handleModify} person={rowData} />} />
+      <Modal title="حذف شخص" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`} onDelete={handleDelete} />} />
     </>
   )
 }
