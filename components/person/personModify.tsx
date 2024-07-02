@@ -30,8 +30,8 @@ export default function PersonModify({ person }: { person?: PersonType }): React
       description: person?.description ?? "",
       isActive: person?.isActive ?? false,
 
-      username: person?.account.username ?? "",
-      password: person?.account.password ?? "",
+      username: person?.account?.username ?? "",
+      password: "",
     }
   });
 
@@ -76,7 +76,7 @@ export default function PersonModify({ person }: { person?: PersonType }): React
 
         <Divider sx={{ width: "75%", mx: "auto", my: "1rem" }} />
 
-        <div className="flex justify-center gap-x-8">
+        <div className="flex flex-wrap justify-center gap-y-2 gap-x-8">
           <TextField {...register("username", { required: true, pattern: regex.username })} size="small" error={errors.username ? true : false} required helperText={errors.username && "نام کاربری می بایست بین 4 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام کاربری</Typography>} />
           <TextField {...register("password", { required: true, pattern: regex.password })} size="small" error={errors.password ? true : false} required helperText={errors.password && "رمز عبور می بایست بین 8 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>رمز عبور</Typography>} type="password" />
         </div>
