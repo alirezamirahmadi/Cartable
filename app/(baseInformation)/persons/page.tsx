@@ -11,6 +11,7 @@ import Modal from "@/components/general/modal/modal";
 import Delete from "@/components/general/delete/delete";
 import Snack from "@/components/general/snack/snack";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
+import Loading from "@/components/general/loading/loading";
 export default function Persons(): React.JSX.Element {
 
   const theme = useTheme();
@@ -98,13 +99,15 @@ export default function Persons(): React.JSX.Element {
 
   if (isLoading) {
     return (
-      <div>...</div>
+      <div className="mt-20">
+        <Loading />
+      </div>
     )
   }
 
   return (
     <>
-      <PersonModify onModify={handleModify}/>
+      <PersonModify onModify={handleModify} />
       <Divider sx={{ mx: "Auto", width: "90%", my: 2 }} />
       <ReactDataTable direction="rtl" rows={personData} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
       <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={() => setIsOpenSnack(false)} />
