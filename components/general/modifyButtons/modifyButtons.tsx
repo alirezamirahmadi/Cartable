@@ -15,7 +15,7 @@ export default function ModifyButtons({ rowData, handleAction }: { value: string
   return (
     <>
       <div className="flex justify-center">
-        <IconButton color="primary" onClick={handleEdit} title="Edit">
+        <IconButton color="secondary" onClick={handleEdit} title="Edit">
           <AppRegistrationIcon />
         </IconButton>
         <IconButton color="error" onClick={handleDelete} title="Delete">

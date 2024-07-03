@@ -99,7 +99,7 @@ export default function MyAccount(): React.JSX.Element {
             <Typography textAlign="right">{me.firstName} {me.lastName}</Typography>
           </MenuItem>
           <MenuItem onClick={handleDarkMode}>
-            <Typography textAlign="right">دارک/لایت</Typography>
+            <Typography textAlign="right">{cookies["dark-mode"] ? "حالت روشن" : "حالت تاریک"}</Typography>
           </MenuItem>
           <MenuItem onClick={handleChangePassword}>
             <Typography textAlign="right">تغییر رمزعبور</Typography>

@@ -6,7 +6,7 @@ export default function Delete({ message, onDelete }: { message: string, onDelet
       <div className="">
         <Typography variant="body1">{message}</Typography>
         <div className="flex flex-wrap justify-end gap-x-2 mt-4">
-          <Button variant="outlined" color="primary" onClick={() => onDelete(false)}>انصراف</Button>
+          <Button variant="outlined" color="secondary" onClick={() => onDelete(false)}>انصراف</Button>
           <Button variant="contained" color="error" onClick={() => onDelete(true)}>حذف</Button>
         </div>
       </div>

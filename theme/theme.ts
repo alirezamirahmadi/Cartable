@@ -27,12 +27,12 @@ export default function theme() {
         mode: mode ? "dark" : "light",
 
         primary: {
-          main: !mode ? "#0067A5" : "#AB3924",
+          main: !mode ? "#0067A5" : "#C37237",
           contrastText: "#fff",
         },
 
         secondary: {
-          main: !mode ? "#AB3924" : "#0067A5",
+          main: !mode ? "#C37237" : "#0067A5",
           contrastText: "#fff",
         },
       },

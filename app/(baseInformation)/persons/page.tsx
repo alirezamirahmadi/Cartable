@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import PersonModify from "@/components/person/personModify";
-import { Divider } from "@mui/material";
+import { Divider, useTheme } from "@mui/material";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import { PersonType } from "@/types/PersonType";
 
@@ -10,9 +10,10 @@ import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "@/components/general/modal/modal";
 import Delete from "@/components/general/delete/delete";
 import Snack from "@/components/general/snack/snack";
-
+import defaultDataTableOptions from "@/utils/defaultDataTable";
 export default function Persons(): React.JSX.Element {
 
+  const theme = useTheme();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [personData, setPersonData] = useState<PersonType[]>([]);
   const [rowData, setRowData] = useState<PersonType>();
@@ -103,9 +104,9 @@ export default function Persons(): React.JSX.Element {
 
   return (
     <>
-      <PersonModify onModify={handleModify} />
+      <PersonModify onModify={handleModify}/>
       <Divider sx={{ mx: "Auto", width: "90%", my: 2 }} />
-      <ReactDataTable direction="rtl" rows={personData} columns={columns} />
+      <ReactDataTable direction="rtl" rows={personData} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
       <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={() => setIsOpenSnack(false)} />
       <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify onModify={handleModify} person={rowData} />} />
       <Modal title="حذف شخص" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`} onDelete={handleDelete} />} />

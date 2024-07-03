@@ -3,7 +3,32 @@
   src: url(../theme/fonts/Vazir.woff2);
 }
 
-.rdttable{
+.rdttable {
   font-family: vazir;
 }
 
+.rdtmenu-main {
+  padding-bottom: 35px !important;
+}
+
+.rdtpagination{
+  font-family: vazir;
+}
+
+.rdtpagination-pages__no {
+  padding: 0 12px;
+  height: 2rem;
+  line-height: 1.25;
+  border: 1px solid #ccc !important;
+  border-radius: 4px;
+}
+
+.rdtpagination-pages__no--select {
+  padding: 0 12px;
+  height: 2rem;
+  line-height: 1.25;
+  border: 1px solid #ccc !important;
+  border-radius: 4px;
+  text-decoration: none !important;
+  background-color: #999 !important;
+}
