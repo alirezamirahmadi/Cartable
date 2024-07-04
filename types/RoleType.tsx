@@ -1,6 +1,7 @@
 type RoleType = {
+  _id?: string,
   title: string,
-  refPerson:string,
+  refPerson: string,
   root: string,
   isActive: boolean,
 }

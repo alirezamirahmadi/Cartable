@@ -10,7 +10,7 @@ export default function Loading(): React.JSX.Element {
   return (
     <>
       <div className="w-fit mx-auto my-auto">
-        <ScaleLoader color={theme.palette.success.main} />
+        <ScaleLoader color={theme.palette.info.main} />
       </div>
     </>
   )
