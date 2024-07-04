@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Button, Autocomplete, Box } from "@mui/material";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
+import AddIcon from '@mui/icons-material/Add';
 import { useForm } from "react-hook-form";
 
 import type { RoleType } from "@/types/RoleType";
@@ -10,11 +11,11 @@ import type { PersonType } from "@/types/PersonType";
 import AutoComplete from "../general/autoComplete/autoComplete";
 import Modal from "../general/modal/modal";
 
-export default function RoleModify({ role }: { role?: RoleType }): React.JSX.Element {
+export default function RoleModify({ role, root, onModify }: { role?: RoleType, root: string, onModify?: (isModify: boolean) => void }): React.JSX.Element {
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-
   const [persons, setPersons] = useState<PersonType[]>([]);
+  const [refPerson, setRefPerson] = useState<string>("");
   const { register, handleSubmit, reset, getValues, formState: { errors } } = useForm({
     defaultValues: {
       title: role?.title ?? "",
@@ -23,27 +24,57 @@ export default function RoleModify({ role }: { role?: RoleType }): React.JSX.Ele
     }
   })
 
-  const submitRole = (data: any) => {
-    console.log(data);
-  }
-
   useEffect(() => {
-    fetch("api/v1/persons")
-      .then(res => res.json())
-      .then(res => { setPersons(res) })
+    loadPersonData();
   }, [])
 
-  const handleSelectedPerson = (personId: string) => {
-    console.log(personId);
+  const loadPersonData = async () => {
+    await fetch("api/v1/persons")
+      .then(res => res.json())
+      .then(res => { setPersons(res) })
+  }
+
+  const submitRole = (data: any) => {
+    role ? putRole(data) : postRole(data);
+  }
+
+  const postRole = async (data: any) => {
+    await fetch("api/v1/roles", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ title: data.title, refPerson, root, isActive: data.isActive })
+    })
+      .then(res => {
+        if (res.status === 201) {
+          onModify && onModify(true);
+        }
+      })
+    }
+    
+    const putRole = async (data: any) => {
 
   }
 
-  const openModal = () => {
+  const handleSelectedPerson = (personId: string) => {
+    setRefPerson(personId);
+  }
+
+  const handleOpenModal = () => {
     setIsOpenModal(true);
   }
-
-  const closeModal = () => {
+  
+  const handleCloseModal = () => {
     setIsOpenModal(false);
+  }
+  
+  const handleModify = (isModify: boolean) => {
+    if (isModify) {
+      onModify && onModify(true);
+      setIsOpenModal(false);
+      loadPersonData();
+    }
   }
 
   return (
@@ -56,13 +87,12 @@ export default function RoleModify({ role }: { role?: RoleType }): React.JSX.Ele
             <FormControlLabel control={<Checkbox {...register("isActive")} defaultChecked={role ? role.isActive : false} color="primary" />} label="فعال" />
           </FormGroup>
         </div>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center gap-x-2 mt-4">
           <Button variant="contained" color="secondary" startIcon={<KeyboardArrowUpOutlinedIcon />} onClick={handleSubmit(submitRole)}>ذخیره</Button>
+          {role && <Button variant="outlined" color="secondary" startIcon={<AddIcon />} onClick={handleOpenModal}>جدید</Button>}
         </div>
       </div>
-      <Modal title="AnnaLena" isOpen={isOpenModal} onCloseModal={closeModal} body={
-        <Typography></Typography>
-      } />
+      <Modal title="سمت جدید" isOpen={isOpenModal} onCloseModal={handleCloseModal} body={<RoleModify root={root} onModify={handleModify} />} />
     </>
   )
 }
