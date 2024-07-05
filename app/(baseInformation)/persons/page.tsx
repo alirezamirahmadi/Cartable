@@ -12,6 +12,8 @@ import Delete from "@/components/general/delete/delete";
 import Snack from "@/components/general/snack/snack";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Loading from "@/components/general/loading/loading";
+import type { SnackProps } from "@/types/General";
+
 export default function Persons(): React.JSX.Element {
 
   const theme = useTheme();
@@ -20,8 +22,7 @@ export default function Persons(): React.JSX.Element {
   const [rowData, setRowData] = useState<PersonType>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
-  const [isOpenSnack, setIsOpenSnack] = useState<boolean>(false);
-  const [snackContext, setSnackContext] = useState<string>("");
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   const columns: ColumnType[] = [
     { field: { title: "id" }, label: "ID", options: { display: false } },
@@ -74,8 +75,10 @@ export default function Persons(): React.JSX.Element {
     setIsOpenEditModal(false);
     if (isModify) {
       loadPersonData();
-      setIsOpenSnack(true);
-      setSnackContext("تغییرات ذخیره شد");
+      setSnackProps({ context: "تغییرات مورد نظر با موفقیت اعمال گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+    }
+    else {
+      setSnackProps({ context: "عملیات مورد نظر با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
     }
   }
 
@@ -91,9 +94,11 @@ export default function Persons(): React.JSX.Element {
       .then(res => {
         if (res.status === 200) {
           loadPersonData();
-          setIsOpenSnack(true);
-          setSnackContext("شخص مورد نظر حذف گردید.");
+          setSnackProps({ context: "شخص مورد نظر با موفقیت حذف گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
         }
+      })
+      .catch(() => {
+        setSnackProps({ context: "عملیات حذف با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
   }
 
@@ -110,7 +115,7 @@ export default function Persons(): React.JSX.Element {
       <PersonModify onModify={handleModify} />
       <Divider sx={{ mx: "Auto", width: "90%", my: 2 }} />
       <ReactDataTable direction="rtl" rows={personData} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
-      <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={() => setIsOpenSnack(false)} />
+      <Snack {...snackProps} />
       <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify onModify={handleModify} person={rowData} />} />
       <Modal title="حذف شخص" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`} onDelete={handleDelete} />} />
     </>

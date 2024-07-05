@@ -11,9 +11,12 @@ import { RoleType } from '@/types/RoleType';
 import Modal from '../general/modal/modal';
 import RoleModify from './roleModify';
 import Delete from '../general/delete/delete';
+import Snack from '../general/snack/snack';
+import type { SnackProps } from '@/types/General';
 
 export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType) => void }): React.JSX.Element {
 
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [isOpenNewModal, setIsOpenNewModal] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleType>();
@@ -55,6 +58,7 @@ export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boo
     if (isModify) {
       setIsOpenNewModal(false);
       loadRoleData();
+      setSnackProps({ context: "سمت مورد نظر با موفقیت ایجاد گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
     }
   }
 
@@ -68,7 +72,11 @@ export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boo
         if (res.status === 200) {
           loadRoleData();
           setSelectedRole(undefined);
+          setSnackProps({ context: "سمت مورد نظر با موفقیت حذف گردید.", isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
         }
+      })
+      .catch(() => {
+        setSnackProps({ context: "عملیات حذف با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
   }
 
@@ -88,6 +96,7 @@ export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boo
             ))
           }
         </SimpleTreeView>
+        <Snack {...snackProps} />
         <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={handleCloseModal} body={<RoleModify root={selectedRole?._id ?? "-1"} onModify={handleModify} />} />
         <Modal title="حذف سمت" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} onDelete={handleDelete} />} />
       </Box>

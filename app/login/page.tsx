@@ -8,12 +8,12 @@ import { useRouter } from "next/navigation";
 import regex from "@/utils/regex";
 import Snack from "@/components/general/snack/snack";
 import type { LoginType } from "@/types/AuthType";
+import type { SnackProps } from "@/types/General";
 
 export default function Login(): React.JSX.Element {
 
   const router = useRouter();
-  const [isOpenSnack, setIsOpenSnack] = useState<boolean>(false);
-  const [snackContext, setSnackContext] = useState<string>("");
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       username: "",
@@ -34,14 +34,9 @@ export default function Login(): React.JSX.Element {
           router.replace("/")
           break;
         case 404:
-          setSnackContext("نام کاربری یا رمزعبور نادرست است");
-          setIsOpenSnack(true);
+          setSnackProps({ context: "نام کاربری یا رمزعبور نادرست است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       }
     });
-  }
-
-  const handleCloseSnack = () => {
-    setIsOpenSnack(false);
   }
 
   return (
@@ -56,7 +51,7 @@ export default function Login(): React.JSX.Element {
           <img src="/svg/pages/login/login.svg" alt="" />
         </div>
       </div>
-      <Snack context={snackContext} isOpen={isOpenSnack} severity="error" onCloseSnack={handleCloseSnack} />
+      <Snack {...snackProps} />
     </>
   )
 }

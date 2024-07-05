@@ -7,9 +7,12 @@ import { useForm } from "react-hook-form";
 
 import type { PersonType } from "@/types/PersonType";
 import AutoComplete from "../general/autoComplete/autoComplete";
+import Snack from "../general/snack/snack";
+import type { SnackProps } from "@/types/General";
 
 export default function RoleModify({ role, root, onModify }: { role?: any, root: string, onModify?: (isModify: boolean) => void }): React.JSX.Element {
 
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [persons, setPersons] = useState<PersonType[]>([]);
   const [refPerson, setRefPerson] = useState<string>("");
   const { register, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm({
@@ -46,6 +49,9 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
           onModify && onModify(true);
         }
       })
+      .catch(() => {
+        setSnackProps({ context: "عملیات ایجاد سمت جدید با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+      })
   }
 
   const putRole = async (data: any) => {
@@ -63,12 +69,15 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
           reset();
         }
       })
+      .catch(() => {
+        setSnackProps({ context: "عملیات ویرایش سمت با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+      })
   }
 
   const handleSelectedPerson = (personId: string) => {
     setRefPerson(personId);
   }
-
+  
   return (
     <>
       <div className="lg:col-span-3 md:col-span-2">
@@ -81,6 +90,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
         </div>
         <div className="flex justify-center gap-x-2 mt-4">
           <Button variant="contained" color="secondary" startIcon={<KeyboardArrowUpOutlinedIcon />} onClick={handleSubmit(submitRole)}>ذخیره</Button>
+          <Snack {...snackProps} />
         </div>
       </div>
     </>

@@ -6,6 +6,8 @@ import RoleModify from "@/components/role/roleModify";
 import RoleTreeView from "@/components/role/roleTreeView";
 import { RoleType } from "@/types/RoleType";
 import Loading from "@/components/general/loading/loading";
+import Snack from "@/components/general/snack/snack";
+import type { SnackProps } from "@/types/General";
 
 export default function Roles(): React.JSX.Element {
 
@@ -13,6 +15,7 @@ export default function Roles(): React.JSX.Element {
   const [isRolesUpdate, setIsRolesUpdate] = useState<boolean>(false);
   const [root, setRoot] = useState<string>("-1");
   const [role, setRole] = useState<RoleType>({ title: "", refPerson: "", root: "-1", isActive: false });
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   useEffect(() => {
     isRolesUpdate && setIsRolesUpdate(false);
@@ -29,20 +32,18 @@ export default function Roles(): React.JSX.Element {
   }
 
   const handleModify = (isModify: boolean) => {
-    isModify && setIsRolesUpdate(true);
+    if (isModify) {
+      setIsRolesUpdate(true);
+      setSnackProps({ context: "سمت مورد نظر با موفقیت ویرایش گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+    }
   }
-
-  // const loadRoleData = async () => {
-  //   await fetch("api/v1/roles")
-  //     .then(res => res.status === 200 && res.json())
-  //     .then(data => setRoles(data));
-  // }
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
         <RoleTreeView onSelectRole={handleSelectRole} isUpdate={isRolesUpdate} />
         {!isLoading ? <RoleModify root={root} role={role} onModify={handleModify} /> : <Loading />}
+        <Snack {...snackProps} />
       </div>
     </>
   )
