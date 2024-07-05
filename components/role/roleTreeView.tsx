@@ -3,16 +3,19 @@
 import { useState, useEffect } from 'react';
 import { Box, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 import { RoleType } from '@/types/RoleType';
 import Modal from '../general/modal/modal';
 import RoleModify from './roleModify';
+import Delete from '../general/delete/delete';
 
 export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType) => void }): React.JSX.Element {
 
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isOpenNewModal, setIsOpenNewModal] = useState(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleType>();
   const [treeData, setTreeData] = useState<RoleType[]>([]);
 
@@ -35,26 +38,48 @@ export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boo
     onSelectRole(role);
   }
 
-  const handleOpenModal = () => {
-    setIsOpenModal(true);
+  const handleOpenNewModal = () => {
+    setIsOpenNewModal(true);
+  }
+
+  const handleOpenDeleteModal = () => {
+    setIsOpenDeleteModal(true);
   }
 
   const handleCloseModal = () => {
-    setIsOpenModal(false);
+    setIsOpenNewModal(false);
+    setIsOpenDeleteModal(false);
   }
 
   const handleModify = (isModify: boolean) => {
     if (isModify) {
-      setIsOpenModal(false);
+      setIsOpenNewModal(false);
       loadRoleData();
     }
+  }
+
+  const handleDelete = async (isDelete: boolean) => {
+    setIsOpenDeleteModal(false);
+
+    isDelete && await fetch(`api/v1/roles/${selectedRole?._id}`, {
+      method: "DELETE"
+    })
+      .then(res => {
+        if (res.status === 200) {
+          loadRoleData();
+          setSelectedRole(undefined);
+        }
+      })
   }
 
   return (
     <>
       <Box sx={{ minHeight: 352, minWidth: 250, mx: 2, mb: 2, py: 2, border: 1, borderRadius: 2 }}>
-        <IconButton onClick={handleOpenModal}>
+        <IconButton onClick={handleOpenNewModal} title="جدید">
           <AddIcon />
+        </IconButton>
+        <IconButton color="error" onClick={handleOpenDeleteModal} title="حذف" disabled={selectedRole ? false : true}>
+          <DeleteIcon />
         </IconButton>
         <SimpleTreeView aria-label="icon expansion" expansionTrigger="iconContainer" slots={{ expandIcon: ChevronLeftIcon }}>
           {
@@ -63,7 +88,8 @@ export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boo
             ))
           }
         </SimpleTreeView>
-        <Modal title="سمت جدید" isOpen={isOpenModal} onCloseModal={handleCloseModal} body={<RoleModify root={selectedRole?._id ?? "-1"} onModify={handleModify} />} />
+        <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={handleCloseModal} body={<RoleModify root={selectedRole?._id ?? "-1"} onModify={handleModify} />} />
+        <Modal title="حذف سمت" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} onDelete={handleDelete} />} />
       </Box>
     </>
   )
