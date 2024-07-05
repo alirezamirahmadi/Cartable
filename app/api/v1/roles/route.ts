@@ -3,9 +3,10 @@ import connectToDB from "@/utils/db";
 
 const GET = async () => {
   connectToDB();
-  
-  const roles = await roleModel.find();
-  
+
+  const roles = await roleModel.aggregate()
+    .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" });
+
   if (roles) {
     return Response.json(roles, { status: 200 });
   }

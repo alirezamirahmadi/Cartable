@@ -1,20 +1,22 @@
 
 import { Autocomplete as MUIAutoComplete, TextField, Box } from "@mui/material";
 
-export default function AutoComplete({ options, getSelectedId, inputProps }:
-  { options: any, getSelectedId: (selectedId: string) => void, inputProps: { label: string, size?: "small" | "medium", width?: number } }): React.JSX.Element {
+export default function AutoComplete({ options, defaultValueId, getSelectedId, inputProps }:
+  { options: any, defaultValueId?: string, getSelectedId: (selectedId: string) => void, inputProps: { label: string, size?: "small" | "medium", width?: number } }): React.JSX.Element {
+
   return (
     <>
-      <MUIAutoComplete options={options} autoHighlight freeSolo
+      <MUIAutoComplete options={options} autoHighlight freeSolo 
+      defaultValue={options?.length >= 1 && defaultValueId ? options.filter((option: any) => option._id === defaultValueId)[0] : null}
         getOptionLabel={(option: any) => {
           getSelectedId(option._id);
-          return option.firstName
+          return `${option.firstName} ${option.lastName}`
         }}
         renderOption={(props, option) => {
           const { ...optionProps } = props;
           return (
             <Box key={option._id} component="li" {...optionProps}>
-              <p>{option.firstName}</p>
+              <p>{option.firstName} {option.lastName}</p>
             </Box>
           )
         }}

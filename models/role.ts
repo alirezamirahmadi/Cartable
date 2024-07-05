@@ -7,7 +7,6 @@ const schema = new mongoose.Schema({
   },
   refPerson: {
     type: mongoose.Schema.ObjectId,
-    require: true,
   },
   root: {
     type: String,
