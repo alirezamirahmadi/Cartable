@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import { TextField, InputAdornment, Typography, Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, IconButton, Tooltip } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import CollectionsIcon from '@mui/icons-material/Collections';
@@ -8,12 +8,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 
-const data = [
-  { label: 'Authentication' },
-  { label: 'Database' },
-  { label: 'Storage' },
-  { label: 'Hosting' },
-];
+import { CollectionType } from '@/types/cartableType';
 
 const Collections = styled(List)<{ component?: React.ElementType }>({
   '& .MuiListItemButton-root': {
@@ -29,8 +24,32 @@ const Collections = styled(List)<{ component?: React.ElementType }>({
   },
 });
 
-export default function SideBar() {
-  const [open, setOpen] = React.useState(true);
+export default function SideBar(): React.JSX.Element {
+
+  const [open, setOpen] = useState(true);
+  const [search, setSearch] = useState<string>("");
+  const [collections, setCollections] = useState<CollectionType[]>([]);
+
+  useEffect(() => {
+    loadCollectionData();
+  }, [])
+
+  const loadCollectionData = async (searchText?: string) => {
+    await fetch(searchText ? `api/v1/collections?showtitle=${searchText}` : "api/v1/collections")
+      .then(res => res.json())
+      .then(data => setCollections(data))
+  }
+
+  const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const searchText = event.target.value;
+    setSearch(searchText);
+    loadCollectionData(searchText);
+  }
+
+  const updateCartable = () => {
+    loadCollectionData();
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <Paper elevation={0} sx={{ maxWidth: 256 }}>
@@ -44,9 +63,10 @@ export default function SideBar() {
           <ListItem component="div" disablePadding>
             <ListItemButton sx={{ height: 56 }}>
               <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
+                value={search} onChange={handleChangeSearch}
                 InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
+                  endAdornment: (
+                    <InputAdornment position="end">
                       <SearchIcon />
                     </InputAdornment>
                   ),
@@ -54,7 +74,7 @@ export default function SideBar() {
               />
             </ListItemButton>
             <Tooltip title="بروزرسانی کارتابل">
-              <IconButton>
+              <IconButton onClick={updateCartable}>
                 <CachedIcon />
               </IconButton>
             </Tooltip>
@@ -71,9 +91,9 @@ export default function SideBar() {
               <KeyboardArrowDown sx={{ mr: -1, opacity: 0, transform: open ? 'rotate(-180deg)' : 'rotate(0)', transition: '0.2s', }} />
             </ListItemButton>
             {open &&
-              data.map((item) => (
-                <ListItemButton key={item.label} sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }} >
-                  <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }} />
+              collections.map((collection) => (
+                <ListItemButton key={collection.showTitle} sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }} >
+                  <ListItemText primary={collection.showTitle} primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }} />
                 </ListItemButton>
               ))}
           </Box>
