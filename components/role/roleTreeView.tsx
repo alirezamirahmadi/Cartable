@@ -7,12 +7,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
-import { RoleType } from '@/types/RoleType';
+import { RoleType } from '@/types/roleType';
 import Modal from '../general/modal/modal';
 import RoleModify from './roleModify';
 import Delete from '../general/delete/delete';
 import Snack from '../general/snack/snack';
-import type { SnackProps } from '@/types/General';
+import type { SnackProps } from '@/types/general';
 
 export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType) => void }): React.JSX.Element {
 

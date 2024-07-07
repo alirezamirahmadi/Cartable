@@ -1,7 +1,7 @@
 import { hashPassword } from "@/utils/crypto";
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
-import type { PersonType } from "@/types/PersonType";
+import type { PersonType } from "@/types/personType";
 
 const GET = async (request: Request) => {
   connectToDB();

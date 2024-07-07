@@ -5,10 +5,10 @@ import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Button } 
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import { useForm } from "react-hook-form";
 
-import type { PersonType } from "@/types/PersonType";
+import type { PersonType } from "@/types/personType";
 import AutoComplete from "../general/autoComplete/autoComplete";
 import Snack from "../general/snack/snack";
-import type { SnackProps } from "@/types/General";
+import type { SnackProps } from "@/types/general";
 
 export default function RoleModify({ role, root, onModify }: { role?: any, root: string, onModify?: (isModify: boolean) => void }): React.JSX.Element {
 

@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 
 import regex from "@/utils/regex";
 import Snack from "@/components/general/snack/snack";
-import type { LoginType } from "@/types/AuthType";
-import type { SnackProps } from "@/types/General";
+import type { LoginType } from "@/types/authType";
+import type { SnackProps } from "@/types/general";
 
 export default function Login(): React.JSX.Element {
 

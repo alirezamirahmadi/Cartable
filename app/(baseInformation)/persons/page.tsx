@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import PersonModify from "@/components/person/personModify";
 import { Divider, useTheme } from "@mui/material";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
-import { PersonType } from "@/types/PersonType";
+import { PersonType } from "@/types/personType";
 
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "@/components/general/modal/modal";
@@ -12,7 +12,7 @@ import Delete from "@/components/general/delete/delete";
 import Snack from "@/components/general/snack/snack";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Loading from "@/components/general/loading/loading";
-import type { SnackProps } from "@/types/General";
+import type { SnackProps } from "@/types/general";
 
 export default function Persons(): React.JSX.Element {
 

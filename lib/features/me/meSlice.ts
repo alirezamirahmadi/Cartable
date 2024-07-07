@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-import type { MeType } from "@/types/AuthType";
+import type { MeType } from "@/types/authType";
 
 const initialState: MeType = { isLogin: false, firstName: "", lastName: "" };
 

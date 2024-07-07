@@ -2,7 +2,7 @@ import { serialize } from "cookie";
 
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
-import type { LoginType } from "@/types/AuthType";
+import type { LoginType } from "@/types/authType";
 import { verifyPassword, hashPassword } from "@/utils/crypto";
 import { createToken } from "@/utils/token";
 

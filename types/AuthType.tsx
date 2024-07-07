@@ -1,4 +1,4 @@
-import { PersonType } from "./PersonType";
+import { PersonType } from "./personType";
 
 type LoginType = {
   username: string,
