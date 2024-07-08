@@ -13,21 +13,17 @@ const GET = async (request: Request) => {
     send = await sendModel.aggregate()
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
-      .lookup({ from: "people", localField: "receivers.refPerson", foreignField: "_id", as: "receiver.person" })
-      .lookup({ from: "roles", localField: "receivers.refRole", foreignField: "_id", as: "receiver.role" })
-      .lookup({ from: "urgencies", localField: "receivers.refUrgency", foreignField: "_id", as: "receiver.urgency" });
-  }
-  else {
-    let refCollection = searchParams.get('refCollection');
-    let refDocument = searchParams.get('refDocument');
-    // send = await sendModel.find({ refCollection, refDocument }).exec();
-    send = await sendModel.aggregate()
+      .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" });
+    }
+    else {
+      let refCollection = searchParams.get('refCollection');
+      let refDocument = searchParams.get('refDocument');
+      // send = await sendModel.find({ refCollection, refDocument }).exec();
+      send = await sendModel.aggregate()
       .match({ refCollection: new mongoose.Types.ObjectId(refCollection ?? ''), refDocument: new mongoose.Types.ObjectId(refDocument ?? '') })
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
-      .lookup({ from: "people", localField: "receivers.refPerson", foreignField: "_id", as: "receiver.person" })
-      .lookup({ from: "roles", localField: "receivers.refRole", foreignField: "_id", as: "receiver.role" })
-      .lookup({ from: "urgencies", localField: "receivers.refUrgency", foreignField: "_id", as: "receiver.urgency" });
+      .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" });
   }
 
   response = send ? { json: send, status: 200 } : { json: { message: "not found" }, status: 404 };
@@ -35,12 +31,12 @@ const GET = async (request: Request) => {
 }
 
 
-const POST = async (request: Request, { params }: { params: { sendId: string } }) => {
+const POST = async (request: Request) => {
   connectToDB();
 
-  const { refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, receivers } = await request.json();
+  const { refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, parentReceive } = await request.json();
 
-  const send = await sendModel.create({ refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, receivers });
+  const send = await sendModel.create({ refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, parentReceive });
 
   if (send) {
     return Response.json({ message: "Document sent successfully" }, { status: 201 });
