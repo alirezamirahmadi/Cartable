@@ -54,7 +54,7 @@ export default function SideBar(): React.JSX.Element {
     <Box sx={{ display: 'flex' }}>
       <Paper elevation={0} sx={{ maxWidth: 256 }}>
         <Collections component="nav" disablePadding>
-          <ListItemButton component="a" href="#customized-list">
+          <ListItemButton component="a" href="#customized-list" sx={{display:{xs:"none", md:"block"}}}>
             <ListItemIcon sx={{ fontSize: 20 }}><CollectionsIcon /></ListItemIcon>
             <ListItemText sx={{ my: 0 }} primary="مدارک"
               primaryTypographyProps={{ fontSize: 20, fontWeight: 'medium', letterSpacing: 0, }} />

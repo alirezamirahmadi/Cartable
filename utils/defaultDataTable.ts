@@ -20,7 +20,7 @@ const defaultDataTableOptions = (darkMode: "dark" | "light"): OptionType => {
     rowsPerPage: 10,
     rowsPerPageOptions: [5, 10, 20, 50, 100],
     searchPlaceholder: "",
-    selectableRowsHideCheckboxes: false,
+    selectableRowsHideCheckboxes: true,
     cells: {
       imageWidth: 60,
     },

@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const schema = new mongoose.Schema({
+  refSend: {
+    type: mongoose.Schema.ObjectId,
+    require: true,
+  },
   refPerson: {
     type: mongoose.Schema.ObjectId,
     require: true,
@@ -9,27 +13,25 @@ const schema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     require: true,
   },
-  refCollection: {
+  refUrgency: {
     type: mongoose.Schema.ObjectId,
     require: true,
   },
-  refDocument: {
-    type: mongoose.Schema.ObjectId,
-    require: true,
-  },
-  ipAddress: {
-    type: String,
-  },
-  sendDate: {
+  viewDate: {
     type: Date,
-    require: true,
   },
-  parentReceive: {
+  lastViewedDate: {
+    type: Date,
+  },
+  comment: {
     type: String,
+  },
+  observed: {
+    type: Boolean,
     require: true,
   }
 })
 
-const sendModel = mongoose.models.send || mongoose.model('send', schema);
+const receiveModel = mongoose.models.receive || mongoose.model("receive", schema);
 
-export default sendModel;
+export default receiveModel;
