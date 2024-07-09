@@ -12,7 +12,7 @@ import Delete from "@/components/general/delete/delete";
 import Snack from "@/components/general/snack/snack";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Loading from "@/components/general/loading/loading";
-import type { SnackProps } from "@/types/general";
+import type { SnackProps } from "@/types/generalType";
 
 export default function Persons(): React.JSX.Element {
 

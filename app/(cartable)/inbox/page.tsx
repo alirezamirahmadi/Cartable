@@ -1,28 +1,48 @@
+"use client"
 
-import ReactDataTable, {ColumnType} from "react-datatable-responsive";
+import { useState, useEffect } from "react";
+import { useTheme } from "@mui/material";
+import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 
 import TopBar from "@/components/cartable/inbox/topbar";
 import SideBar from "@/components/cartable/sidebar";
 import { Box } from "@mui/material";
+import Loading from "@/components/general/loading/loading";
+import defaultDataTableOptions from "@/utils/defaultDataTable";
 
 export default function Inbox(): React.JSX.Element {
 
-  
-  // const columns: ColumnType[] = [
-  //   { field: { title: "_id" }, label: "ID", options: { display: false } },
-  //   { field: { title: "person.firstName" }, label: "فرستنده" },
-  //   { field: { title: "collection.title" }, label: "نوع مدرک" },
-  //   { field: { title: "isActive" }, label: "فوریت" },
-  //   { field: { title: "account.username" }, label: "تاریخ دریافت" },
-  // ]
+  const theme = useTheme();
+  const [rows, setRows] = useState([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const columns: ColumnType[] = [
+    { field: { title: "_id" }, label: "ID", options: { display: false } },
+    { field: { title: "person.firstName" }, label: "فرستنده" },
+    { field: { title: "collection.title" }, label: "نوع مدرک" },
+    { field: { title: "urgency.title" }, label: "فوریت" },
+    { field: { title: "send.sendDate" }, label: "تاریخ دریافت" },
+  ]
+
+  useEffect(() => {
+    fetch("api/v1/cartable/inbox/668cdfce72e7704b27400128")
+      .then(res => res.json())
+      .then(data => {
+        setRows(data);
+        setIsLoading(false);
+      });
+  }, [])
+
+  if (isLoading) {
+    return (<div className="mt-20"><Loading /></div>)
+  }
 
   return (
     <>
       <TopBar />
-      <Box sx={{display:{xs:"none", md:"block"}}}>
+      <Box sx={{ display: { xs: "none", md: "block" } }}>
         <SideBar />
       </Box>
-      {/* <ReactDataTable columns={columns}/> */}
+      <ReactDataTable rows={rows} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
     </>
   )
 }

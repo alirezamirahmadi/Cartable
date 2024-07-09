@@ -7,9 +7,9 @@ import connectToDB from "@/utils/db";
 const GET = async () => {
   connectToDB();
 
-  const cookieStore = cookies();
-  const tokenPayload = verifyToken(cookieStore.get("token")?.value ?? "");
-
+  const token = cookies().get("token");
+  const tokenPayload = verifyToken(token?.value ?? "");
+  
   if (!tokenPayload) {
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
