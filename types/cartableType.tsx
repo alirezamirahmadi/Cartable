@@ -9,6 +9,12 @@ type CollectionType = {
   isActive: boolean,
 }
 
+type InboxListType = {
+  _id: string,
+  title: string,
+  count: number,
+}
+
 export type {
-  CollectionType
+  CollectionType, InboxListType
 }

@@ -13,7 +13,6 @@ const GET = async (request: Request) => {
   }
   else{
     const showTitle = searchParams.get("showtitle");
-    console.log(showTitle);
     
     collections = await collectionModel.find({showTitle:{$regex:`.*${showTitle}.*`}});
   }

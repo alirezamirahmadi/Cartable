@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect, ChangeEvent } from 'react';
-import { TextField, InputAdornment, Typography, Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, IconButton, Tooltip } from "@mui/material";
+import { TextField, InputAdornment, Typography, Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, IconButton, Tooltip, Badge } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import CachedIcon from '@mui/icons-material/Cached';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 
-import { CollectionType } from '@/types/cartableType';
+import { InboxListType } from '@/types/cartableType';
 
 const Collections = styled(List)<{ component?: React.ElementType }>({
   '& .MuiListItemButton-root': {
@@ -28,22 +28,67 @@ export default function SideBar(): React.JSX.Element {
 
   const [open, setOpen] = useState(true);
   const [search, setSearch] = useState<string>("");
-  const [collections, setCollections] = useState<CollectionType[]>([]);
+  const [collections, setCollections] = useState<InboxListType[]>([]);
 
   useEffect(() => {
     loadCollectionData();
   }, [])
 
-  const loadCollectionData = async (searchText?: string) => {
-    await fetch(searchText ? `api/v1/collections?showtitle=${searchText}` : "api/v1/collections")
+  useEffect(() => {
+    loadCollectionData();
+  }, [search])
+
+  const loadCollectionData = async () => {
+    await fetch(search ? `api/v1/collections?showtitle=${search}` : "api/v1/cartable/inbox", {
+      method: "GET",
+      headers: {
+        "Get-Type": "all"
+      }
+    })
       .then(res => res.json())
-      .then(data => setCollections(data))
+      .then(data => handleCollectionData(data))
   }
+
+  const loadNonObserved = async (inboxList: InboxListType[]) => {
+    await fetch(search ? `api/v1/collections?showtitle=${search}` : "api/v1/cartable/inbox", {
+      method: "GET",
+      headers: {
+        "Get-Type": "nonObserved"
+      }
+    })
+      .then(res => res.json())
+      .then(data => handleNonObserved(data, inboxList))
+  }
+
+  const handleCollectionData = (data: any) => {
+    const myCollections = new Array<InboxListType>();
+
+    data.map((collection: any) => {
+      myCollections.push({ _id: collection?._id?._id ? collection?._id?._id[0] : "", title: collection?._id?.showTitle ? collection?._id?.showTitle[0] : "", count: 0 });
+    })
+    loadNonObserved(myCollections)
+  }
+
+  const handleNonObserved = (data: any, inboxList: InboxListType[]) => {
+    let count = 0;
+
+    const myCollections = inboxList.map(collection => {
+      count = 0;
+      data.forEach((observe: any) => { if (observe?._id?._id && observe?._id?._id[0] === collection?._id) count = observe?.count })
+      if (count > 0) {
+        return { ...collection, count }
+      }
+      return { ...collection }
+    })
+
+    setCollections(myCollections);
+  }
+
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
-    loadCollectionData(searchText);
+    // loadCollectionData();
   }
 
   const updateCartable = () => {
@@ -54,7 +99,7 @@ export default function SideBar(): React.JSX.Element {
     <Box sx={{ display: 'flex' }}>
       <Paper elevation={0} sx={{ maxWidth: 256 }}>
         <Collections component="nav" disablePadding>
-          <ListItemButton component="a" href="#customized-list" sx={{display:{xs:"none", md:"block"}}}>
+          <ListItemButton component="a" href="#customized-list" sx={{ display: { xs: "none", md: "block" } }}>
             <ListItemIcon sx={{ fontSize: 20 }}><CollectionsIcon /></ListItemIcon>
             <ListItemText sx={{ my: 0 }} primary="مدارک"
               primaryTypographyProps={{ fontSize: 20, fontWeight: 'medium', letterSpacing: 0, }} />
@@ -80,7 +125,7 @@ export default function SideBar(): React.JSX.Element {
             </Tooltip>
           </ListItem>
           <Divider />
-          <Box sx={{ bgcolor: open ? 'rgba(71, 98, 130, 0.2)' : null, pb: open ? 2 : 0, }} >
+          <Box sx={{ boxShadow: 1, pb: open ? 2 : 0, }} >
             <ListItemButton alignItems="flex-start" onClick={() => setOpen(!open)}
               sx={{ px: 3, pt: 2.5, pb: open ? 0 : 2.5, '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 } }, }}>
               <ListItemText primary="مدارک" primaryTypographyProps={{ fontSize: 15, fontWeight: 'medium', lineHeight: '20px', mb: '2px', }}
@@ -92,8 +137,10 @@ export default function SideBar(): React.JSX.Element {
             </ListItemButton>
             {open &&
               collections.map((collection) => (
-                <ListItemButton key={collection.showTitle} sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }} >
-                  <ListItemText primary={collection.showTitle} primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }} />
+                <ListItemButton key={collection._id} sx={{ py: 0, minHeight: 32 }} >
+                  <Badge badgeContent={collection.count} color="secondary">
+                    <ListItemText primary={collection.title} primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }} />
+                  </Badge>
                 </ListItemButton>
               ))}
           </Box>
