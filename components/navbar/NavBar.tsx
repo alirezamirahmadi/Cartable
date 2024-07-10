@@ -36,7 +36,7 @@ export default function NavBar() {
   }
 
   return (
-    <AppBar position="static" sx={{ mb: 4 }}>
+    <AppBar position="static" sx={{ mb: 2 }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />

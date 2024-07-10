@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 
 import TopBar from "@/components/cartable/inbox/topbar";
@@ -12,11 +13,14 @@ import defaultDataTableOptions from "@/utils/defaultDataTable";
 
 export default function Inbox(): React.JSX.Element {
 
+  const searchParams = useSearchParams();
+  const collectionId = searchParams.get("collid");
+
   const theme = useTheme();
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const columns: ColumnType[] = [
-    { field: { title: "_id" }, label: "ID", options: { display: false } },
+    { field: { title: "_id" }, label: "ID" },
     { field: { title: "person.firstName" }, label: "فرستنده" },
     { field: { title: "collection.title" }, label: "نوع مدرک" },
     { field: { title: "urgency.title" }, label: "فوریت" },
@@ -24,44 +28,44 @@ export default function Inbox(): React.JSX.Element {
   ]
 
   useEffect(() => {
-    fetch("api/v1/cartable/inbox/668cdfce72e7704b27400128")
+    setIsLoading(true);
+    collectionId && loadCollectionData();
+  }, [collectionId])
+
+  useEffect(() => {
+    collectionId ? loadCollectionData() : setIsLoading(false);
+  }, [])
+
+  const loadCollectionData = async () => {
+    await fetch(`api/v1/cartable/inbox/${collectionId}`)
       .then(res => res.json())
       .then(data => {
         setRows(data);
         setIsLoading(false);
-      });
-  }, [])
+      }).
+      catch(() => setIsLoading(false))
+  }
 
   if (isLoading) {
-    return (<div className="mt-20"><Loading /></div>)
+    return (
+      <div className="mt-20">
+        <Loading />
+      </div>
+    )
   }
 
   return (
     <>
-      <TopBar />
-      <Box sx={{ display: { xs: "none", md: "block" } }}>
-        <SideBar />
-      </Box>
-      <ReactDataTable rows={rows} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
+      <div className="flex">
+        <Box sx={{ display: { xs: "none", md: "block" }, maxWidth:300 }}>
+          <SideBar />
+        </Box>
+        <div className="w-full mx-2 shadow-md">
+          <TopBar />
+          <ReactDataTable rows={rows} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
+        </div>
+      </div>
     </>
   )
 }
 
-// const extractData = (row: any, fileld: string) => {
-//   const subField = fileld.split(".");
-
-//   switch (subField.length) {
-//     case 1:
-//       return row[subField[0]];
-//     case 2:
-//       return row[subField[0]][subField[1]];
-//     case 3:
-//       return row[subField[0]][subField[1]][subField[2]];
-//     case 4:
-//       return row[subField[0]][subField[1]][subField[2]][subField[3]];
-//     case 5:
-//       return row[subField[0]][subField[1]][subField[2]][subField[3]][subField[4]];
-//     case 6:
-//       return row[subField[0]][subField[1]][subField[2]][subField[3]][subField[4]][subField[5]];
-//   }
-// }
