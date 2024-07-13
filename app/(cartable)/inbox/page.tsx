@@ -78,7 +78,27 @@ export default function Inbox(): React.JSX.Element {
   }
 
   const handleAction = (data: any, action: string) => {
-    console.log(data, action)
+    switch (action) {
+      case "Open":
+        openDocument(data);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  const openDocument = async (data: any) => {
+    const today = new Date();
+
+    await fetch(`api/v1/receives/${data._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ observed: true, viewDate: data.viewDate ?? today, lastViewedDate: today, })
+    })
+      .then(res => { res.status === 201 && loadCollectionData() })
   }
 
   if (isLoading) {
