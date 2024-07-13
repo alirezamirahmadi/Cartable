@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 
 import { verifyToken } from "@/utils/token";
 
-const GET = async (request: Request, {params}: {params:{ collectionId: string }}) => {
+const GET = async (request: Request, { params }: { params: { collectionId: string } }) => {
   connectToDB();
 
   const token = cookies().get("token");
@@ -26,7 +26,7 @@ const GET = async (request: Request, {params}: {params:{ collectionId: string }}
       .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" })
       .match({ "person.account.username": tokenPayload.username })
       .match({ "send.refCollection": new mongoose.Types.ObjectId(params.collectionId) })
-      .project({ "sender.firstName": 1, "sender.lastName": 1, "role.title": 1, "collection.title": 1, "urgency.title": 1, "send.sendDate": 1 })
+      .project({ "sender.firstName": 1, "sender.lastName": 1, "role.title": 1, "collection.title": 1, "urgency.title": 1, "send.sendDate": 1, "observed": 1, "viewDate": 1, "lastViewedDate": 1, })
 
     if (receive) {
       return Response.json(receive, { status: 200 });

@@ -23,7 +23,9 @@ const PUT = async (request: Request, { params }: { params: { receiveId: string }
 
   const { refSend, refPerson, refRole, refUrgency, viewDate, lastViewedDate, comment, observed } = await request.json();
 
-  const receive = await receiveModel.findByIdAndUpdate(params.receiveId, { refSend, refPerson, refRole, refUrgency, viewDate, lastViewedDate, comment, observed });
+  const receive = await receiveModel.findByIdAndUpdate(params.receiveId,
+    { $set: { observed, viewDate, lastViewedDate } });
+  // { refSend, refPerson, refRole, refUrgency, viewDate, lastViewedDate, comment, observed });
 
   if (receive) {
     return Response.json({ message: "Receive updated successfully" }, { status: 201 });

@@ -23,7 +23,7 @@ export default function Buttons({ rowData, onAction }: { value: string, onChange
         <IconButton color="secondary" onClick={handleOpenDocument} title="مشاهده">
           <VisibilityIcon />
         </IconButton>
-        <IconButton color="secondary" onClick={handleReferenceDocument} title="ارجاع">
+        <IconButton color="primary" onClick={handleReferenceDocument} title="ارجاع">
           <AddLinkIcon />
         </IconButton>
         <IconButton color="secondary" onClick={handleDetailsDocument} title="جزئیات">
