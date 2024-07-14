@@ -10,9 +10,11 @@ import DraftsIcon from '@mui/icons-material/Drafts';
 import TopBar from "@/components/cartable/inbox/topbar";
 import SideBar from "@/components/cartable/sidebar";
 import { Box } from "@mui/material";
-import Loading from "@/components/general/loading/loading";
+// import Loading from "@/components/general/loading/loading";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Buttons from "@/components/cartable/buttons";
+import Reference from "@/components/cartable/send/sidebar";
+import { RoleType } from "@/types/roleType";
 
 export default function Inbox(): React.JSX.Element {
 
@@ -21,7 +23,7 @@ export default function Inbox(): React.JSX.Element {
 
   const theme = useTheme();
   const [rows, setRows] = useState([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const columns: ColumnType[] = [
     {
@@ -33,9 +35,9 @@ export default function Inbox(): React.JSX.Element {
         )
       }
     },
-    { field: { title: "_id" }, label: "ID" },
-    { field: { title: "person.firstName" }, label: "فرستنده" },
-    { field: { title: "collection.title" }, label: "نوع مدرک" },
+    { field: { title: "_id" }, label: "ID", options: { display: false } },
+    { field: { title: "sender.firstName" }, label: "فرستنده" },
+    { field: { title: "collection.showTitle" }, label: "نوع مدرک" },
     { field: { title: "urgency.title" }, label: "فوریت" },
     { field: { title: "send.sendDate" }, label: "تاریخ دریافت" },
     {
@@ -46,22 +48,22 @@ export default function Inbox(): React.JSX.Element {
   ]
 
   useEffect(() => {
-    setIsLoading(true);
+    // setIsLoading(true);
     collectionId && loadCollectionData();
   }, [collectionId])
 
   useEffect(() => {
-    collectionId ? loadCollectionData() : setIsLoading(false);
+    collectionId && loadCollectionData() //: setIsLoading(false);
   }, [])
 
   const loadCollectionData = async () => {
     await fetch(`api/v1/cartable/inbox/${collectionId}`)
-      .then(res => res.json())
+      .then(res => res.status === 200 && res.json())
       .then(data => {
         setRows(data);
-        setIsLoading(false);
-      }).
-      catch(() => setIsLoading(false))
+        // setIsLoading(false);
+      })
+    // .catch(() => setIsLoading(false))
   }
 
   const handleObserved = async (data: any) => {
@@ -101,12 +103,16 @@ export default function Inbox(): React.JSX.Element {
       .then(res => { res.status === 201 && loadCollectionData() })
   }
 
-  if (isLoading) {
-    return (
-      <div className="mt-20">
-        <Loading />
-      </div>
-    )
+  // if (isLoading) {
+  //   return (
+  //     <div className="mt-20">
+  //       <Loading />
+  //     </div>
+  //   )
+  // }
+
+  const handleSelect = (role:RoleType) => {
+console.log(role)
   }
 
   return (
@@ -115,11 +121,12 @@ export default function Inbox(): React.JSX.Element {
         <Box sx={{ display: { xs: "none", md: "block" }, maxWidth: 300 }}>
           <SideBar />
         </Box>
-        <div className="w-full mx-2 shadow-md">
+        <div className="w-full mx-2">
           <TopBar />
-          <ReactDataTable rows={rows} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
+          <ReactDataTable rows={rows && rows.length > 0 ? rows : []} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
         </div>
       </div>
+      <Reference onSelect={handleSelect} />
     </>
   )
 }

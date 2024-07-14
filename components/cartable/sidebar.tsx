@@ -90,11 +90,9 @@ export default function SideBar(): React.JSX.Element {
     setCollections(myCollections);
   }
 
-
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
-    // loadCollectionData();
   }
 
   const updateCartable = () => {
@@ -148,7 +146,7 @@ export default function SideBar(): React.JSX.Element {
             </ListItemButton>
             {open &&
               collections.sort((a, b) => a._id > b._id ? 1 : -1).map((collection) => (
-                <ListItemButton key={collection._id} sx={{ py: 0, minHeight: 32 }} onClick={() => handleOpenCollection(collection._id)}>
+                <ListItemButton key={collection._id} sx={{ py: 0, minHeight: 32, mt:1 }} onClick={() => handleOpenCollection(collection._id)}>
                   <Badge badgeContent={collection.count} color="secondary">
                     <ListItemText primary={collection.title} primaryTypographyProps={{
                       fontSize: selectedCollection === collection._id ? 16 : 14,

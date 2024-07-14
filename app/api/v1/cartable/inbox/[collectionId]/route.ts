@@ -17,7 +17,6 @@ const GET = async (request: Request, { params }: { params: { collectionId: strin
 
   if (typeof tokenPayload !== "string") {
     const receive = await receiveModel.aggregate()
-      // .match({ _id: new mongoose.Types.ObjectId(params.receiveId) })
       .lookup({ from: "sends", localField: "refSend", foreignField: "_id", as: "send" })
       .lookup({ from: "people", localField: "send.refPerson", foreignField: "_id", as: "sender" })
       .lookup({ from: "collections", localField: "send.refCollection", foreignField: "_id", as: "collection" })
@@ -26,7 +25,12 @@ const GET = async (request: Request, { params }: { params: { collectionId: strin
       .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" })
       .match({ "person.account.username": tokenPayload.username })
       .match({ "send.refCollection": new mongoose.Types.ObjectId(params.collectionId) })
-      .project({ "sender.firstName": 1, "sender.lastName": 1, "role.title": 1, "collection.title": 1, "urgency.title": 1, "send.sendDate": 1, "observed": 1, "viewDate": 1, "lastViewedDate": 1, })
+      .project({ "sender.firstName": 1, "sender.lastName": 1, "role.title": 1, "collection.showTitle": 1, "urgency.title": 1, "send.sendDate": 1, "observed": 1, "viewDate": 1, "lastViewedDate": 1, })
+      .unwind("$sender")
+      .unwind("$send")
+      .unwind("$collection")
+      .unwind("$role")
+      .unwind("$urgency")
 
     if (receive) {
       return Response.json(receive, { status: 200 });

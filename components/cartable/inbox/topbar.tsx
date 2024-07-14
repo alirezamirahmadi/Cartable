@@ -23,7 +23,7 @@ export default function TopBar(): React.JSX.Element {
   }
 
   return (
-    <AppBar position="static" color="transparent">
+    <AppBar position="static" color="transparent" sx={{ mb: 2 }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
