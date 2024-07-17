@@ -15,6 +15,7 @@ import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Buttons from "@/components/cartable/buttons";
 import Reference from "@/components/cartable/send/sidebar";
 import { RoleType } from "@/types/roleType";
+import Urgency from "@/components/cartable/urgency/urgency";
 
 export default function Inbox(): React.JSX.Element {
 
@@ -127,6 +128,7 @@ console.log(role)
         </div>
       </div>
       <Reference onSelect={handleSelect} />
+      <Urgency onChange={value => console.log(value)}/>
     </>
   )
 }

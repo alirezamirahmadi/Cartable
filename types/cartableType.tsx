@@ -15,6 +15,11 @@ type InboxListType = {
   count: number,
 }
 
+type Urgency = {
+  _id?: string,
+  title: string,
+}
+
 export type {
-  CollectionType, InboxListType
+  CollectionType, InboxListType, Urgency
 }
