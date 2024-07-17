@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { IconButton, useTheme } from "@mui/material";
+import { IconButton, useTheme, ListItemText } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import MailIcon from '@mui/icons-material/Mail';
@@ -10,21 +10,19 @@ import DraftsIcon from '@mui/icons-material/Drafts';
 import TopBar from "@/components/cartable/inbox/topbar";
 import SideBar from "@/components/cartable/sidebar";
 import { Box } from "@mui/material";
-// import Loading from "@/components/general/loading/loading";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Buttons from "@/components/cartable/buttons";
-import Reference from "@/components/cartable/send/sidebar";
-import { RoleType } from "@/types/roleType";
-import Urgency from "@/components/cartable/urgency/urgency";
+import Modal from "@/components/general/modal/modal";
+import Send from "@/components/cartable/send/send";
 
 export default function Inbox(): React.JSX.Element {
 
   const searchParams = useSearchParams();
   const collectionId = searchParams.get("collid");
+  const [isOpenSendModal, setIsOpenSendModal] = useState<boolean>(false);
 
   const theme = useTheme();
   const [rows, setRows] = useState([]);
-  // const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const columns: ColumnType[] = [
     {
@@ -37,7 +35,13 @@ export default function Inbox(): React.JSX.Element {
       }
     },
     { field: { title: "_id" }, label: "ID", options: { display: false } },
-    { field: { title: "sender.firstName" }, label: "فرستنده" },
+    {
+      field: { title: "sender" }, label: "فرستنده", kind: "component", options: {
+        component: (value, onChange, rowData) => (
+          <ListItemText primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.role.title} />
+        )
+      }
+    },
     { field: { title: "collection.showTitle" }, label: "نوع مدرک" },
     { field: { title: "urgency.title" }, label: "فوریت" },
     { field: { title: "send.sendDate" }, label: "تاریخ دریافت" },
@@ -49,12 +53,11 @@ export default function Inbox(): React.JSX.Element {
   ]
 
   useEffect(() => {
-    // setIsLoading(true);
     collectionId && loadCollectionData();
   }, [collectionId])
 
   useEffect(() => {
-    collectionId && loadCollectionData() //: setIsLoading(false);
+    collectionId && loadCollectionData()
   }, [])
 
   const loadCollectionData = async () => {
@@ -62,9 +65,7 @@ export default function Inbox(): React.JSX.Element {
       .then(res => res.status === 200 && res.json())
       .then(data => {
         setRows(data);
-        // setIsLoading(false);
       })
-    // .catch(() => setIsLoading(false))
   }
 
   const handleObserved = async (data: any) => {
@@ -85,7 +86,9 @@ export default function Inbox(): React.JSX.Element {
       case "Open":
         openDocument(data);
         break;
-
+      case "Send":
+        openSendModal();
+        break;
       default:
         break;
     }
@@ -104,16 +107,8 @@ export default function Inbox(): React.JSX.Element {
       .then(res => { res.status === 201 && loadCollectionData() })
   }
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="mt-20">
-  //       <Loading />
-  //     </div>
-  //   )
-  // }
-
-  const handleSelect = (role:RoleType) => {
-console.log(role)
+  const openSendModal = () => {
+    setIsOpenSendModal(true);
   }
 
   return (
@@ -124,11 +119,10 @@ console.log(role)
         </Box>
         <div className="w-full mx-2">
           <TopBar />
-          <ReactDataTable rows={rows && rows.length > 0 ? rows : []} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
+          <ReactDataTable rows={rows} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
         </div>
       </div>
-      <Reference onSelect={handleSelect} />
-      <Urgency onChange={value => console.log(value)}/>
+      <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send />} onCloseModal={() => setIsOpenSendModal(false)} />
     </>
   )
 }

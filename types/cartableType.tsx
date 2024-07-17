@@ -15,11 +15,19 @@ type InboxListType = {
   count: number,
 }
 
-type Urgency = {
-  _id?: string,
+type UrgencyType = {
+  _id: string,
   title: string,
 }
 
+type ReceiverType = {
+  _id?: string,
+  person: { _id: string, name: string },
+  role: { _id: string, title: string },
+  urgency: { _id: string, title: string },
+  comment: string,
+}
+
 export type {
-  CollectionType, InboxListType, Urgency
+  CollectionType, InboxListType, UrgencyType, ReceiverType
 }

@@ -7,6 +7,7 @@ const GET = async () => {
   const roles = await roleModel.aggregate()
     .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
     .match({ isActive: true })
+    .unwind("person")
 
   if (roles) {
     return Response.json(roles, { status: 200 });

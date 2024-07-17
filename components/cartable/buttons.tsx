@@ -9,8 +9,8 @@ export default function Buttons({ rowData, onAction }: { value: string, onChange
     onAction(rowData, "Open");
   }
 
-  const handleReferenceDocument = () => {
-    onAction(rowData, "Reference");
+  const handleSendDocument = () => {
+    onAction(rowData, "Send");
   }
 
   const handleDetailsDocument = () => {
@@ -23,7 +23,7 @@ export default function Buttons({ rowData, onAction }: { value: string, onChange
         <IconButton color="secondary" onClick={handleOpenDocument} title="مشاهده">
           <VisibilityIcon />
         </IconButton>
-        <IconButton color="primary" onClick={handleReferenceDocument} title="ارجاع">
+        <IconButton color="primary" onClick={handleSendDocument} title="ارجاع">
           <AddLinkIcon />
         </IconButton>
         <IconButton color="secondary" onClick={handleDetailsDocument} title="جزئیات">

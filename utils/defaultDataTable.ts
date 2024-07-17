@@ -27,7 +27,7 @@ const defaultDataTableOptions = (darkMode: "dark" | "light"): OptionType => {
     textLabels: {
       body: {
         title: "",
-        noMatch: "داده ای جهت نمایش وجود ندارد",
+        noMatch: "...", //"داده ای جهت نمایش وجود ندارد",
         toolTip: "مرتب سازی",
       },
       pagination: {

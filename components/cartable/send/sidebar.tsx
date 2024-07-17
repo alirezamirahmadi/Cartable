@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect, ChangeEvent } from "react";
-import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import { ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar, Avatar, Typography } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
+
 import { RoleType } from "@/types/roleType";
 
 export default function SideBar({ onSelect }: { onSelect: (role: RoleType) => void }): React.JSX.Element {
@@ -47,11 +47,11 @@ export default function SideBar({ onSelect }: { onSelect: (role: RoleType) => vo
         {
           roles.map((role: any) => (
             <div key={role._id}>
-              <ListItem alignItems="flex-start" sx={{ p: 0 }} onClick={() => onSelect(role)}>
+              <ListItem alignItems="flex-start" sx={{ p: 0 }}>
                 <ListItemAvatar>
-                  <Avatar alt={role.person[0].firstName} src="" sx={{ width: 35, height: 35, mx: "auto" }} />
+                  <Avatar alt={role.person.firstName} src="" sx={{ width: 35, height: 35, mx: "auto" }} />
                 </ListItemAvatar>
-                <ListItemText primary={`${role.person[0].firstName} ${role.person[0].lastName}`} secondary={role.title} sx={{ cursor: "pointer" }} />
+                <ListItemText primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} onClick={() => onSelect(role)} sx={{ cursor: "pointer" }} />
               </ListItem>
               <Divider variant="middle" component="li" />
             </div>
