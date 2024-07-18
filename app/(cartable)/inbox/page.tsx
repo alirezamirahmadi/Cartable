@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { IconButton, useTheme, ListItemText } from "@mui/material";
+import { IconButton, useTheme, ListItemText, Typography } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import MailIcon from '@mui/icons-material/Mail';
 import DraftsIcon from '@mui/icons-material/Drafts';
+import * as shamsi from "shamsi-date-converter";
 
 import TopBar from "@/components/cartable/inbox/topbar";
 import SideBar from "@/components/cartable/sidebar";
@@ -20,6 +21,7 @@ export default function Inbox(): React.JSX.Element {
   const searchParams = useSearchParams();
   const collectionId = searchParams.get("collid");
   const [isOpenSendModal, setIsOpenSendModal] = useState<boolean>(false);
+  const [selectedDocument, setSelectedDocument] = useState<any>();
 
   const theme = useTheme();
   const [rows, setRows] = useState([]);
@@ -44,7 +46,11 @@ export default function Inbox(): React.JSX.Element {
     },
     { field: { title: "collection.showTitle" }, label: "نوع مدرک" },
     { field: { title: "urgency.title" }, label: "فوریت" },
-    { field: { title: "send.sendDate" }, label: "تاریخ دریافت" },
+    {
+      field: { title: "send.sendDate" }, label: "زمان دریافت", kind: "component", options: {
+        component: (value, onChange, rowData) => (<Typography variant="body2" sx={{direction:"rtl"}}>{shamsi.gregorianToJalali(value).join("/")} {new Date(value).toLocaleTimeString()}</Typography>)
+      }
+    },
     {
       field: { title: "Details" }, label: "", kind: "component", options: {
         component: (value, onChange, rowData) => (<Buttons value={value} onChange={(event: any) => onChange && onChange(event.target.value)} rowData={rowData} onAction={handleAction} />)
@@ -82,9 +88,11 @@ export default function Inbox(): React.JSX.Element {
   }
 
   const handleAction = (data: any, action: string) => {
+    setSelectedDocument(data);
+
     switch (action) {
       case "Open":
-        openDocument(data);
+        openDocument();
         break;
       case "Send":
         openSendModal();
@@ -94,15 +102,15 @@ export default function Inbox(): React.JSX.Element {
     }
   }
 
-  const openDocument = async (data: any) => {
+  const openDocument = async () => {
     const today = new Date();
 
-    await fetch(`api/v1/receives/${data._id}`, {
+    await fetch(`api/v1/receives/${selectedDocument?._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ observed: true, viewDate: data.viewDate ?? today, lastViewedDate: today, })
+      body: JSON.stringify({ observed: true, viewDate: selectedDocument?.viewDate ?? today, lastViewedDate: today, })
     })
       .then(res => { res.status === 201 && loadCollectionData() })
   }
@@ -122,7 +130,7 @@ export default function Inbox(): React.JSX.Element {
           <ReactDataTable rows={rows} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
         </div>
       </div>
-      <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send />} onCloseModal={() => setIsOpenSendModal(false)} />
+      <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={selectedDocument?.send?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />
     </>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { Box, IconButton, Typography, Menu, Avatar, Tooltip, MenuItem } from "@mui/material";
+import { Box, IconButton, Typography, Menu, Avatar, Tooltip, MenuItem, ListItemText } from "@mui/material";
 import { useCookies } from "react-cookie";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -96,7 +96,7 @@ export default function MyAccount(): React.JSX.Element {
           onClose={handleCloseUserMenu}
         >
           <MenuItem >
-            <Typography textAlign="right">{me.firstName} {me.lastName}</Typography>
+          <ListItemText primary={`${me.firstName} ${me.lastName}`} secondary={me.selectedRole.title} />
           </MenuItem>
           <MenuItem onClick={handleDarkMode}>
             <Typography textAlign="right">{cookies["dark-mode"] ? "حالت روشن" : "حالت تاریک"}</Typography>

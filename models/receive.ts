@@ -19,9 +19,11 @@ const schema = new mongoose.Schema({
   },
   viewDate: {
     type: Date,
+    null: true,
   },
   lastViewedDate: {
     type: Date,
+    null: true,
   },
   comment: {
     type: String,

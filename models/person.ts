@@ -51,8 +51,7 @@ const schema = new mongoose.Schema({
   account: {
     username: { type: String, require: true, minLength: 4 },
     password: { type: String, require: true, minLength: 8 },
-  },
-  refRole: [mongoose.Schema.ObjectId]
+  }
 })
 
 const personModel = mongoose.models.person || mongoose.model('person', schema);

@@ -14,12 +14,12 @@ const GET = async (request: Request) => {
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
       .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" });
-    }
-    else {
-      let refCollection = searchParams.get('refCollection');
-      let refDocument = searchParams.get('refDocument');
-      // send = await sendModel.find({ refCollection, refDocument }).exec();
-      send = await sendModel.aggregate()
+  }
+  else {
+    let refCollection = searchParams.get('refCollection');
+    let refDocument = searchParams.get('refDocument');
+    // send = await sendModel.find({ refCollection, refDocument }).exec();
+    send = await sendModel.aggregate()
       .match({ refCollection: new mongoose.Types.ObjectId(refCollection ?? ''), refDocument: new mongoose.Types.ObjectId(refDocument ?? '') })
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
@@ -34,12 +34,12 @@ const GET = async (request: Request) => {
 const POST = async (request: Request) => {
   connectToDB();
 
-  const { refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, parentReceive } = await request.json();
+  const { refPerson, refRole, refCollection, refDocument, sendDate, parentReceive } = await request.json();
 
-  const send = await sendModel.create({ refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, parentReceive });
+  const send = await sendModel.create({ refPerson, refRole, refCollection, refDocument, ipAddress: (request.headers.get('X-Forwarded-For'))?.split(":").reverse()[0], sendDate, parentReceive });
 
   if (send) {
-    return Response.json({ message: "Document sent successfully" }, { status: 201 });
+    return Response.json({ message: "Document sent successfully", _id: send._id }, { status: 201 });
   }
   return Response.json({ message: "Document was not sent" }, { status: 500 });
 }

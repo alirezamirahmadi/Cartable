@@ -28,6 +28,18 @@ type ReceiverType = {
   comment: string,
 }
 
+type ReceiveType = {
+  _id?: string,
+  refSend: string,
+  refPerson: string,
+  refRole: string,
+  refUrgency: string,
+  viewDate: Date | null,
+  lastViewedDate: Date | null,
+  comment: string,
+  observed: boolean
+}
+
 export type {
-  CollectionType, InboxListType, UrgencyType, ReceiverType
+  CollectionType, InboxListType, UrgencyType, ReceiverType, ReceiveType
 }

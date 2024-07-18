@@ -36,6 +36,7 @@
     "react-multi-date-picker": "^4.5.2",
     "react-redux": "^9.1.2",
     "react-spinners": "^0.14.1",
+    "shamsi-date-converter": "^1.0.5",
     "stylis": "^4.3.2",
     "stylis-plugin-rtl": "^2.1.1"
   },

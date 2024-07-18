@@ -1,4 +1,5 @@
 import { PersonType } from "./personType";
+import { RoleType } from "./roleType";
 
 type LoginType = {
   username: string,
@@ -7,9 +8,11 @@ type LoginType = {
 
 type MeType = {
   isLogin: boolean,
+  _id: string,
   firstName: string,
   lastName: string,
-  refRole?: string[],
+  selectedRole: { _id: string, title: string, root: string },
+  roles: [{ _id: string, title: string, root: string }],
 }
 
 export type {

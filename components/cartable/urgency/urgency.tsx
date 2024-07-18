@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react";
-import { Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { Select, MenuItem, SelectChangeEvent, FormControl } from "@mui/material";
 
 import type { UrgencyType } from "@/types/cartableType";
 
@@ -11,7 +11,6 @@ export default function Urgency({ defaultValue, onChange }: { defaultValue: Urge
   const [urgency, setUrgency] = useState<UrgencyType>({ _id: "", title: "" });
 
   useEffect(() => {
-
     fetch("api/v1/urgencies")
       .then(res => res.status === 200 && res.json())
       .then(data => {
@@ -20,7 +19,10 @@ export default function Urgency({ defaultValue, onChange }: { defaultValue: Urge
   }, [])
 
   useEffect(() => {
-    urgencies && setUrgency(defaultValue);
+    if(urgencies){
+      setUrgency(defaultValue._id ? defaultValue : urgencies[0]);
+      !defaultValue._id && onChange(urgencies[0]);
+    } 
   }, [urgencies])
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -30,13 +32,15 @@ export default function Urgency({ defaultValue, onChange }: { defaultValue: Urge
 
   return (
     <>
-      <Select value={urgency._id} onChange={handleChange}>
-        {
-          urgencies?.map((urgency: UrgencyType) => (
-            <MenuItem key={urgency._id} value={urgency._id}>{urgency.title}</MenuItem>
-          ))
-        }
-      </Select>
+      <FormControl>
+        <Select value={urgency._id} onChange={handleChange} >
+          {
+            urgencies?.map((urgency: UrgencyType) => (
+              <MenuItem key={urgency._id} value={urgency._id}>{urgency.title}</MenuItem>
+            ))
+          }
+        </Select>
+      </FormControl>
     </>
   )
 }

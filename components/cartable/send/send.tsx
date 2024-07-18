@@ -1,23 +1,28 @@
 "use client"
 
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
-import { IconButton, useTheme, ListItemText, TextField, Select, MenuItem, Button } from "@mui/material";
+import { IconButton, useTheme, ListItemText, TextField, Button } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
+import CloseIcon from '@mui/icons-material/Close';
 
+import { useAppSelector } from "@/lib/hooks";
 import SideBar from "./sidebar";
-import { RoleType } from "@/types/roleType";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
-import type { ReceiverType, UrgencyType } from "@/types/cartableType";
 import Urgency from "../urgency/urgency";
+import Snack from "@/components/general/snack/snack";
+import type { ReceiverType, UrgencyType, ReceiveType } from "@/types/cartableType";
+import type { SnackProps } from "@/types/generalType";
 
-export default function Send(): React.JSX.Element {
+export default function Send({ refCollection, refDocument, parentReceive, onClose }: { refCollection: string, refDocument: string, parentReceive: string, onClose: () => void }): React.JSX.Element {
 
   const theme = useTheme();
 
   const [receivers, setReceivers] = useState<ReceiverType[]>();
   const [deleteReceiver, setDeleteReceiver] = useState<ReceiverType>();
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
+  const me = useAppSelector(state => state.me);
 
   const columns: ColumnType[] = [
     { field: { title: "_id" }, label: "ID", options: { display: false } },
@@ -71,8 +76,6 @@ export default function Send(): React.JSX.Element {
   const handleDeleteReceiver = (rowData: any) => {
     setDeleteReceiver(rowData);
   }
-  console.log(receivers);
-  
 
   const handleSelectRole = (role: any) => {
     if (!receivers?.some((receiver: ReceiverType) => receiver.role._id === role._id)) {
@@ -88,8 +91,38 @@ export default function Send(): React.JSX.Element {
     }
   }
 
-  const handleSubmit = () => {
-console.log(receivers);
+  const handleSubmit = async () => {
+    
+    await fetch("api/v1/sends", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ refPerson: me._id, refRole: me.selectedRole._id, refCollection, refDocument, sendDate: new Date(), parentReceive })
+    })
+      .then(res => res.status === 201 && res.json())
+
+      .then(async (data) => {
+        let receiverList: ReceiveType[] = [];
+        receivers?.map((receiver: ReceiverType) => {
+          receiverList.push({ refSend: data._id, refPerson: receiver.person._id, refRole: receiver.role._id, refUrgency: receiver.urgency._id, viewDate: null, lastViewedDate: null, comment: receiver.comment, observed: false })
+        })
+        await fetch("api/v1/receives", {
+          method: "POST",
+          headers: {
+            "Content-Type": "Application/json"
+          },
+          body: JSON.stringify(receiverList)
+        })
+          .then(res => res.status === 201 && onClose())
+          .catch(() => {
+            setSnackProps({ context: "ارسال مدرک با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+          })
+      })
+
+      .catch(() => {
+        setSnackProps({ context: "ارسال مدرک با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+      })
   }
 
   return (
@@ -102,9 +135,11 @@ console.log(receivers);
           />
         </div>
       </div>
-      <div className="flex justify-center">
-        <Button variant="contained" color="primary" onClick={handleSubmit} startIcon={<KeyboardArrowUpOutlinedIcon />}>ارسال</Button>
+      <div className="flex justify-center gap-x-4">
+        <Button variant="outlined" color="primary" onClick={() => onClose()} startIcon={<CloseIcon />}>انصراف</Button>
+        <Button variant="contained" color="primary" disabled={receivers && receivers.length > 0 ? false : true} onClick={handleSubmit} startIcon={<KeyboardArrowUpOutlinedIcon />}>ارسال</Button>
       </div>
+      <Snack {...snackProps} />
     </>
   )
 }

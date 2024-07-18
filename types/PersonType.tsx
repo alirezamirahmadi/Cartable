@@ -14,7 +14,6 @@ type PersonType = {
   description?: string,
   isActive?: boolean,
   account: AccountType,
-  refRole?: string[],
 }
 
 type AccountType = {

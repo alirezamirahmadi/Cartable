@@ -34,11 +34,12 @@ const GET = async (request: Request) => {
 const POST = async (request: Request) => {
   connectToDB();
 
-  const { refSend, refPerson, refRole, refUrgency, viewDate, lastViewedDate, comment, observed } = await request.json();
+  // const { refSend, refPerson, refRole, refUrgency, viewDate, lastViewedDate, comment, observed } = await request.json();
+  const receivers = await request.json();
+console.log(receivers)
+  const receive = await receiveModel.insertMany(receivers);
 
-  const send = await receiveModel.create({ refSend, refPerson, refRole, refUrgency, viewDate, lastViewedDate, comment, observed });
-
-  if (send) {
+  if (receive) {
     return Response.json({ message: "Document receive successfully" }, { status: 201 });
   }
   return Response.json({ message: "Document was not receive" }, { status: 500 });

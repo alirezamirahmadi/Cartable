@@ -2,16 +2,14 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import type { MeType } from "@/types/authType";
 
-const initialState: MeType = { isLogin: false, firstName: "", lastName: "" };
+const initialState: MeType = { isLogin: false, _id: "", firstName: "", lastName: "", roles: [{ _id: "", title: "", root: "" }], selectedRole: { _id: "", title: "", root: "" } };
 
 const getMe = createAsyncThunk(
   "me/GET",
   async () => {
     return await fetch("api/v1/auth/me")
-      .then(res => {
-        return res.status === 200 && res.json()
-      })
-      .then(data => { return data ? { isLogin: true, ...data } : initialState })
+      .then(res => res.status === 200 && res.json())
+      .then(data => { return data ? { isLogin: true, ...data, selectedRole: { _id: data.roles[0]._id, title: data.roles[0].title, root: data.roles[0].root } } : initialState })
       .catch(() => initialState);
   }
 )
