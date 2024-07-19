@@ -31,7 +31,7 @@ const POST = async (request: Request) => {
 
   connectToDB();
 
-  const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole }: PersonType = await request.json();
+  const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account }: PersonType = await request.json();
 
   // data check
   if (firstName?.trim().length < 2 || lastName?.trim().length < 2 || account?.username?.trim().length < 4 || account?.password?.trim().length < 8) {
@@ -47,7 +47,7 @@ const POST = async (request: Request) => {
   // hash password
   const hashedPassword = await hashPassword(account.password);
 
-  const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account: { ...account, password: hashedPassword }, refRole });
+  const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account: { ...account, password: hashedPassword } });
 
   if (person) {
     return Response.json({ message: "Person created successfully" }, {status: 201});

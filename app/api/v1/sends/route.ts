@@ -18,12 +18,19 @@ const GET = async (request: Request) => {
   else {
     let refCollection = searchParams.get('refCollection');
     let refDocument = searchParams.get('refDocument');
-    // send = await sendModel.find({ refCollection, refDocument }).exec();
     send = await sendModel.aggregate()
       .match({ refCollection: new mongoose.Types.ObjectId(refCollection ?? ''), refDocument: new mongoose.Types.ObjectId(refDocument ?? '') })
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
-      .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" });
+      .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" })
+      .lookup({ from: "receives", localField: "_id", foreignField: "refSend", as: "receives" })
+      .lookup({ from: "people", localField: "receives.refPerson", foreignField: "_id", as: "receivers" })
+      .lookup({ from: "roles", localField: "receives.refRole", foreignField: "_id", as: "receiversRole" })
+      .lookup({ from: "urgencies", localField: "receives.refUrgency", foreignField: "_id", as: "urgency" })
+      .project({
+        "person.firstName": 1, "person.lastName": 1, "role.title": 1, "receivers.firstName": 1, "receivers.lastName": 1, "sendDate": 1,
+        "receiversRole.title":1, "urgency.title": 1, "receives.comment": 1, "receives.viewDate": 1, "receives.lastViewedDate": 1
+      })
   }
 
   response = send ? { json: send, status: 200 } : { json: { message: "not found" }, status: 404 };

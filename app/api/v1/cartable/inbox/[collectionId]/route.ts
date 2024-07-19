@@ -21,7 +21,7 @@ const GET = async (request: Request, { params }: { params: { collectionId: strin
       .lookup({ from: "people", localField: "send.refPerson", foreignField: "_id", as: "sender" })
       .lookup({ from: "collections", localField: "send.refCollection", foreignField: "_id", as: "collection" })
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
-      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+      .lookup({ from: "roles", localField: "send.refRole", foreignField: "_id", as: "role" })
       .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" })
       .match({ "person.account.username": tokenPayload.username })
       .match({ "send.refCollection": new mongoose.Types.ObjectId(params.collectionId) })

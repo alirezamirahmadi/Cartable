@@ -2,6 +2,8 @@ import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
 import mongoose from "mongoose";
 
+import { hashPassword } from "@/utils/crypto";
+
 const GET = async (request: Request, { params }: { params: { personId: string } }) => {
   connectToDB();
 
@@ -18,9 +20,17 @@ const GET = async (request: Request, { params }: { params: { personId: string } 
 const PUT = async (request: Request, { params }: { params: { personId: string } }) => {
   connectToDB();
 
-  const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole } = await request.json();
+  const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account } = await request.json();
 
-  const person = await personModel.findByIdAndUpdate(params.personId, { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account, refRole });
+  // data check
+  if (firstName?.trim().length < 2 || lastName?.trim().length < 2 || account?.username?.trim().length < 4 || account?.password?.trim().length < 8) {
+    return Response.json({ message: "Data is invalid" }, { status: 422 });
+  }
+
+  // hash password
+  const hashedPassword = await hashPassword(account.password);
+
+  const person = await personModel.findByIdAndUpdate(params.personId, { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account: { ...account, password: hashedPassword } });
 
   if (person) {
     return Response.json({ message: "Person updated successfully" }, { status: 201 });

@@ -17,13 +17,34 @@ const GET = async (request: Request) => {
       .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" });
   }
   else {
-    let refUrgency = searchParams.get('refUrgency');
+    // let refUrgency = searchParams.get('refUrgency');
+    // receive = await receiveModel.aggregate()
+    //   .match({ refUrgency: new mongoose.Types.ObjectId(refUrgency ?? '') })
+    //   .lookup({ from: "sends", localField: "refSend", foreignField: "_id", as: "send" })
+    //   .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+    //   .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+    //   .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" });
+
+    let refCollection = searchParams.get('refCollection');
+    let refDocument = searchParams.get('refDocument');
     receive = await receiveModel.aggregate()
-      .match({ refUrgency: new mongoose.Types.ObjectId(refUrgency ?? '') })
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "receiver" })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "receiverRole" })
+      .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" })
       .lookup({ from: "sends", localField: "refSend", foreignField: "_id", as: "send" })
-      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
-      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
-      .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" });
+      .lookup({ from: "people", localField: "send.refPerson", foreignField: "_id", as: "sender" })
+      .lookup({ from: "roles", localField: "send.refRole", foreignField: "_id", as: "senderRole" })
+      .match({ "send.refCollection": new mongoose.Types.ObjectId(refCollection ?? ''), "send.refDocument": new mongoose.Types.ObjectId(refDocument ?? '') })
+      .project({
+        "sender.firstName": 1, "sender.lastName": 1, "senderRole.title": 1, "send.sendDate": 1,
+        "receiver.firstName": 1, "receiver.lastName": 1, "receiverRole.title": 1, "urgency.title": 1, "comment": 1, "viewDate": 1, "lastViewedDate": 1
+      })
+      .unwind("send")
+      .unwind("sender")
+      .unwind("receiver")
+      .unwind("senderRole")
+      .unwind("receiverRole")
+      .unwind("urgency")
   }
 
   response = receive ? { json: receive, status: 200 } : { json: { message: "not found" }, status: 404 };
@@ -34,9 +55,7 @@ const GET = async (request: Request) => {
 const POST = async (request: Request) => {
   connectToDB();
 
-  // const { refSend, refPerson, refRole, refUrgency, viewDate, lastViewedDate, comment, observed } = await request.json();
   const receivers = await request.json();
-console.log(receivers)
   const receive = await receiveModel.insertMany(receivers);
 
   if (receive) {

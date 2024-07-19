@@ -69,7 +69,7 @@ export default function SideBar(): React.JSX.Element {
   const handleCollectionData = (data: any) => {
     const myCollections = new Array<InboxListType>();
 
-    data.map((collection: any) => {
+    data?.map((collection: any) => {
       myCollections.push({ _id: collection?._id?._id ? collection?._id?._id[0] : "", title: collection?._id?.showTitle ? collection?._id?.showTitle[0] : "", count: 0 });
     })
     loadNonObserved(myCollections)
