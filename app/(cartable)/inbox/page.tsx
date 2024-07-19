@@ -132,7 +132,7 @@ export default function Inbox(): React.JSX.Element {
     <>
       <div className="flex">
         <Box sx={{ display: { xs: "none", md: "block" }, maxWidth: 300 }}>
-          <SideBar />
+          <SideBar place="inbox"/>
         </Box>
         <div className="w-full mx-2">
           <TopBar />

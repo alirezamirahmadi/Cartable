@@ -26,7 +26,7 @@ const Collections = styled(List)<{ component?: React.ElementType }>({
   },
 });
 
-export default function SideBar(): React.JSX.Element {
+export default function SideBar({ place }: { place: "inbox" | "outbox" }): React.JSX.Element {
 
   const searchParams = useSearchParams();
 
@@ -45,15 +45,16 @@ export default function SideBar(): React.JSX.Element {
   }, [search])
 
   const loadCollectionData = async () => {
-    await fetch(search ? `api/v1/collections?showtitle=${search}` : "api/v1/cartable/inbox", {
+    place && await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/${place}`, {
       method: "GET",
       headers: {
         "Get-Type": "all"
       }
     })
-      .then(res => res.json())
+      .then(res => res.status === 200 && res.json())
       .then(data => handleCollectionData(data))
   }
+
 
   const loadNonObserved = async (inboxList: InboxListType[]) => {
     await fetch(search ? `api/v1/collections?showtitle=${search}` : "api/v1/cartable/inbox", {
@@ -62,17 +63,18 @@ export default function SideBar(): React.JSX.Element {
         "Get-Type": "nonObserved"
       }
     })
-      .then(res => res.json())
+      .then(res => res.status === 200 && res.json())
       .then(data => handleNonObserved(data, inboxList))
   }
 
   const handleCollectionData = (data: any) => {
+    console.log(data)
     const myCollections = new Array<InboxListType>();
 
     data?.map((collection: any) => {
       myCollections.push({ _id: collection?._id?._id ? collection?._id?._id[0] : "", title: collection?._id?.showTitle ? collection?._id?.showTitle[0] : "", count: 0 });
     })
-    loadNonObserved(myCollections)
+    place === "inbox" ? loadNonObserved(myCollections) : setCollections(myCollections);
   }
 
   const handleNonObserved = (data: any, inboxList: InboxListType[]) => {
@@ -101,17 +103,16 @@ export default function SideBar(): React.JSX.Element {
 
   const handleOpenCollection = (collectionId: string) => {
     setSelectedCollection(collectionId);
-    router.replace(`/inbox?collid=${collectionId}`);
+    router.replace(`/${place}?collid=${collectionId}`);
   }
 
   return (
-    <Box sx={{ display: 'flex', boxShadow:1 }}>
+    <Box sx={{ display: 'flex', boxShadow: 1 }}>
       <Paper elevation={0} sx={{ maxWidth: 256 }}>
         <Collections component="nav" disablePadding>
           <ListItemButton component="a" href="#customized-list" sx={{ display: { xs: "none", md: "block" } }}>
             <ListItemIcon sx={{ fontSize: 20 }}><CollectionsIcon /></ListItemIcon>
-            <ListItemText sx={{ my: 0 }} primary="مدارک"
-              primaryTypographyProps={{ fontSize: 20, fontWeight: 'medium', letterSpacing: 0, }} />
+            <ListItemText sx={{ my: 0 }} primary={place === "inbox" ? "کارتابل جاری" : "کارتابل پیگیری"} primaryTypographyProps={{ fontSize: 20, fontWeight: 'medium', letterSpacing: 0, }} />
           </ListItemButton>
           <Divider />
           <ListItem component="div" disablePadding>
@@ -146,7 +147,7 @@ export default function SideBar(): React.JSX.Element {
             </ListItemButton>
             {open &&
               collections.sort((a, b) => a._id > b._id ? 1 : -1).map((collection) => (
-                <ListItemButton key={collection._id} sx={{ py: 0, minHeight: 32, mt:1 }} onClick={() => handleOpenCollection(collection._id)}>
+                <ListItemButton key={collection._id} sx={{ py: 0, minHeight: 32, mt: 1 }} onClick={() => handleOpenCollection(collection._id)}>
                   <Badge badgeContent={collection.count} color="secondary">
                     <ListItemText primary={collection.title} primaryTypographyProps={{
                       fontSize: selectedCollection === collection._id ? 16 : 14,
