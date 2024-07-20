@@ -8,6 +8,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import * as shamsi from "shamsi-date-converter";
 
+import { useAppSelector } from "@/lib/hooks";
 import TopBar from "@/components/cartable/inbox/topbar";
 import SideBar from "@/components/cartable/sidebar";
 import { Box } from "@mui/material";
@@ -19,6 +20,7 @@ import Circulation from "@/components/cartable/details/circulation/circulation";
 
 export default function Inbox(): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const searchParams = useSearchParams();
   const collectionId = searchParams.get("collid");
   const [isOpenSendModal, setIsOpenSendModal] = useState<boolean>(false);
@@ -26,11 +28,11 @@ export default function Inbox(): React.JSX.Element {
   const [selectedDocument, setSelectedDocument] = useState<any>();
 
   const theme = useTheme();
-  const [rows, setRows] = useState([]);
+  const [documents, setDocuments] = useState([]);
 
   const columns: ColumnType[] = [
     {
-      field: { title: "observed" }, label: "آیکن مشاهده", kind: "component", options: {
+      field: { title: "observed" }, label: "", kind: "component", options: {
         component: (value, onChange, rowData) => (
           <IconButton onClick={() => handleObserved(rowData)} disabled={value ? false : true}>
             {value ? <DraftsIcon fontSize="small" titleAccess="مشاهده شده (برای تغییر به مشاهده نشده کلیک کنید)" /> : <MailIcon fontSize="small" color="primary" titleAccess="مشاهده نشده" />}
@@ -46,6 +48,7 @@ export default function Inbox(): React.JSX.Element {
         )
       }
     },
+    { field: { title: "send.refDocument" }, label: "شماره مدرک" },
     { field: { title: "collection.showTitle" }, label: "نوع مدرک" },
     { field: { title: "urgency.title" }, label: "فوریت" },
     {
@@ -69,10 +72,10 @@ export default function Inbox(): React.JSX.Element {
   }, [])
 
   const loadCollectionData = async () => {
-    collectionId && await fetch(`api/v1/cartable/inbox/${collectionId}`)
+    collectionId && me && await fetch(`api/v1/cartable/inbox/${collectionId}?roleId=${me.selectedRole._id}`)
       .then(res => res.status === 200 && res.json())
       .then(data => {
-        setRows(data);
+        setDocuments(data);
       })
   }
 
@@ -97,12 +100,10 @@ export default function Inbox(): React.JSX.Element {
         openDocument(data);
         break;
       case "Send":
-        openSendModal();
+        setIsOpenSendModal(true);
         break;
       case "Details":
-        openDatailsModal();
-        break;
-      default:
+        setIsOpenDetailsModal(true);
         break;
     }
   }
@@ -120,25 +121,17 @@ export default function Inbox(): React.JSX.Element {
       .then(res => { res.status === 201 && loadCollectionData() })
   }
 
-  const openSendModal = () => {
-    setIsOpenSendModal(true);
-  }
-
-  const openDatailsModal = () => {
-    setIsOpenDetailsModal(true);
-  }
-
   return (
     <>
-      <div className="flex">
+      <Box sx={{ display: "flex" }}>
         <Box sx={{ display: { xs: "none", md: "block" }, maxWidth: 300 }}>
-          <SideBar place="inbox"/>
+          <SideBar place="inbox" />
         </Box>
-        <div className="w-full mx-2">
+        <Box sx={{ width: "100%", mx: 1 }}>
           <TopBar />
-          <ReactDataTable rows={rows} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
-        </div>
-      </div>
+          <ReactDataTable rows={documents} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
+        </Box>
+      </Box>
       <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={selectedDocument?.send?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />
       <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={selectedDocument?.send?.refDocument} onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />
     </>

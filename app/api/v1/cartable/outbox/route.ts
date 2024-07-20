@@ -9,7 +9,7 @@ const GET = async () => {
   const tokenPayload = verifyToken(token?.value ?? "");
 
   if (!tokenPayload) {
-    return Response.json({ message: "Person not found" }, { status: 404 })
+    return Response.json({ message: "Person is not login" }, { status: 401 })
   }
 
   if (typeof tokenPayload !== "string") {
@@ -23,8 +23,8 @@ const GET = async () => {
     if (sends) {
       return Response.json(sends, { status: 200 });
     }
-    return Response.json({ message: "not found" }, { status: 404 });
   }
+  return Response.json({ message: "not found" }, { status: 404 });
 }
 
 export {

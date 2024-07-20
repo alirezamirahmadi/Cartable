@@ -68,7 +68,6 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
   }
 
   const handleCollectionData = (data: any) => {
-    console.log(data)
     const myCollections = new Array<InboxListType>();
 
     data?.map((collection: any) => {
