@@ -1,4 +1,5 @@
 import receiveModel from "@/models/receive";
+import sendModel from "@/models/send";
 import connectToDB from "@/utils/db";
 import mongoose from "mongoose";
 
@@ -35,10 +36,23 @@ const PUT = async (request: Request, { params }: { params: { receiveId: string }
 const DELETE = async (request: Request, { params }: { params: { receiveId: string } }) => {
   connectToDB();
 
-  const receive = await receiveModel.findByIdAndDelete(params.receiveId);
+  const { refSend } = await request.json();
+  const receives = await receiveModel.find({ refSend });
 
-  if (receive) {
-    return Response.json({ message: "Receive deleted successfully" }, { status: 200 });
+  if (receives.length > 1) {
+    const receive = await receiveModel.findByIdAndDelete(params.receiveId);
+    
+    if (receive) {
+      return Response.json({ message: "Receive deleted successfully" }, { status: 200 });
+    }
+  }
+  else if (receives.length === 1) {
+    const receive = await receiveModel.findByIdAndDelete(params.receiveId);
+    const send = receive && await sendModel.findByIdAndDelete(refSend);
+    
+    if (receive && send) {
+      return Response.json({ message: "Receive deleted successfully" }, { status: 200 });
+    }
   }
   return Response.json({ message: "Receive was not deleted" }, { status: 500 });
 }

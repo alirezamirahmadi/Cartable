@@ -10,6 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import { useRouter } from 'next/navigation';
 
+import { useAppSelector } from '@/lib/hooks';
 import { InboxListType } from '@/types/cartableType';
 
 const Collections = styled(List)<{ component?: React.ElementType }>({
@@ -28,8 +29,8 @@ const Collections = styled(List)<{ component?: React.ElementType }>({
 
 export default function SideBar({ place }: { place: "inbox" | "outbox" }): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const searchParams = useSearchParams();
-
   const router = useRouter();
   const [open, setOpen] = useState(true);
   const [search, setSearch] = useState<string>("");
@@ -45,7 +46,7 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
   }, [search])
 
   const loadCollectionData = async () => {
-    place && await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/${place}`, {
+    place && me && await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/${place}?roleId=${me.selectedRole._id}`, {
       method: "GET",
       headers: {
         "Get-Type": "all"
@@ -57,7 +58,7 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
 
 
   const loadNonObserved = async (inboxList: InboxListType[]) => {
-    await fetch(search ? `api/v1/collections?showtitle=${search}` : "api/v1/cartable/inbox", {
+    await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/inbox?roleId=${me.selectedRole._id}`, {
       method: "GET",
       headers: {
         "Get-Type": "nonObserved"

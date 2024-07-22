@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import receiveModel from "@/models/receive";
 import connectToDB from "@/utils/db";
 import { verifyToken } from "@/utils/token";
+import mongoose from "mongoose";
 
 const GET = async (request: Request) => {
   connectToDB();
@@ -10,6 +11,7 @@ const GET = async (request: Request) => {
   const token = cookies().get("token");
   const tokenPayload = verifyToken(token?.value ?? "");
   const { searchParams } = new URL(request.url);
+  const roleId = searchParams.get("roleId");
   const showTitle = searchParams.get("showtitle");
 
   if (!tokenPayload) {
@@ -25,9 +27,10 @@ const GET = async (request: Request) => {
         .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
         // .match({ "collection.showTitle": showTitle && { $regex: `.*${showTitle}.*` } })
         .match({ "person.account.username": tokenPayload.username })
+        .match({ refRole: new mongoose.Types.ObjectId(roleId ?? "") })
         .project({ "collection._id": 1, "collection.showTitle": 1 })
         .group({ _id: { "_id": "$collection._id", "showTitle": "$collection.showTitle" } })
-      return Response.json(receive, { status: 200 });
+        return Response.json(receive, { status: 200 });
     }
     else if (getType === "nonObserved") {
 
@@ -38,6 +41,7 @@ const GET = async (request: Request) => {
         .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
         // .match({ "collection.showTitle": showTitle && { $regex: `.*${showTitle}.*` } })
         .match({ "person.account.username": tokenPayload.username })
+        .match({ refRole: new mongoose.Types.ObjectId(roleId ?? "") })
         .project({ "collection._id": 1 })
         .group({ _id: { "_id": "$collection._id" }, count: { $sum: 1 } })
       return Response.json(receive, { status: 200 });
