@@ -12,18 +12,24 @@ import { changeMode } from "@/lib/features/darkMode/darkSlice";
 import Modal from "../modal/modal";
 import ChangePassword from "@/components/changePassword/changePassword";
 import Snack from "../snack/snack";
+import MyRoles from "../myRoles/myRoles";
 
 export default function MyAccount(): React.JSX.Element {
 
   const [isOpenSnack, setIsOpenSnack] = useState<boolean>(false);
   const [snackContext, setSnackContext] = useState<string>("");
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [isOpenPasswordModal, setIsOpenPasswordModal] = useState<boolean>(false);
+  const [isOpenRolesModal, setIsOpenRolesModal] = useState<boolean>(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
   const [cookies, setCookie,] = useCookies(["dark-mode"]);
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
   const router = useRouter();
+  
+  useEffect(() => {
+    dispatch(changeMode(cookies["dark-mode"] ?? false));
+  }, [])
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -52,29 +58,32 @@ export default function MyAccount(): React.JSX.Element {
   }
 
   const handleCloseModal = () => {
-    setIsOpenModal(false);
+    setIsOpenPasswordModal(false);
+    setIsOpenRolesModal(false);
   }
 
   const handleChangePassword = () => {
-    setIsOpenModal(true);
+    setIsOpenPasswordModal(true);
     setAnchorElUser(null);
   }
-  
-  useEffect(() => {
-    dispatch(changeMode(cookies["dark-mode"] ?? false));
-  }, [])
+
+  const handleMyRoles = () => {
+    setIsOpenRolesModal(true);
+    setAnchorElUser(null);
+  }
+  // console.log(me)
 
   const handleError = (context: string) => {
     setSnackContext(context);
     setIsOpenSnack(true);
   }
-  
+
   const handleCloseSnack = () => {
     setIsOpenSnack(false);
   }
-  
+
   const changePasswordSuccess = () => {
-    setIsOpenModal(false);
+    setIsOpenPasswordModal(false);
     setSnackContext("رمزعبور با موفقیت تغییر کرد");
     setIsOpenSnack(true);
   }
@@ -96,7 +105,10 @@ export default function MyAccount(): React.JSX.Element {
           onClose={handleCloseUserMenu}
         >
           <MenuItem >
-          <ListItemText primary={`${me.firstName} ${me.lastName}`} secondary={me.selectedRole.title} />
+            <ListItemText primary={`${me.firstName} ${me.lastName}`} secondary={me.selectedRole.title} />
+          </MenuItem>
+          <MenuItem onClick={handleMyRoles}>
+            <Typography textAlign="right">سمت های من</Typography>
           </MenuItem>
           <MenuItem onClick={handleDarkMode}>
             <Typography textAlign="right">{cookies["dark-mode"] ? "حالت روشن" : "حالت تاریک"}</Typography>
@@ -109,7 +121,9 @@ export default function MyAccount(): React.JSX.Element {
           </MenuItem>
         </Menu>
       </Box>
-      <Modal title="تغییر رمزعبور" isOpen={isOpenModal} body={<ChangePassword onChangePassword={changePasswordSuccess} onError={handleError} />} onCloseModal={handleCloseModal} />
+      <Modal title="تغییر رمزعبور" isOpen={isOpenPasswordModal} body={<ChangePassword onChangePassword={changePasswordSuccess} onError={handleError} />} onCloseModal={handleCloseModal} />
+      <Modal title="سمت های من" isOpen={isOpenRolesModal} body={<MyRoles />} onCloseModal={handleCloseModal} />
+
       <Snack context={snackContext} isOpen={isOpenSnack} severity="error" onCloseSnack={handleCloseSnack} />
       <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={handleCloseSnack} />
     </>

@@ -56,7 +56,6 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
       .then(data => handleCollectionData(data))
   }
 
-
   const loadNonObserved = async (inboxList: InboxListType[]) => {
     await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/inbox?roleId=${me.selectedRole._id}`, {
       method: "GET",

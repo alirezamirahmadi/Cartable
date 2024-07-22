@@ -19,7 +19,7 @@ const GET = async () => {
       .match({ "account.username": tokenPayload.username })
       .lookup({ from: "roles", localField: "_id", foreignField: "refPerson", as: "roles" })
       .match({ "roles.isActive": true })
-      .project({ "firstName": 1, "lastName": 1, "roles": 1 })
+      .project({ "firstName": 1, "lastName": 1, "roles._id": 1, "roles.root": 1, "roles.title": 1 })
       .limit(1);
     return person && Response.json(person[0], { status: 200 });
   }

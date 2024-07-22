@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 import type { MeType } from "@/types/authType";
 
@@ -21,7 +21,11 @@ const meSlice = createSlice({
   reducers: {
     clearMe: (me: MeType) => {
       return me = initialState
-    }
+    },
+    changeRole: (me: MeType, action: PayloadAction<MeType>) => {
+      me.selectedRole = action.payload.selectedRole;
+      return me;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getMe.fulfilled, (state, action) => action.payload);
@@ -34,4 +38,4 @@ export {
   getMe
 }
 
-export const { clearMe } = meSlice.actions;
+export const { clearMe, changeRole } = meSlice.actions;
