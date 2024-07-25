@@ -7,7 +7,7 @@ import RoleTreeView from "@/components/role/roleTreeView";
 import { RoleType } from "@/types/roleType";
 import Loading from "@/components/general/loading/loading";
 import Snack from "@/components/general/snack/snack";
-import type { SnackProps } from "@/types/general";
+import type { SnackProps } from "@/types/generalType";
 
 export default function Roles(): React.JSX.Element {
 
