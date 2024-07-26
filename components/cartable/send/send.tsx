@@ -8,7 +8,7 @@ import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutl
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useAppSelector } from "@/lib/hooks";
-import SideBar from "./sidebar";
+import Roles from "../../role/roles";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Urgency from "../urgency/urgency";
 import Snack from "@/components/general/snack/snack";
@@ -140,7 +140,7 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
   return (
     <>
       <div className="flex">
-        <SideBar roles={roles} onSelect={handleSelectRole} />
+        <Roles roles={roles} onAction={handleSelectRole} add/>
         <div className="w-full">
           <ReactDataTable rows={receivers ?? []} columns={columns} direction="rtl"
             options={{ ...defaultDataTableOptions(theme.palette.mode), filter: false, search: false, download: false, viewColumns: false, print: false }}

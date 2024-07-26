@@ -6,11 +6,10 @@ import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import GroupIcon from '@mui/icons-material/Group';
 import SearchIcon from '@mui/icons-material/Search';
 import ReplyIcon from '@mui/icons-material/Reply';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 import type { GroupType } from "@/types/groupType";
 import type { RoleType } from "@/types/roleType";
-import SideBar from "@/components/cartable/send/sidebar";
+import Roles from "@/components/role/roles";
 
 export default function Groups(): React.JSX.Element {
 
@@ -23,6 +22,7 @@ export default function Groups(): React.JSX.Element {
 
   useEffect(() => {
     loadGroupData();
+    loadRoleData();
   }, [])
 
   useEffect(() => {
@@ -82,53 +82,53 @@ export default function Groups(): React.JSX.Element {
     setRoots(tempRoots);
   }
 
-  const handleSelectRole = (role: RoleType) => {
+  const handleActionRole = (role: RoleType) => {
 
   }
 
   return (
     <>
-      <Box sx={{ width: '100%', maxWidth: 256, bgcolor: 'background.paper' }}>
-        <Breadcrumbs>
-          {roots.length > 1 && roots.map((root: GroupType, index) => (
-            <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.title}</Button>
-          ))}
-        </Breadcrumbs>
-        <List component="nav" aria-label="main mailbox folders">
-          <ListItem component="div" disablePadding>
-            <ListItemButton sx={{ height: 56, m: 0 }}>
-              <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
-                value={search} onChange={handleChangeSearch} sx={{ m: 0 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </ListItemButton>
-            <IconButton onClick={handleBackward} disabled={roots.length === 1} title="بازگشت">
-              <ReplyIcon />
-            </IconButton>
-          </ListItem>
-          {filteredGroups.map((group: GroupType) => (
-            <ListItem key={group._id} sx={{ py: 0, minHeight: 24 }}>
-              <IconButton onClick={() => handleSubGroup(group)}>
-                {group.kind === 1 ? <FolderSharedIcon /> : <GroupIcon />}
-              </IconButton>
-              <ListItemButton sx={{ py: 0 }} selected={selectedIndex === 0} onClick={(event) => handleListItemClick(event, 0)}>
-                <ListItemText primary={group.title} />
+      <Box sx={{ display: "flex" }}>
+        <Box sx={{ width: '100%', maxWidth: 256, bgcolor: 'background.paper' }}>
+          <Breadcrumbs>
+            {roots.length > 1 && roots.map((root: GroupType, index) => (
+              <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.title}</Button>
+            ))}
+          </Breadcrumbs>
+          <List component="nav" aria-label="main mailbox folders">
+            <ListItem component="div" disablePadding>
+              <ListItemButton sx={{ height: 56, m: 0 }}>
+                <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
+                  value={search} onChange={handleChangeSearch} sx={{ m: 0 }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
               </ListItemButton>
+              <IconButton onClick={handleBackward} disabled={roots.length === 1} title="بازگشت">
+                <ReplyIcon />
+              </IconButton>
             </ListItem>
-          ))}
-        </List>
+            {filteredGroups.map((group: GroupType) => (
+              <ListItem key={group._id} sx={{ py: 0, minHeight: 24 }}>
+                <IconButton onClick={() => handleSubGroup(group)}>
+                  {group.kind === 1 ? <FolderSharedIcon /> : <GroupIcon />}
+                </IconButton>
+                <ListItemButton sx={{ py: 0 }} selected={selectedIndex === 0} onClick={(event) => handleListItemClick(event, 0)}>
+                  <ListItemText primary={group.title} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+        <Box sx={{ mx: "auto" }}>
+          <Roles roles={roles} onAction={handleActionRole} omit />
+        </Box>
       </Box>
-      {/* <SideBar roles={roles} onSelect={handleSelectRole} buttons={
-        <IconButton color="error" onClick={handleDelete} title="حذف">
-          <DeleteIcon />
-        </IconButton>
-      } /> */}
     </>
   )
 }

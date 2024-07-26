@@ -5,25 +5,22 @@ import { ListItemButton, TextField, InputAdornment, List, ListItem, Divider, Lis
 import SearchIcon from '@mui/icons-material/Search';
 
 import { RoleType } from "@/types/roleType";
+import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 
-export default function SideBar({ roles, onSelect, Buttons }: { roles: RoleType[], onSelect: (role: RoleType) => void, Buttons?: React.JSX.Element }): React.JSX.Element {
+export default function Roles({ roles, onAction, add, edit, omit }: { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean }): React.JSX.Element {
 
-  // const [roles, setRoles] = useState([]);
   const [search, setSearch] = useState<string>("");
+  const [filteredRoles, setFilteredRoles] = useState<RoleType[]>([]);
 
-  // useEffect(() => {
-  //   loadActorData();
-  // }, [])
-
-  // const loadActorData = async () => {
-  //   await fetch("api/v1/roles")
-  //     .then(res => res.status === 200 && res.json())
-  //     .then(data => setRoles(data))
-  // }
+  useEffect(() => {
+    setFilteredRoles(roles);
+  }, [roles])
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
+
+    setFilteredRoles([...roles].filter((role: RoleType) => role.title.includes(searchText) || role.person?.firstName.includes(searchText) || role.person?.lastName.includes(searchText)));
   }
 
   return (
@@ -45,16 +42,16 @@ export default function SideBar({ roles, onSelect, Buttons }: { roles: RoleType[
         </ListItem>
         <Divider variant="middle" component="li" />
         {
-          roles.map((role: any) => (
+          filteredRoles?.map((role: any) => (
             <Box key={role._id}>
               <ListItem alignItems="center">
                 <ListItem alignItems="flex-start" sx={{ p: 0 }}>
                   <ListItemAvatar>
                     <Avatar alt={role.person.firstName} src="" sx={{ width: 35, height: 35, mx: "auto" }} />
                   </ListItemAvatar>
-                  <ListItemText primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} onClick={() => onSelect(role)} sx={{ cursor: "pointer" }} />
+                  <ListItemText primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} sx={{ cursor: "pointer" }} />
                 </ListItem>
-                
+                <ModifyButtons add={add} edit={edit} omit={omit} rowData={role} onAction={onAction} />
               </ListItem>
               <Divider variant="middle" component="li" />
             </Box>
