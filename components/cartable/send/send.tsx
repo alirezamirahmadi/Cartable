@@ -14,11 +14,13 @@ import Urgency from "../urgency/urgency";
 import Snack from "@/components/general/snack/snack";
 import type { ReceiverType, UrgencyType, ReceiveType } from "@/types/cartableType";
 import type { SnackProps } from "@/types/generalType";
+import { RoleType } from "@/types/roleType";
 
 export default function Send({ refCollection, refDocument, parentReceive, onClose }: { refCollection: string, refDocument: string, parentReceive: string, onClose: () => void }): React.JSX.Element {
 
   const theme = useTheme();
 
+  const [roles, setRoles] = useState<RoleType[]>([]);
   const [receivers, setReceivers] = useState<ReceiverType[]>();
   const [deleteReceiver, setDeleteReceiver] = useState<ReceiverType>();
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
@@ -59,11 +61,21 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
   ]
 
   useEffect(() => {
+    loadRoleData();
+  }, [])
+
+  useEffect(() => {
     if (receivers) {
       let tempReceivers: ReceiverType[] = receivers.filter((receiver: ReceiverType) => receiver.role._id !== deleteReceiver?.role._id);
       setReceivers(tempReceivers);
     }
   }, [deleteReceiver])
+
+  const loadRoleData = async () => {
+    await fetch("api/v1/roles")
+      .then(res => res.status === 200 && res.json())
+      .then(data => setRoles(data))
+  }
 
   const handleChangeUrgency = (value: UrgencyType, rowData: ReceiverType) => {
     rowData.urgency = value;
@@ -92,7 +104,7 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
   }
 
   const handleSubmit = async () => {
-    
+
     await fetch("api/v1/sends", {
       method: "POST",
       headers: {
@@ -128,7 +140,7 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
   return (
     <>
       <div className="flex">
-        <SideBar onSelect={handleSelectRole} />
+        <SideBar roles={roles} onSelect={handleSelectRole} />
         <div className="w-full">
           <ReactDataTable rows={receivers ?? []} columns={columns} direction="rtl"
             options={{ ...defaultDataTableOptions(theme.palette.mode), filter: false, search: false, download: false, viewColumns: false, print: false }}

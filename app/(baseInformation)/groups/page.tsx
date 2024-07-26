@@ -6,11 +6,15 @@ import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import GroupIcon from '@mui/icons-material/Group';
 import SearchIcon from '@mui/icons-material/Search';
 import ReplyIcon from '@mui/icons-material/Reply';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import type { GroupType } from "@/types/groupType";
+import type { RoleType } from "@/types/roleType";
+import SideBar from "@/components/cartable/send/sidebar";
 
 export default function Groups(): React.JSX.Element {
 
+  const [roles, setRoles] = useState<RoleType[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(1);
   const [roots, setRoots] = useState<GroupType[]>([{ _id: "-1", title: "خانه", root: "-1", kind: 1 }]);
   const [search, setSearch] = useState<string>("");
@@ -36,6 +40,12 @@ export default function Groups(): React.JSX.Element {
         setGroups(data);
         setFilteredGroups(data);
       })
+  }
+
+  const loadRoleData = async () => {
+    await fetch("api/v1/roles")
+      .then(res => res.status === 200 && res.json())
+      .then(data => setRoles(data))
   }
 
   const handleSubGroup = (group: GroupType) => {
@@ -72,14 +82,18 @@ export default function Groups(): React.JSX.Element {
     setRoots(tempRoots);
   }
 
+  const handleSelectRole = (role: RoleType) => {
+
+  }
+
   return (
     <>
-      <Breadcrumbs>
-        {roots.length > 1 && roots.map((root: GroupType, index) => (
-          <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.title}</Button>
-        ))}
-      </Breadcrumbs>
       <Box sx={{ width: '100%', maxWidth: 256, bgcolor: 'background.paper' }}>
+        <Breadcrumbs>
+          {roots.length > 1 && roots.map((root: GroupType, index) => (
+            <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.title}</Button>
+          ))}
+        </Breadcrumbs>
         <List component="nav" aria-label="main mailbox folders">
           <ListItem component="div" disablePadding>
             <ListItemButton sx={{ height: 56, m: 0 }}>
@@ -110,6 +124,11 @@ export default function Groups(): React.JSX.Element {
           ))}
         </List>
       </Box>
+      {/* <SideBar roles={roles} onSelect={handleSelectRole} buttons={
+        <IconButton color="error" onClick={handleDelete} title="حذف">
+          <DeleteIcon />
+        </IconButton>
+      } /> */}
     </>
   )
 }

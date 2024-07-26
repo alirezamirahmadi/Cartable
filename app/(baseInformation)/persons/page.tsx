@@ -33,7 +33,7 @@ export default function Persons(): React.JSX.Element {
     { field: { title: "account.username" }, label: "نام کاربری" },
     {
       field: { title: "ویرایش" }, label: "ویرایش", kind: "component", options: {
-        component: (value, onChange, rowData) => (<ModifyButtons value={value} onChange={(event: any) => onChange && onChange(event.target.value)} rowData={rowData} handleAction={handleAction} />)
+        component: (value, onChange, rowData) => (<ModifyButtons value={value} onChange={(event: any) => onChange && onChange(event.target.value)} rowData={rowData} onAction={handleAction} edit omit/>)
       }
     },
   ]
