@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, ChangeEvent } from "react";
-import { Box, List, ListItemButton, TextField, ListItemText, ListItem, IconButton, Typography, Menu, InputAdornment, Breadcrumbs, Button } from "@mui/material"
+import { Box, List, ListItemButton, TextField, ListItemText, ListItem, IconButton, Typography, InputAdornment, Breadcrumbs, Button } from "@mui/material"
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import GroupIcon from '@mui/icons-material/Group';
 import SearchIcon from '@mui/icons-material/Search';
@@ -11,11 +11,11 @@ import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 
 import type { GroupType } from "@/types/groupType";
 import type { RoleType } from "@/types/roleType";
+import type { SnackProps } from "@/types/generalType";
 import Roles from "@/components/role/roles";
 import Modal from "@/components/general/modal/modal";
 import TextSave from "@/components/general/textSave/textSave";
 import Snack from "@/components/general/snack/snack";
-import { SnackProps } from "@/types/generalType";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Delete from "@/components/general/delete/delete";
 
@@ -27,7 +27,7 @@ export default function Groups(): React.JSX.Element {
   const [search, setSearch] = useState<string>("");
   const [groups, setGroups] = useState<GroupType[]>([]);
   const [filteredGroups, setFilteredGroups] = useState<GroupType[]>([]);
-  const [isOpenRolesModal, setIsOpenRolesModal] = useState<boolean>(false);
+  const [openRolesModal, setOpenRolesModal] = useState<{ isOpen: boolean, refGroup: string }>({ isOpen: false, refGroup: "" });
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [anchorGroup, setAnchorGroup] = useState<null | HTMLElement>(null);
   const [anchorFolder, setAnchorFolder] = useState<null | HTMLElement>(null);
@@ -36,7 +36,6 @@ export default function Groups(): React.JSX.Element {
 
   useEffect(() => {
     loadGroupData();
-    loadRoleData();
   }, [])
 
   useEffect(() => {
@@ -56,8 +55,8 @@ export default function Groups(): React.JSX.Element {
       })
   }
 
-  const loadRoleData = async () => {
-    await fetch("api/v1/roles")
+  const loadRoleData = async (refGroup: string) => {
+    await fetch(`api/v1/groupMembers?refGroup=${refGroup}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setRoles(data))
   }
@@ -69,7 +68,7 @@ export default function Groups(): React.JSX.Element {
         setRoots([...roots, group]);
         break;
       case 2:
-        setIsOpenRolesModal(true);
+        loadRoleData(group._id).then(() => setOpenRolesModal({ isOpen: true, refGroup: group._id }))
         break;
     }
   }
@@ -267,8 +266,8 @@ export default function Groups(): React.JSX.Element {
         </List>
       </Box>
       <Snack {...snackProps} />
-      <Modal isOpen={isOpenRolesModal} title="اعضا گروه" body={<Roles roles={roles} onAction={handleActionRole} omit />} onCloseModal={() => setIsOpenRolesModal(false)} />
-      <Modal isOpen={isOpenDeleteModal} title="حذف گروه" body={<Delete message={`آیا از حذف " ${selectedGroup?.title} اطمینان دارید`} onDelete={handleDeleteGroup} />} onCloseModal={() => setIsOpenDeleteModal(false)} />
+      <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleActionRole} omit newMember refGroup={openRolesModal.refGroup} />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />
+      <Modal isOpen={isOpenDeleteModal} title="حذف گروه" body={<Delete message={`آیا از حذف "${selectedGroup?.title}" اطمینان دارید`} onDelete={handleDeleteGroup} />} onCloseModal={() => setIsOpenDeleteModal(false)} />
     </>
   )
 }

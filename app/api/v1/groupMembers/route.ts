@@ -1,4 +1,5 @@
 import groupMemberModel from "@/models/groupMember";
+import roleModel from "@/models/role";
 import connectToDB from "@/utils/db";
 import mongoose from "mongoose";
 
@@ -8,15 +9,14 @@ const GET = async (request: Request) => {
   const { searchParams } = new URL(request.url);
   const refGroup = searchParams.get("refGroup");
 
-  const members = await groupMemberModel.aggregate()
-    .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
-    .lookup({ from: "people", localField: "role.refPerson", foreignField: "_id", as: "person" })
-    .match({ refGroup: new mongoose.Types.ObjectId(refGroup ?? "") })
+  const members = await roleModel.aggregate()
+    .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+    .lookup({ from: "groupmembers", localField: "_id", foreignField: "refRole", as: "groupmember" })
+    .match({ "groupmember.refGroup": new mongoose.Types.ObjectId(refGroup ?? "") })
     .project({
-      "_id": 0, "role._id": 1, "role.title": 1, "role.refPerson": 1, "role.root": 1, "role.isActive": 1,
+      "title": 1, "root": 1, "isActive": 1,
       "person._id": 1, "person.firstName": 1, "person.lastName": 1
     })
-    .unwind("role")
     .unwind("person")
 
   if (members) {

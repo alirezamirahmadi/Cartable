@@ -1,31 +1,81 @@
 "use client"
 
-import { useState, useEffect, ChangeEvent, ReactNode } from "react";
-import { ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar, Avatar, Typography, Box } from "@mui/material";
+import { useState, useEffect, ChangeEvent } from "react";
+import { ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar, Avatar, Typography, Box, IconButton } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-
+import { Add } from "@mui/icons-material";
 import { RoleType } from "@/types/roleType";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
+import Modal from "../general/modal/modal";
 
-export default function Roles({ roles, onAction, add, edit, omit }: { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean }): React.JSX.Element {
+export default function Roles({ roles, onAction, add, edit, omit, newMember, refGroup }: { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, newMember?: boolean, refGroup?: string }): React.JSX.Element {
 
   const [search, setSearch] = useState<string>("");
+  const [listRoles, setListRoles] = useState<RoleType[]>([]);
   const [filteredRoles, setFilteredRoles] = useState<RoleType[]>([]);
+  const [isOpenNewMemberModal, setIsOpenNewMemberModal] = useState<boolean>(false);
+  const [allRoles, setAllRoles] = useState<RoleType[]>([]);
 
   useEffect(() => {
-    setFilteredRoles(roles);
+    setListRoles(roles);
   }, [roles])
+  
+  useEffect(() => {
+    setFilteredRoles(listRoles);
+  }, [listRoles])
+
+  useEffect(() => {
+    loadRoleData()
+  }, [])
+
+  const loadRoleData = async () => {
+    await fetch("api/v1/roles")
+      .then(res => res.status === 200 && res.json())
+      .then(data => setAllRoles(data))
+  }
+
+  const addNewMember = async (role: RoleType) => {
+    refGroup && await fetch("api/v1/groupMembers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({ refGroup, refRole:role._id })
+    })
+      .then(res => {
+        if(res.status === 201){
+          setIsOpenNewMemberModal(false);
+          onAction(role, "NewMember");
+          setListRoles([...listRoles, role]);
+        } 
+      })
+  }
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
 
-    setFilteredRoles([...roles].filter((role: RoleType) => role.title.includes(searchText) || role.person?.firstName.includes(searchText) || role.person?.lastName.includes(searchText)));
+    setFilteredRoles([...listRoles].filter((role: RoleType) => role.title.includes(searchText) || role.person?.firstName.includes(searchText) || role.person?.lastName.includes(searchText)));
+  }
+
+  const handleNewMemberAction = (role: RoleType, action: string) => {
+    switch (action) {
+      case "Add":
+        addNewMember(role);
+        break;
+    }
   }
 
   return (
     <>
-      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', py: 0 }}>
+        {newMember &&
+          <ListItem sx={{ py: 0 }}>
+            <IconButton onClick={() => setIsOpenNewMemberModal(true)} title="عضو جدید">
+              <Add />
+            </IconButton>
+          </ListItem>
+        }
         <ListItem component="div" disablePadding>
           <ListItemButton sx={{ height: 56 }}>
             <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
@@ -58,6 +108,7 @@ export default function Roles({ roles, onAction, add, edit, omit }: { roles: Rol
           ))
         }
       </List>
+      <Modal isOpen={isOpenNewMemberModal} title="انتخاب عضو جدید" body={<Roles roles={allRoles} onAction={handleNewMemberAction} add />} onCloseModal={() => setIsOpenNewMemberModal(false)} />
     </>
   )
 }
