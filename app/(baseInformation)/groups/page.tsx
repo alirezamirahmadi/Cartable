@@ -101,7 +101,7 @@ export default function Groups(): React.JSX.Element {
   }
 
   const handleActionRole = (role: RoleType) => {
-
+console.log(role)
   }
 
   const handleNewGroup = (event: React.MouseEvent<HTMLButtonElement>) => {

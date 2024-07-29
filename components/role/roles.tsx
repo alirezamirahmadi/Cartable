@@ -101,7 +101,7 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
                   </ListItemAvatar>
                   <ListItemText primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} sx={{ cursor: "pointer" }} />
                 </ListItem>
-                <ModifyButtons add={add} edit={edit} omit={omit} rowData={role} onAction={onAction} />
+                <ModifyButtons add={add} edit={edit} omit={omit} rowData={role} onAction={onAction} omitMessage={`آیا از حذف "${role.title}" اطمینان دارید؟`}/>
               </ListItem>
               <Divider variant="middle" component="li" />
             </Box>
