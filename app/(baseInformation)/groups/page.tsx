@@ -17,7 +17,6 @@ import Modal from "@/components/general/modal/modal";
 import TextSave from "@/components/general/textSave/textSave";
 import Snack from "@/components/general/snack/snack";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
-import Delete from "@/components/general/delete/delete";
 
 export default function Groups(): React.JSX.Element {
 
@@ -28,7 +27,6 @@ export default function Groups(): React.JSX.Element {
   const [groups, setGroups] = useState<GroupType[]>([]);
   const [filteredGroups, setFilteredGroups] = useState<GroupType[]>([]);
   const [openRolesModal, setOpenRolesModal] = useState<{ isOpen: boolean, refGroup: string }>({ isOpen: false, refGroup: "" });
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [anchorGroup, setAnchorGroup] = useState<null | HTMLElement>(null);
   const [anchorFolder, setAnchorFolder] = useState<null | HTMLElement>(null);
   const [anchorEdit, setAnchorEdit] = useState<null | HTMLElement>(null);
@@ -101,7 +99,7 @@ export default function Groups(): React.JSX.Element {
   }
 
   const handleActionRole = (role: RoleType) => {
-console.log(role)
+    
   }
 
   const handleNewGroup = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -156,7 +154,7 @@ console.log(role)
         setAnchorEdit(document.getElementById("ibtnNewGroup"));
         break;
       case "Delete":
-        setIsOpenDeleteModal(true);
+        handleDeleteGroup();
         break;
     }
   }
@@ -187,10 +185,8 @@ console.log(role)
       })
   }
 
-  const handleDeleteGroup = async (isDelete: boolean) => {
-    setIsOpenDeleteModal(false);
-
-    isDelete && selectedGroup &&
+  const handleDeleteGroup = async () => {
+    selectedGroup &&
       await fetch(`api/v1/groups/${selectedGroup._id}`, {
         method: "DELETE"
       })
@@ -231,7 +227,7 @@ console.log(role)
             <CreateNewFolderIcon />
           </IconButton>
           <TextSave anchor={anchorFolder} onAction={handleActionNewFolder} label="پوشه جدید" />
-          {selectedGroup && <ModifyButtons edit omit rowData={undefined} onAction={handleModifyAction} />}
+          {selectedGroup && <ModifyButtons edit omit rowData={undefined} onAction={handleModifyAction} omitMessage={`آیا از حذف "${selectedGroup?.title}" اطمینان دارید`} />}
           <TextSave anchor={anchorEdit} onAction={handleActionEdit} defaultValue={selectedGroup?.title} />
         </Box>
 
@@ -267,7 +263,6 @@ console.log(role)
       </Box>
       <Snack {...snackProps} />
       <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleActionRole} omit newMember refGroup={openRolesModal.refGroup} />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />
-      <Modal isOpen={isOpenDeleteModal} title="حذف گروه" body={<Delete message={`آیا از حذف "${selectedGroup?.title}" اطمینان دارید`} onDelete={handleDeleteGroup} />} onCloseModal={() => setIsOpenDeleteModal(false)} />
     </>
   )
 }

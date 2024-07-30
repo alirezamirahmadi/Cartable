@@ -12,7 +12,7 @@ import Modal from '../general/modal/modal';
 import RoleModify from './roleModify';
 import Delete from '../general/delete/delete';
 import Snack from '../general/snack/snack';
-import type { SnackProps } from '@/types/general';
+import type { SnackProps } from '@/types/generalType';
 
 export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType) => void }): React.JSX.Element {
 

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import groupModel from "@/models/group";
+import groupMemberModel from "@/models/groupMember";
 import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { groupId: string } }) => {
@@ -32,6 +33,11 @@ const DELETE = async (request: Request, { params }: { params: { groupId: string 
 
   const groups = await groupModel.find({ root: new mongoose.Types.ObjectId(params.groupId) });
   if (groups.length > 0) {
+    return Response.json({ message: "Group was not deleted because of its children" }, { status: 403 })
+  }
+  
+  const groupMembers = await groupMemberModel.find({ refGroup: new mongoose.Types.ObjectId(params.groupId) });
+  if (groupMembers.length > 0) {
     return Response.json({ message: "Group was not deleted because of its children" }, { status: 403 })
   }
 

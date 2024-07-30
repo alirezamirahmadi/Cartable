@@ -8,7 +8,6 @@ import { PersonType } from "@/types/personType";
 
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "@/components/general/modal/modal";
-import Delete from "@/components/general/delete/delete";
 import Snack from "@/components/general/snack/snack";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Loading from "@/components/general/loading/loading";
@@ -21,7 +20,6 @@ export default function Persons(): React.JSX.Element {
   const [personData, setPersonData] = useState<PersonType[]>([]);
   const [rowData, setRowData] = useState<PersonType>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   const columns: ColumnType[] = [
@@ -33,7 +31,7 @@ export default function Persons(): React.JSX.Element {
     { field: { title: "account.username" }, label: "نام کاربری" },
     {
       field: { title: "ویرایش" }, label: "ویرایش", kind: "component", options: {
-        component: (value, onChange, rowData) => (<ModifyButtons rowData={rowData} onAction={handleAction} edit omit/>)
+        component: (value, onChange, rowData) => (<ModifyButtons rowData={rowData} onAction={handleAction} edit omit omitMessage={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`}/>)
       }
     },
   ]
@@ -61,14 +59,13 @@ export default function Persons(): React.JSX.Element {
         setIsOpenEditModal(true);
         break;
       case "Delete":
-        setIsOpenDeleteModal(true);
+        handleDelete();
         break;
     }
   }
 
   const handleCloseModal = () => {
     setIsOpenEditModal(false);
-    setIsOpenDeleteModal(false);
   }
 
   const handleModify = (isModify: boolean) => {
@@ -82,10 +79,8 @@ export default function Persons(): React.JSX.Element {
     }
   }
 
-  const handleDelete = async (isDelete: boolean) => {
-    setIsOpenDeleteModal(false);
-
-    isDelete && await fetch(`api/v1/persons/${rowData?._id}`, {
+  const handleDelete = async () => {
+    await fetch(`api/v1/persons/${rowData?._id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"
@@ -117,7 +112,6 @@ export default function Persons(): React.JSX.Element {
       <ReactDataTable direction="rtl" rows={personData} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
       <Snack {...snackProps} />
       <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify onModify={handleModify} person={rowData} />} />
-      <Modal title="حذف شخص" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`} onDelete={handleDelete} />} />
     </>
   )
 }

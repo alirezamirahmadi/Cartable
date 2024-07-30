@@ -19,7 +19,7 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
   useEffect(() => {
     setListRoles(roles);
   }, [roles])
-  
+
   useEffect(() => {
     setFilteredRoles(listRoles);
   }, [listRoles])
@@ -40,15 +40,22 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
       headers: {
         "Content-Type": "Application/json"
       },
-      body: JSON.stringify({ refGroup, refRole:role._id })
+      body: JSON.stringify({ refGroup, refRole: role._id })
     })
       .then(res => {
-        if(res.status === 201){
+        if (res.status === 201) {
           setIsOpenNewMemberModal(false);
           onAction(role, "NewMember");
           setListRoles([...listRoles, role]);
-        } 
+        }
       })
+  }
+
+  const deleteMember = async (deleteRole: RoleType) => {
+    await fetch(`api/v1/groupMembers?refGroup=${refGroup}&refRole=${deleteRole._id}`, {
+      method: "DELETE",
+    })
+      .then(res => res.status === 200 && setListRoles([...listRoles].filter((role: RoleType) => role._id !== deleteRole._id)))
   }
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -56,6 +63,15 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
     setSearch(searchText);
 
     setFilteredRoles([...listRoles].filter((role: RoleType) => role.title.includes(searchText) || role.person?.firstName.includes(searchText) || role.person?.lastName.includes(searchText)));
+  }
+
+  const handleAction = (role: RoleType, action: string) => {
+    switch (action) {
+      case "Delete":
+        deleteMember(role);
+        break;
+    }
+    onAction(role, action);
   }
 
   const handleNewMemberAction = (role: RoleType, action: string) => {
@@ -101,7 +117,7 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
                   </ListItemAvatar>
                   <ListItemText primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} sx={{ cursor: "pointer" }} />
                 </ListItem>
-                <ModifyButtons add={add} edit={edit} omit={omit} rowData={role} onAction={onAction} omitMessage={`آیا از حذف "${role.title}" اطمینان دارید؟`}/>
+                <ModifyButtons add={add} edit={edit} omit={omit} rowData={role} onAction={handleAction} omitMessage={`آیا از حذف "${role.title}" اطمینان دارید؟`} />
               </ListItem>
               <Divider variant="middle" component="li" />
             </Box>
