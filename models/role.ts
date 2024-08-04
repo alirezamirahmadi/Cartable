@@ -10,7 +10,6 @@ const schema = new mongoose.Schema({
   },
   root: {
     type: mongoose.Schema.ObjectId,
-    required: true,
     null: true,
   },
   isActive: {

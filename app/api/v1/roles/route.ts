@@ -18,8 +18,8 @@ const GET = async (request: Request) => {
     await roleModel.aggregate()
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .match({ root: root !== "-1" ? new mongoose.Types.ObjectId(root) : null })
-      .unwind("person")
-console.log(roles)
+      .unwind({ path: "$person", preserveNullAndEmptyArrays: true })
+
   if (roles) {
     return Response.json(roles, { status: 200 });
   }

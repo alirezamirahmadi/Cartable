@@ -10,11 +10,11 @@ import AutoComplete from "../general/autoComplete/autoComplete";
 import Snack from "../general/snack/snack";
 import type { SnackProps } from "@/types/generalType";
 
-export default function RoleModify({ role, root, onModify }: { role?: any, root: string, onModify?: (isModify: boolean) => void }): React.JSX.Element {
+export default function RoleModify({ role, root, onModify }: { role?: any, root: string | null, onModify?: (isModify: boolean) => void }): React.JSX.Element {
 
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [persons, setPersons] = useState<PersonType[]>([]);
-  const [refPerson, setRefPerson] = useState<string>("");
+  const [refPerson, setRefPerson] = useState<string | null>(null);
   const { register, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm({
     defaultValues: {
       title: role?.title ?? "",

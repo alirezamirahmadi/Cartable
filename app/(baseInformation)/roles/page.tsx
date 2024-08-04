@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import RoleModify from "@/components/role/roleModify";
-import RoleTreeView from "@/components/role/roleTreeView";
+import RoleTree from "@/components/role/roleTree";
 import { RoleType } from "@/types/roleType";
 import Loading from "@/components/general/loading/loading";
 import Snack from "@/components/general/snack/snack";
@@ -13,8 +13,8 @@ export default function Roles(): React.JSX.Element {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRolesUpdate, setIsRolesUpdate] = useState<boolean>(false);
-  const [root, setRoot] = useState<string>("-1");
-  const [role, setRole] = useState<RoleType>({ title: "", refPerson: "", root: "-1", isActive: false });
+  const [root, setRoot] = useState<string | null>(null);
+  const [role, setRole] = useState<RoleType>({ title: "", refPerson: "", root: null, isActive: false });
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Roles(): React.JSX.Element {
 
   const handleSelectRole = (selectedRole: RoleType) => {
     setIsLoading(true);
-    setRoot(selectedRole._id ?? "-1");
+    setRoot(selectedRole?._id ?? null);
     setRole(selectedRole);
   }
 
@@ -41,7 +41,7 @@ export default function Roles(): React.JSX.Element {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
-        <RoleTreeView onSelectRole={handleSelectRole} isUpdate={isRolesUpdate} />
+        <RoleTree onSelectRole={handleSelectRole} isUpdate={isRolesUpdate} />
         {!isLoading ? <RoleModify root={root} role={role} onModify={handleModify} /> : <Loading />}
         <Snack {...snackProps} />
       </div>

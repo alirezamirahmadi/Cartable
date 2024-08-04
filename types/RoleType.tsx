@@ -5,7 +5,7 @@ type RoleType = {
   title: string,
   refPerson: string,
   person?: PersonType,
-  root: string,
+  root: string | null,
   isActive: boolean,
 }
 

@@ -1,11 +1,15 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { Box, IconButton } from '@mui/material';
+import { useState, useEffect, ChangeEvent } from 'react';
+import {
+  Box, IconButton, ListItem, ListItemText, ListItemButton, Breadcrumbs, Button, List, TextField, InputAdornment,
+  Typography
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import GroupIcon from '@mui/icons-material/Group';
+import SearchIcon from '@mui/icons-material/Search';
+import ReplyIcon from '@mui/icons-material/Reply';
 
 import { RoleType } from '@/types/roleType';
 import Modal from '../general/modal/modal';
@@ -14,14 +18,15 @@ import Delete from '../general/delete/delete';
 import Snack from '../general/snack/snack';
 import type { SnackProps } from '@/types/generalType';
 
-export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType) => void }): React.JSX.Element {
+export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType) => void }): React.JSX.Element {
 
-  const [roots, setRoots] = useState<RoleType[]>([{ _id: "6659dc900de30272bc816964", title: "خانه", root: "-1", refPerson: "", isActive: true }]);
+  const [roots, setRoots] = useState<RoleType[]>([{ _id: "-1", title: "خانه", root: null, refPerson: "", isActive: true }]);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [isOpenNewModal, setIsOpenNewModal] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleType>();
   const [treeData, setTreeData] = useState<RoleType[]>([]);
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
     loadRoleData();
@@ -31,15 +36,46 @@ export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boo
     isUpdate && loadRoleData();
   }, [isUpdate])
 
+  useEffect(() => {
+    loadRoleData();
+  }, [roots])
+
   const loadRoleData = async () => {
     await fetch(`api/v1/roles?root=${roots[roots.length - 1]._id}`)
-      .then(res => res.status === 200 && res.json()) 
+      .then(res => res.status === 200 && res.json())
       .then(data => setTreeData(data));
+  }
+
+  const handleBreadcrumbs = (root: RoleType) => {
+    const tempRoots: RoleType[] = [...roots];
+    do {
+      tempRoots.pop();
+    }
+    while (tempRoots[tempRoots.length - 1]._id !== root._id);
+    
+    setRoots(tempRoots);
+  }
+  
+  const handleBackward = () => {
+    const tempRoots: RoleType[] = [...roots];
+    tempRoots.pop();
+    setRoots(tempRoots);
   }
 
   const handleSelectRole = (role: RoleType) => {
     setSelectedRole(role);
     onSelectRole(role);
+  }
+
+  const handleSubRole = (role: RoleType) => {
+    setRoots([...roots, role]);
+  }
+
+  const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const searchText = event.target.value;
+    setSearch(searchText);
+
+    // setFilteredGroups(searchText ? groups.filter((group: GroupType) => group.title.includes(searchText)) : groups);
   }
 
   const handleOpenNewModal = () => {
@@ -84,21 +120,51 @@ export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boo
   return (
     <>
       <Box sx={{ minHeight: 352, minWidth: 250, mx: 2, mb: 2, py: 2, border: 1, borderRadius: 2 }}>
+        <Breadcrumbs>
+          {roots.length > 1 && roots.map((root: RoleType, index) => (
+            <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.title}</Button>
+          ))}
+        </Breadcrumbs>
+
         <IconButton onClick={handleOpenNewModal} title="جدید">
           <AddIcon />
         </IconButton>
         <IconButton color="error" onClick={handleOpenDeleteModal} title="حذف" disabled={selectedRole ? false : true}>
           <DeleteIcon />
         </IconButton>
-        <SimpleTreeView aria-label="icon expansion" expansionTrigger="iconContainer" slots={{ expandIcon: ChevronLeftIcon }}>
+        <List>
+          <ListItem component="div" disablePadding>
+            <ListItemButton sx={{ height: 56, m: 0 }}>
+              <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
+                value={search} onChange={handleChangeSearch} sx={{ m: 0 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </ListItemButton>
+            <IconButton onClick={handleBackward} disabled={roots.length === 1} title="بازگشت">
+              <ReplyIcon />
+            </IconButton>
+          </ListItem>
           {
             treeData.map(role => (
-              <TreeItem itemId={role.title} key={role._id} label={role.title} onClick={() => handleSelectRole(role)} />
+              <ListItem key={role._id} sx={{ py: 0, minHeight: 24 }}>
+                <IconButton onClick={() => handleSubRole(role)}>
+                  <GroupIcon />
+                </IconButton>
+                <ListItemButton sx={{ py: 0 }} selected={selectedRole?._id === role._id} onClick={(event) => handleSelectRole(role)}>
+                  <ListItemText primary={role.title} />
+                </ListItemButton>
+              </ListItem>
             ))
           }
-        </SimpleTreeView>
+        </List>
         <Snack {...snackProps} />
-        <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={handleCloseModal} body={<RoleModify root={selectedRole?._id ?? "-1"} onModify={handleModify} />} />
+        <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={handleCloseModal} body={<RoleModify root={selectedRole?._id ?? null} onModify={handleModify} />} />
         <Modal title="حذف سمت" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} onDelete={handleDelete} />} />
       </Box>
     </>

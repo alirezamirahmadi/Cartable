@@ -97,13 +97,13 @@ export default function Persons(): React.JSX.Element {
       })
   }
 
-  if (isLoading) {
-    return (
-      <div className="mt-20">
-        <Loading />
-      </div>
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="mt-20">
+  //       <Loading />
+  //     </div>
+  //   )
+  // }
 
   return (
     <>
