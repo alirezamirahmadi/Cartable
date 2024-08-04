@@ -1,14 +1,25 @@
 import roleModel from "@/models/role";
 import connectToDB from "@/utils/db";
+import mongoose from "mongoose";
 
-const GET = async () => {
+const GET = async (request: Request) => {
   connectToDB();
 
-  const roles = await roleModel.aggregate()
-    .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
-    .match({ isActive: true })
-    .unwind("person")
+  const { searchParams } = new URL(request.url);
+  const root = searchParams.get("root");
 
+  const roles = !root
+    ?
+    await roleModel.aggregate()
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .match({ isActive: true })
+      .unwind("person")
+    :
+    await roleModel.aggregate()
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .match({ root: root !== "-1" ? new mongoose.Types.ObjectId(root) : null })
+      .unwind("person")
+console.log(roles)
   if (roles) {
     return Response.json(roles, { status: 200 });
   }

@@ -3,18 +3,19 @@ import mongoose from "mongoose";
 const schema = new mongoose.Schema({
   title: {
     type: String,
-    require: true,
+    required: true,
   },
   refPerson: {
     type: mongoose.Schema.ObjectId,
   },
   root: {
-    type: String,
-    require: true,
+    type: mongoose.Schema.ObjectId,
+    required: true,
+    null: true,
   },
   isActive: {
     type: Boolean,
-    require: true,
+    required: true,
   }
 })
 

@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import type { PersonType } from "@/types/personType";
 import AutoComplete from "../general/autoComplete/autoComplete";
 import Snack from "../general/snack/snack";
-import type { SnackProps } from "@/types/general";
+import type { SnackProps } from "@/types/generalType";
 
 export default function RoleModify({ role, root, onModify }: { role?: any, root: string, onModify?: (isModify: boolean) => void }): React.JSX.Element {
 

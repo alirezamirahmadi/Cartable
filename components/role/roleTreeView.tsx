@@ -16,6 +16,7 @@ import type { SnackProps } from '@/types/generalType';
 
 export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType) => void }): React.JSX.Element {
 
+  const [roots, setRoots] = useState<RoleType[]>([{ _id: "6659dc900de30272bc816964", title: "خانه", root: "-1", refPerson: "", isActive: true }]);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [isOpenNewModal, setIsOpenNewModal] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
@@ -31,8 +32,8 @@ export default function RoleTreeView({ isUpdate, onSelectRole }: { isUpdate: boo
   }, [isUpdate])
 
   const loadRoleData = async () => {
-    await fetch("api/v1/roles")
-      .then(res => res.status === 200 && res.json())
+    await fetch(`api/v1/roles?root=${roots[roots.length - 1]._id}`)
+      .then(res => res.status === 200 && res.json()) 
       .then(data => setTreeData(data));
   }
 
