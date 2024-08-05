@@ -10,6 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import GroupIcon from '@mui/icons-material/Group';
 import SearchIcon from '@mui/icons-material/Search';
 import ReplyIcon from '@mui/icons-material/Reply';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import { RoleType } from '@/types/roleType';
 import Modal from '../general/modal/modal';
@@ -18,7 +19,7 @@ import Delete from '../general/delete/delete';
 import Snack from '../general/snack/snack';
 import type { SnackProps } from '@/types/generalType';
 
-export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType) => void }): React.JSX.Element {
+export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType | undefined) => void }): React.JSX.Element {
 
   const [roots, setRoots] = useState<RoleType[]>([{ _id: "-1", title: "خانه", root: null, refPerson: "", isActive: true }]);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
@@ -29,24 +30,36 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    loadRoleData();
+    loadRoleByRoot();
   }, [])
 
   useEffect(() => {
-    isUpdate && loadRoleData();
+    isUpdate && loadRoleByRoot();
   }, [isUpdate])
 
   useEffect(() => {
-    loadRoleData();
+    loadRoleByRoot();
   }, [roots])
 
-  const loadRoleData = async () => {
+  useEffect(()=>{
+    onSelectRole(selectedRole);
+  }, [selectedRole])
+
+  const loadRoleByRoot = async () => {
     await fetch(`api/v1/roles?root=${roots[roots.length - 1]._id}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setTreeData(data));
   }
 
+  const loadRoleByTitle = async () => {
+    await fetch(`api/v1/roles?title=${search}`)
+      .then(res => res.status === 200 && res.json())
+      .then(data => setTreeData(data));
+  }
+
   const handleBreadcrumbs = (root: RoleType) => {
+    setSelectedRole(undefined);
+    
     const tempRoots: RoleType[] = [...roots];
     do {
       tempRoots.pop();
@@ -57,25 +70,34 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
   }
   
   const handleBackward = () => {
+    setSelectedRole(undefined);
+    
     const tempRoots: RoleType[] = [...roots];
     tempRoots.pop();
     setRoots(tempRoots);
   }
-
+  
   const handleSelectRole = (role: RoleType) => {
     setSelectedRole(role);
-    onSelectRole(role);
   }
-
+  
   const handleSubRole = (role: RoleType) => {
+    setSelectedRole(undefined);
+
     setRoots([...roots, role]);
   }
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
+  }
 
-    // setFilteredGroups(searchText ? groups.filter((group: GroupType) => group.title.includes(searchText)) : groups);
+  const handleSearchRole = () => {
+    loadRoleByTitle();
+  }
+
+  const handleResetRole = () =>{
+    setRoots([[...roots][0]]);
   }
 
   const handleOpenNewModal = () => {
@@ -94,7 +116,7 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
   const handleModify = (isModify: boolean) => {
     if (isModify) {
       setIsOpenNewModal(false);
-      loadRoleData();
+      loadRoleByRoot();
       setSnackProps({ context: "سمت مورد نظر با موفقیت ایجاد گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
     }
   }
@@ -107,7 +129,7 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
     })
       .then(res => {
         if (res.status === 200) {
-          loadRoleData();
+          loadRoleByRoot();
           setSelectedRole(undefined);
           setSnackProps({ context: "سمت مورد نظر با موفقیت حذف گردید.", isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
         }
@@ -133,19 +155,15 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
           <DeleteIcon />
         </IconButton>
         <List>
-          <ListItem component="div" disablePadding>
-            <ListItemButton sx={{ height: 56, m: 0 }}>
-              <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
-                value={search} onChange={handleChangeSearch} sx={{ m: 0 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </ListItemButton>
+          <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
+            <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
+              value={search} onChange={handleChangeSearch} sx={{ m: 0 }} />
+            <IconButton disabled={search.length === 0} onClick={handleSearchRole} title="جستجو">
+              <SearchIcon />
+            </IconButton>
+            <IconButton onClick={handleResetRole} title="ریست">
+              <CachedIcon />
+            </IconButton>
             <IconButton onClick={handleBackward} disabled={roots.length === 1} title="بازگشت">
               <ReplyIcon />
             </IconButton>

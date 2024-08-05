@@ -7,8 +7,8 @@ const GET = async (request: Request) => {
 
   const { searchParams } = new URL(request.url);
   const root = searchParams.get("root");
-
-  const roles = !root
+  const title = searchParams.get("title");
+  const roles = (!root && !title)
     ?
     await roleModel.aggregate()
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
@@ -17,8 +17,15 @@ const GET = async (request: Request) => {
     :
     await roleModel.aggregate()
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
-      .match({ root: root !== "-1" ? new mongoose.Types.ObjectId(root) : null })
+      .match(title ? { title: { $regex: `.*${title}.*` } } : { root: root !== "-1" ? new mongoose.Types.ObjectId(root ?? "") : null })
       .unwind({ path: "$person", preserveNullAndEmptyArrays: true })
+
+  // else {
+  //   roles = await roleModel.aggregate()
+  //     .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+  //     .match(title ? { title: {$regex:`.*${title}.*`}} : { root: root !== "-1" ? new mongoose.Types.ObjectId(root) : null })
+  //     .unwind({ path: "$person", preserveNullAndEmptyArrays: true })
+  // }
 
   if (roles) {
     return Response.json(roles, { status: 200 });

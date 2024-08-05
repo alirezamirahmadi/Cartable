@@ -14,7 +14,7 @@ export default function Roles(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRolesUpdate, setIsRolesUpdate] = useState<boolean>(false);
   const [root, setRoot] = useState<string | null>(null);
-  const [role, setRole] = useState<RoleType>({ title: "", refPerson: "", root: null, isActive: false });
+  const [role, setRole] = useState<RoleType | undefined>({ title: "", refPerson: "", root: null, isActive: false });
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function Roles(): React.JSX.Element {
     setIsLoading(false);
   }, [role])
 
-  const handleSelectRole = (selectedRole: RoleType) => {
+  const handleSelectRole = (selectedRole: RoleType | undefined) => {
     setIsLoading(true);
     setRoot(selectedRole?._id ?? null);
     setRole(selectedRole);

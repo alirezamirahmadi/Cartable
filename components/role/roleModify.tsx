@@ -15,6 +15,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [persons, setPersons] = useState<PersonType[]>([]);
   const [refPerson, setRefPerson] = useState<string | null>(null);
+  
   const { register, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm({
     defaultValues: {
       title: role?.title ?? "",
