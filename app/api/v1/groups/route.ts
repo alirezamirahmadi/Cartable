@@ -1,6 +1,21 @@
 import groupModel from "@/models/group";
 import connectToDB from "@/utils/db";
 
+const GET = async (request: Request) => {
+  connectToDB();
+
+  const { searchParams } = new URL(request.url);
+  const title = searchParams.get("title");
+
+  const groups = await groupModel.find({ title: { $regex: `.*${title}.*` } });
+
+  if (groups) {
+    return Response.json(groups, { status: 200 })
+  }
+  return Response.json({ message: "not found" }, { status: 404 })
+}
+
+
 const POST = async (request: Request) => {
   connectToDB();
 
@@ -15,5 +30,6 @@ const POST = async (request: Request) => {
 }
 
 export {
+  GET,
   POST
 }

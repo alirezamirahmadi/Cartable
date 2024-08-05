@@ -98,6 +98,7 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
 
   const handleResetRole = () =>{
     setRoots([[...roots][0]]);
+    setSearch("");
   }
 
   const handleOpenNewModal = () => {

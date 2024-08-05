@@ -8,6 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ReplyIcon from '@mui/icons-material/Reply';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import CachedIcon from '@mui/icons-material/Cached';
 
 import type { GroupType } from "@/types/groupType";
 import type { RoleType } from "@/types/roleType";
@@ -25,7 +26,7 @@ export default function Groups(): React.JSX.Element {
   const [roots, setRoots] = useState<GroupType[]>([{ _id: "-1", title: "خانه", root: "-1", kind: 1 }]);
   const [search, setSearch] = useState<string>("");
   const [groups, setGroups] = useState<GroupType[]>([]);
-  const [filteredGroups, setFilteredGroups] = useState<GroupType[]>([]);
+  // const [filteredGroups, setFilteredGroups] = useState<GroupType[]>([]);
   const [openRolesModal, setOpenRolesModal] = useState<{ isOpen: boolean, refGroup: string }>({ isOpen: false, refGroup: "" });
   const [anchorGroup, setAnchorGroup] = useState<null | HTMLElement>(null);
   const [anchorFolder, setAnchorFolder] = useState<null | HTMLElement>(null);
@@ -33,23 +34,32 @@ export default function Groups(): React.JSX.Element {
   const [snackProps, setSnackProps] = useState<SnackProps>();
 
   useEffect(() => {
-    loadGroupData();
+    loadGroupByRoot();
   }, [])
 
   useEffect(() => {
-    loadGroupData();
+    loadGroupByRoot();
   }, [roots])
 
   const handleListItemClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, group: GroupType) => {
     setSelectedGroup(group);
   }
 
-  const loadGroupData = async () => {
+  const loadGroupByRoot = async () => {
     await fetch(`api/v1/groups/${roots[roots.length - 1]._id}`)
       .then(res => res.status === 200 && res.json())
       .then(data => {
         setGroups(data);
-        setFilteredGroups(data);
+        // setFilteredGroups(data);
+      })
+  }
+
+  const loadGroupByTitle = async () => {
+    await fetch(`api/v1/groups?title=${search}`)
+      .then(res => res.status === 200 && res.json())
+      .then(data => {
+        setGroups(data);
+        // setFilteredGroups(data);
       })
   }
 
@@ -75,7 +85,16 @@ export default function Groups(): React.JSX.Element {
     const searchText = event.target.value;
     setSearch(searchText);
 
-    setFilteredGroups(searchText ? groups.filter((group: GroupType) => group.title.includes(searchText)) : groups);
+    // setFilteredGroups(searchText ? groups.filter((group: GroupType) => group.title.includes(searchText)) : groups);
+  }
+
+  const handleSearchGroup = () => {
+    loadGroupByTitle();
+  }
+
+  const handleResetGroup = () => {
+    setRoots([[...roots][0]]);
+    setSearch("");
   }
 
   const handleBackward = () => {
@@ -99,7 +118,7 @@ export default function Groups(): React.JSX.Element {
   }
 
   const handleActionRole = (role: RoleType) => {
-    
+
   }
 
   const handleNewGroup = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -117,7 +136,7 @@ export default function Groups(): React.JSX.Element {
       body: JSON.stringify({ title: value, root: roots[roots.length - 1]._id !== "-1" ? roots[roots.length - 1]._id : null, kind: 2 })
     })
       .then(res => {
-        res.status === 201 ? loadGroupData() :
+        res.status === 201 ? loadGroupByRoot() :
           setSnackProps({ context: "ایجاد گروه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
       .catch(() => {
@@ -140,7 +159,7 @@ export default function Groups(): React.JSX.Element {
       body: JSON.stringify({ title: value, root: roots[roots.length - 1]._id !== "-1" ? roots[roots.length - 1]._id : null, kind: 1 })
     })
       .then(res => {
-        res.status === 201 ? loadGroupData() :
+        res.status === 201 ? loadGroupByRoot() :
           setSnackProps({ context: "ایجاد پوشه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
       .catch(() => {
@@ -173,7 +192,7 @@ export default function Groups(): React.JSX.Element {
         switch (res.status) {
           case 201:
             setSnackProps({ context: "ویرایش نام پوشه/گروه با موفقیت انجام شد", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
-            loadGroupData();
+            loadGroupByRoot();
             break;
           default:
             setSnackProps({ context: "ویرایش نام پوشه/گروه با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
@@ -194,7 +213,7 @@ export default function Groups(): React.JSX.Element {
           switch (res.status) {
             case 200:
               setSnackProps({ context: "حذف پوشه/گروه با موفقیت انجام شد", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
-              loadGroupData();
+              loadGroupByRoot();
               break;
             case 403:
               setSnackProps({ context: "امکان حذف پوشه/گروه به دلیل داشتن زیر مجموعه وجود ندارد", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
@@ -232,24 +251,20 @@ export default function Groups(): React.JSX.Element {
         </Box>
 
         <List component="nav" sx={{ py: 0 }}>
-          <ListItem component="div" disablePadding>
-            <ListItemButton sx={{ height: 56, m: 0 }}>
-              <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
-                value={search} onChange={handleChangeSearch} sx={{ m: 0 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </ListItemButton>
+          <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
+            <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
+              value={search} onChange={handleChangeSearch} sx={{ m: 0 }} />
+            <IconButton onClick={handleSearchGroup} disabled={search.length === 0} title="جستجو">
+              <SearchIcon />
+            </IconButton>
+            <IconButton onClick={handleResetGroup} title="ریست">
+              <CachedIcon />
+            </IconButton>
             <IconButton onClick={handleBackward} disabled={roots.length === 1} title="بازگشت">
               <ReplyIcon />
             </IconButton>
           </ListItem>
-          {filteredGroups.map((group: GroupType) => (
+          {groups.map((group: GroupType) => (
             <ListItem key={group._id} sx={{ py: 0, minHeight: 24 }}>
               <IconButton onClick={() => handleSubGroup(group)}>
                 {group.kind === 1 ? <FolderSharedIcon /> : <GroupIcon />}
