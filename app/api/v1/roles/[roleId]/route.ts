@@ -15,9 +15,9 @@ const GET = async (request: Request, { params }: { params: { roleId: string } })
 const PUT = async (request: Request, { params }: { params: { roleId: string } }) => {
   connectToDB();
   
-  const { title, refPerson, root, isActive } = await request.json();
+  const { title, refPerson, root, isDefault, isActive } = await request.json();
   
-  const role = await roleModel.findByIdAndUpdate(params.roleId, { title, refPerson, root, isActive });
+  const role = await roleModel.findByIdAndUpdate(params.roleId, { title, refPerson, root, isDefault, isActive });
   
   if (role) {
     return Response.json({ message: "Role updated successfully" }, { status: 201 })

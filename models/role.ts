@@ -12,6 +12,9 @@ const schema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     null: true,
   },
+  isDefault: {
+    type: Boolean
+  },
   isActive: {
     type: Boolean,
     required: true,

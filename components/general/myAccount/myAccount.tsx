@@ -26,7 +26,7 @@ export default function MyAccount(): React.JSX.Element {
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
   const router = useRouter();
-  
+
   useEffect(() => {
     dispatch(changeMode(cookies["dark-mode"] ?? false));
   }, [])
@@ -71,7 +71,6 @@ export default function MyAccount(): React.JSX.Element {
     setIsOpenRolesModal(true);
     setAnchorElUser(null);
   }
-  // console.log(me)
 
   const handleError = (context: string) => {
     setSnackContext(context);

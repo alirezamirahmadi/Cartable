@@ -1,15 +1,20 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
-import type { MeType } from "@/types/authType";
+import type { MeType } from "@/types/AuthType";
 
-const initialState: MeType = { isLogin: false, _id: "", firstName: "", lastName: "", roles: [{ _id: "", title: "", root: "" }], selectedRole: { _id: "", title: "", root: "" } };
+const initialState: MeType = { isLogin: false, _id: "", firstName: "", lastName: "", selectedRole: { _id: "", title: "", root: "" } };
 
 const getMe = createAsyncThunk(
   "me/GET",
   async () => {
     return await fetch("api/v1/auth/me")
       .then(res => res.status === 200 && res.json())
-      .then(data => { return data ? { isLogin: true, ...data, selectedRole: { _id: data.roles[0]._id, title: data.roles[0].title, root: data.roles[0].root } } : initialState })
+      .then(data => {
+        const trueDefault = data.roles.filter((role:any) => role.isDefault === true);
+        const defaultRole = (data && trueDefault.length > 0) ? trueDefault[0] : { ...data.roles[0] }
+
+        return data ? { isLogin: true, _id:data._id, firstName:data.firstName, lastName:data.lastName, selectedRole: defaultRole } : initialState
+      })
       .catch(() => initialState);
   }
 )

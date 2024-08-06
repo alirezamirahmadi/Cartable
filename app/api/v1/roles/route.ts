@@ -38,7 +38,7 @@ const POST = async (request: Request) => {
 
   const { title, refPerson, root, isActive } = await request.json();
 
-  const role = await roleModel.create({ title, refPerson, root, isActive });
+  const role = await roleModel.create({ title, refPerson, root, isDefault: false, isActive });
 
   if (role) {
     return Response.json({ message: "Role created successfully" }, { status: 201 });

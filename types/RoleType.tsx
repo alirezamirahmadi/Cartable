@@ -6,6 +6,7 @@ type RoleType = {
   refPerson: string,
   person?: PersonType,
   root: string | null,
+  isDefault: boolean,
   isActive: boolean,
 }
 

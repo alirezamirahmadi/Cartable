@@ -1,5 +1,5 @@
 import { PersonType } from "./personType";
-import { RoleType } from "./roleType";
+import { RoleType } from "./RoleType";
 
 type LoginType = {
   username: string,
@@ -12,7 +12,6 @@ type MeType = {
   firstName: string,
   lastName: string,
   selectedRole: { _id: string, title: string, root: string },
-  roles: [{ _id: string, title: string, root: string }],
 }
 
 export type {
