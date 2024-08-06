@@ -41,7 +41,7 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
     loadRoleByRoot();
   }, [roots])
 
-  useEffect(()=>{
+  useEffect(() => {
     onSelectRole(selectedRole);
   }, [selectedRole])
 
@@ -59,28 +59,28 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
 
   const handleBreadcrumbs = (root: RoleType) => {
     setSelectedRole(undefined);
-    
+
     const tempRoots: RoleType[] = [...roots];
     do {
       tempRoots.pop();
     }
     while (tempRoots[tempRoots.length - 1]._id !== root._id);
-    
+
     setRoots(tempRoots);
   }
-  
+
   const handleBackward = () => {
     setSelectedRole(undefined);
-    
+
     const tempRoots: RoleType[] = [...roots];
     tempRoots.pop();
     setRoots(tempRoots);
   }
-  
+
   const handleSelectRole = (role: RoleType) => {
     setSelectedRole(role);
   }
-  
+
   const handleSubRole = (role: RoleType) => {
     setSelectedRole(undefined);
 
@@ -96,7 +96,7 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
     loadRoleByTitle();
   }
 
-  const handleResetRole = () =>{
+  const handleResetRole = () => {
     setRoots([[...roots][0]]);
     setSearch("");
   }
@@ -183,7 +183,7 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
           }
         </List>
         <Snack {...snackProps} />
-        <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={handleCloseModal} body={<RoleModify root={selectedRole?._id ?? null} onModify={handleModify} />} />
+        <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={handleCloseModal} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />
         <Modal title="حذف سمت" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} onDelete={handleDelete} />} />
       </Box>
     </>

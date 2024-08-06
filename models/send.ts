@@ -3,30 +3,29 @@ import mongoose from "mongoose";
 const schema = new mongoose.Schema({
   refPerson: {
     type: mongoose.Schema.ObjectId,
-    require: true,
+    required: true,
   },
   refRole: {
     type: mongoose.Schema.ObjectId,
-    require: true,
+    required: true,
   },
   refCollection: {
     type: mongoose.Schema.ObjectId,
-    require: true,
+    required: true,
   },
   refDocument: {
     type: mongoose.Schema.ObjectId,
-    require: true,
+    required: true,
   },
   ipAddress: {
     type: String,
   },
   sendDate: {
     type: Date,
-    require: true,
+    required: true,
   },
   parentReceive: {
     type: String,
-    require: true,
   }
 })
 

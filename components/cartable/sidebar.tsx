@@ -36,14 +36,15 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
   const [search, setSearch] = useState<string>("");
   const [selectedCollection, setSelectedCollection] = useState<string>(searchParams.get("collid") ?? "");
   const [collections, setCollections] = useState<InboxListType[]>([]);
+  const [filteredCollections, setFilteredCollections] = useState<InboxListType[]>([]);
 
   useEffect(() => {
     loadCollectionData();
   }, [])
 
   useEffect(() => {
-    loadCollectionData();
-  }, [search])
+    setFilteredCollections(collections);
+  }, [collections])
 
   const loadCollectionData = async () => {
     place && me && await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/${place}?roleId=${me.selectedRole._id}`, {
@@ -94,6 +95,8 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
+
+    setFilteredCollections(searchText ? [...filteredCollections].filter(collection => collection.title.includes(searchText)) : collections);
   }
 
   const updateCartable = () => {
@@ -145,7 +148,7 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
               <KeyboardArrowDown sx={{ mr: -1, opacity: 0, transform: open ? 'rotate(-180deg)' : 'rotate(0)', transition: '0.2s', }} />
             </ListItemButton>
             {open &&
-              collections.sort((a, b) => a._id > b._id ? 1 : -1).map((collection) => (
+              filteredCollections.sort((a, b) => a._id > b._id ? 1 : -1).map((collection) => (
                 <ListItemButton key={collection._id} sx={{ py: 0, minHeight: 32, mt: 1 }} onClick={() => handleOpenCollection(collection._id)}>
                   <Badge badgeContent={collection.count} color="secondary">
                     <ListItemText primary={collection.title} primaryTypographyProps={{

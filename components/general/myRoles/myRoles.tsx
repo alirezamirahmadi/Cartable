@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { List, ListItem, ListItemButton, ListItemText, ListItemIcon, Box, Divider } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 
@@ -9,11 +9,13 @@ import { changeRole } from "@/lib/features/me/meSlice";
 
 export default function MyRoles(): React.JSX.Element {
 
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
 
   const handleChangeRole = (role: any) => {
-    dispatch(changeRole({ ...me, selectedRole: role }))
+    dispatch(changeRole({ ...me, selectedRole: role }));
+    // router.replace("/");
   }
 
   return (

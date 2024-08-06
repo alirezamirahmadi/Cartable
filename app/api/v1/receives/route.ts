@@ -17,14 +17,6 @@ const GET = async (request: Request) => {
       .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" });
   }
   else {
-    // let refUrgency = searchParams.get('refUrgency');
-    // receive = await receiveModel.aggregate()
-    //   .match({ refUrgency: new mongoose.Types.ObjectId(refUrgency ?? '') })
-    //   .lookup({ from: "sends", localField: "refSend", foreignField: "_id", as: "send" })
-    //   .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
-    //   .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
-    //   .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" });
-
     let refCollection = searchParams.get('refCollection');
     let refDocument = searchParams.get('refDocument');
     receive = await receiveModel.aggregate()
@@ -59,7 +51,7 @@ const POST = async (request: Request) => {
   const receive = await receiveModel.insertMany(receivers);
 
   if (receive) {
-    return Response.json({ message: "Document receive successfully" }, { status: 201 });
+    return Response.json({ message: "Document received successfully" }, { status: 201 });
   }
   return Response.json({ message: "Document was not receive" }, { status: 500 });
 }

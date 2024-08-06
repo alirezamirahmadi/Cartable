@@ -3,19 +3,19 @@ import mongoose from "mongoose";
 const schema = new mongoose.Schema({
   refSend: {
     type: mongoose.Schema.ObjectId,
-    require: true,
+    required: true,
   },
   refPerson: {
     type: mongoose.Schema.ObjectId,
-    require: true,
+    required: true,
   },
   refRole: {
     type: mongoose.Schema.ObjectId,
-    require: true,
+    required: true,
   },
   refUrgency: {
     type: mongoose.Schema.ObjectId,
-    require: true,
+    required: true,
   },
   viewDate: {
     type: Date,
@@ -30,7 +30,7 @@ const schema = new mongoose.Schema({
   },
   observed: {
     type: Boolean,
-    require: true,
+    required: true,
   }
 })
 

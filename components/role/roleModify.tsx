@@ -15,7 +15,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [persons, setPersons] = useState<PersonType[]>([]);
   const [refPerson, setRefPerson] = useState<string | null>(null);
-  
+
   const { register, handleSubmit, reset, getValues, setValue, formState: { errors } } = useForm({
     defaultValues: {
       title: role?.title ?? "",
@@ -61,7 +61,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ title: data.title, refPerson, root, isActive: data.isActive })
+      body: JSON.stringify({ title: data.title, refPerson, root: data.root, isActive: data.isActive })
     })
       .then(res => {
         if (res.status === 201) {
@@ -78,7 +78,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
   const handleSelectedPerson = (personId: string) => {
     setRefPerson(personId);
   }
-  
+
   return (
     <>
       <div className="lg:col-span-3 md:col-span-2">
