@@ -4,7 +4,7 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar, Avatar, Typography, Box, IconButton } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { Add } from "@mui/icons-material";
-import { RoleType } from "@/types/roleType";
+import { RoleType } from "@/types/RoleType";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "../general/modal/modal";
 

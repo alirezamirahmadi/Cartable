@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import RoleModify from "@/components/role/roleModify";
 import RoleTree from "@/components/role/roleTree";
-import { RoleType } from "@/types/roleType";
+import { RoleType } from "@/types/RoleType";
 import Loading from "@/components/general/loading/loading";
 import Snack from "@/components/general/snack/snack";
 import type { SnackProps } from "@/types/generalType";
@@ -14,7 +14,7 @@ export default function Roles(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRolesUpdate, setIsRolesUpdate] = useState<boolean>(false);
   const [root, setRoot] = useState<string | null>(null);
-  const [role, setRole] = useState<RoleType | undefined>({ title: "", refPerson: "", root: null, isActive: false });
+  const [role, setRole] = useState<RoleType | undefined>({ title: "", refPerson: "", root: null, isDefault: false, isActive: false });
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   useEffect(() => {

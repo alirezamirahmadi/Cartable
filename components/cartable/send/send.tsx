@@ -14,7 +14,7 @@ import Urgency from "../urgency/urgency";
 import Snack from "@/components/general/snack/snack";
 import type { ReceiverType, UrgencyType, ReceiveType } from "@/types/cartableType";
 import type { SnackProps } from "@/types/generalType";
-import { RoleType } from "@/types/roleType";
+import { RoleType } from "@/types/RoleType";
 
 export default function Send({ refCollection, refDocument, parentReceive, onClose }: { refCollection: string, refDocument: string, parentReceive: string, onClose: () => void }): React.JSX.Element {
 
@@ -72,7 +72,8 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
   }, [deleteReceiver])
 
   const loadRoleData = async () => {
-    await fetch("api/v1/roles")
+    // await fetch("api/v1/roles")
+    await fetch(`api/v1/roles/myConnections?roleId=${me.selectedRole._id}&root=${me.selectedRole.root}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setRoles(data))
   }
@@ -140,7 +141,7 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
   return (
     <>
       <div className="flex">
-        <Roles roles={roles} onAction={handleSelectRole} add/>
+        <Roles roles={roles} onAction={handleSelectRole} add />
         <div className="w-full">
           <ReactDataTable rows={receivers ?? []} columns={columns} direction="rtl"
             options={{ ...defaultDataTableOptions(theme.palette.mode), filter: false, search: false, download: false, viewColumns: false, print: false }}

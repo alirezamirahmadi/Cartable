@@ -84,7 +84,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
       <div className="lg:col-span-3 md:col-span-2">
         <div className="flex flex-wrap gap-4 justify-center">
           <TextField {...register("title")} required error={errors.title ? true : false} helperText={errors.title ? "لطفا عنوان را وارد کنید" : ""} size="small" label={<Typography variant="body1" sx={{ display: "inline" }}>عنوان</Typography>} />
-          <AutoComplete options={persons} defaultValueId={role?.refPerson ?? ""} getSelectedId={handleSelectedPerson} inputProps={{ label: "شخص", size: "small", width: 300 }} key={JSON.stringify(persons)} />
+          <AutoComplete options={persons} defaultValueId={role?.person?._id ?? ""} getSelectedId={handleSelectedPerson} inputProps={{ label: "شخص", size: "small", width: 300 }} key={JSON.stringify(persons)} />
           <FormGroup>
             <FormControlLabel control={<Checkbox {...register("isActive")} defaultChecked={role ? getValues("isActive") : false} color="primary" />} label="فعال" />
           </FormGroup>
