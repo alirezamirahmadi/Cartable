@@ -9,7 +9,7 @@ const GET = async (request: Request) => {
   const { searchParams } = new URL(request.url);
   const roleId = searchParams.get("roleId");
   const root = searchParams.get("root");
-  console.log(12, root)
+
   if (!roleId || !root) {
     return Response.json({ message: "roleId and root are required" }, { status: 403 })
   }

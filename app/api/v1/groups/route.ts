@@ -29,7 +29,20 @@ const POST = async (request: Request) => {
   return Response.json({ message: "Group is not create" }, { status: 500 })
 }
 
+const PUT = async (request: Request) => {
+  connectToDB();
+
+  const { groupIds, root } = await request.json();
+  const group = await groupModel.updateMany({_id: { $in: groupIds }}, { $set: { root } });
+
+  if (group) {
+    return Response.json({ message: "Group updated successfully" }, { status: 201 });
+  }
+  return Response.json({ message: "Group was not updated" }, { status: 500 });
+}
+
 export {
   GET,
-  POST
+  POST,
+  PUT
 }
