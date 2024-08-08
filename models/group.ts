@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 const schema = new mongoose.Schema({
   title: {
     type: String,
-    require: true,
+    required: true,
   },
   root: {
     type: mongoose.Types.ObjectId,
   },
   kind: {
-    type: Number, // 1- category 2- user group
-    require: true,
+    type: Number, // 1- category, 2- user group
+    required: true,
   }
 })
 
