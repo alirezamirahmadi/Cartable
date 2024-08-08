@@ -1,14 +1,18 @@
 "use client"
 
 import { useState, useEffect, ChangeEvent } from "react";
-import { ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar, Avatar, Typography, Box, IconButton } from "@mui/material";
+import {
+  ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar,
+  Avatar, Typography, Box, IconButton
+} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { Add } from "@mui/icons-material";
 import { RoleType } from "@/types/RoleType";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "../general/modal/modal";
 
-export default function Roles({ roles, onAction, add, edit, omit, newMember, refGroup }: { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, newMember?: boolean, refGroup?: string }): React.JSX.Element {
+export default function Roles({ roles, onAction, add, edit, omit, newMember, refGroup }: 
+  { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, newMember?: boolean, refGroup?: string }): React.JSX.Element {
 
   const [search, setSearch] = useState<string>("");
   const [listRoles, setListRoles] = useState<RoleType[]>([]);

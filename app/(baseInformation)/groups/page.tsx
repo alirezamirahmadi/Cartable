@@ -34,7 +34,7 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
   const [anchorEdit, setAnchorEdit] = useState<null | HTMLElement>(null);
   const [snackProps, setSnackProps] = useState<SnackProps>();
   const [checked, setChecked] = useState<string[]>([]);
-  const [isOpenGroupModal, setIsOpenGroupModal] = useState<boolean>(false);
+  const [isOpenTransferModal, setIsOpenTransferModal] = useState<boolean>(false);
 
   useEffect(() => {
     loadGroupByRoot();
@@ -120,10 +120,10 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
   }
 
   const handleTransferTo = async (root: string) => {
-    setIsOpenGroupModal(false);
+    setIsOpenTransferModal(false);
 
     if (checked.includes(root)) {
-      setSnackProps({ context: "پوشه/گروه مقصد نمی تواند پوشه/گروه انتخاب شده جهت انتقال باشد", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+      setSnackProps({ context: "پوشه/گروه مقصد نمی تواند از پوشه/گروه های انتخاب شده جهت انتقال باشد", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
       return;
     }
 
@@ -142,7 +142,7 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
   }
 
   const handleTransfer = () => {
-    isTransfer && onTransfer ? onTransfer(checked.length === 1 ? checked[0] : "") : setIsOpenGroupModal(true);
+    isTransfer && onTransfer ? onTransfer(checked.length === 1 ? checked[0] : "") : setIsOpenTransferModal(true);
   }
 
   const handleToggle = (groupId: string) => {
@@ -315,7 +315,7 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
       </Box>
       <Snack {...snackProps} />
       <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleActionRole} omit newMember refGroup={openRolesModal.refGroup} />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />
-      <Modal isOpen={isOpenGroupModal} title="انتقال به" body={<Groups isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenGroupModal(false)} />
+      <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<Groups isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />
     </>
   )
 }

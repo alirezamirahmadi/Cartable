@@ -90,7 +90,7 @@ export default function MyAccount(): React.JSX.Element {
   return (
     <>
       <Box sx={{ flexGrow: 0 }}>
-        <Tooltip title="Open settings">
+        <Tooltip title="کاربری من">
           <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
             <Avatar />
           </IconButton>

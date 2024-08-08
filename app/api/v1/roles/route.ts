@@ -41,7 +41,18 @@ const POST = async (request: Request) => {
   return Response.json({ message: "Role was not created" }, { status: 500 });
 }
 
+const PUT = async (request: Request) => {
+  const { roleIds, root } = await request.json();
+
+  const role = await roleModel.updateMany({ _id: { $in: roleIds } }, { $set: { root } });
+  if (role) {
+    return Response.json({ message: "Roles updated successfully" }, { status: 201 });
+  }
+  return Response.json({ message: "Roles did not update" }, { status: 500 });
+}
+
 export {
   GET,
-  POST
+  POST,
+  PUT
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, ChangeEvent } from 'react';
 import {
-  Box, IconButton, ListItem, ListItemText, ListItemButton, Breadcrumbs, Button, List, TextField, InputAdornment,
+  Box, IconButton, ListItem, ListItemText, ListItemButton, Breadcrumbs, Button, List, TextField, Checkbox,
   Typography
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -11,23 +11,28 @@ import GroupIcon from '@mui/icons-material/Group';
 import SearchIcon from '@mui/icons-material/Search';
 import ReplyIcon from '@mui/icons-material/Reply';
 import CachedIcon from '@mui/icons-material/Cached';
+import MoveUpIcon from '@mui/icons-material/MoveUp';
+import MoveDownIcon from '@mui/icons-material/MoveDown';
 
-import { RoleType } from '@/types/roleType';
+import { RoleType } from '@/types/RoleType';
 import Modal from '../general/modal/modal';
 import RoleModify from './roleModify';
 import Delete from '../general/delete/delete';
 import Snack from '../general/snack/snack';
 import type { SnackProps } from '@/types/generalType';
 
-export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean, onSelectRole: (role: RoleType | undefined) => void }): React.JSX.Element {
+export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfer }:
+  { isUpdate?: boolean, isTransfer?: boolean, onSelectRole?: (role: RoleType | undefined) => void, onTransfer?: (root: string) => void }): React.JSX.Element {
 
-  const [roots, setRoots] = useState<RoleType[]>([{ _id: "-1", title: "خانه", root: null, refPerson: "", isActive: true }]);
+  const [roots, setRoots] = useState<RoleType[]>([{ _id: "-1", title: "خانه", root: null, refPerson: "", isDefault: false, isActive: true }]);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [isOpenNewModal, setIsOpenNewModal] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [isOpenTransferModal, setIsOpenTransferModal] = useState<boolean>(false);
   const [selectedRole, setSelectedRole] = useState<RoleType>();
   const [treeData, setTreeData] = useState<RoleType[]>([]);
   const [search, setSearch] = useState<string>("");
+  const [checked, setChecked] = useState<string[]>([]);
 
   useEffect(() => {
     loadRoleByRoot();
@@ -42,7 +47,7 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
   }, [roots])
 
   useEffect(() => {
-    onSelectRole(selectedRole);
+    onSelectRole && onSelectRole(selectedRole);
   }, [selectedRole])
 
   const loadRoleByRoot = async () => {
@@ -87,6 +92,45 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
     setRoots([...roots, role]);
   }
 
+  const handleTransfer = () => {
+    isTransfer && onTransfer ? onTransfer(checked.length === 1 ? checked[0] : "") : setIsOpenTransferModal(true);
+  }
+
+  const handleTransferTo = async (root: string) => {
+    setIsOpenTransferModal(false);
+
+    if(checked.includes(root)){
+      setSnackProps({ context: "سمت مقصد نمی تواند از سمت های انتخاب شده جهت انتقال باشد", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+    }
+
+    await fetch("api/v1/roles", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({ roleIds: checked, root })
+    })
+      .then(res => {
+        if (res.status === 201) {
+          search ? loadRoleByTitle() : loadRoleByRoot();
+          setChecked([]);
+        }
+      })
+  }
+
+  const handleToggle = (roleId: string) => {
+    const index = checked.indexOf(roleId);
+
+    if (!isTransfer) {
+      const tempChecked = [...checked];
+      index === -1 ? tempChecked.push(roleId) : tempChecked.splice(index, 1);
+      setChecked([...tempChecked]);
+    }
+    else {
+      setChecked(index === -1 ? [roleId] : []);
+    }
+  }
+
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
@@ -107,11 +151,6 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
 
   const handleOpenDeleteModal = () => {
     setIsOpenDeleteModal(true);
-  }
-
-  const handleCloseModal = () => {
-    setIsOpenNewModal(false);
-    setIsOpenDeleteModal(false);
   }
 
   const handleModify = (isModify: boolean) => {
@@ -152,6 +191,9 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
         <IconButton onClick={handleOpenNewModal} title="جدید">
           <AddIcon />
         </IconButton>
+        <IconButton onClick={handleTransfer} disabled={checked.length === 0} title={isTransfer ? "انتقال به" : "انتقال"}>
+          {isTransfer ? <MoveDownIcon /> : <MoveUpIcon />}
+        </IconButton>
         <IconButton color="error" onClick={handleOpenDeleteModal} title="حذف" disabled={selectedRole ? false : true}>
           <DeleteIcon />
         </IconButton>
@@ -172,6 +214,7 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
           {
             treeData.map(role => (
               <ListItem key={role._id} sx={{ py: 0, minHeight: 24 }}>
+                <Checkbox value={checked.includes(role._id ?? "")} onChange={() => handleToggle(role._id ?? "")} />
                 <IconButton onClick={() => handleSubRole(role)}>
                   <GroupIcon />
                 </IconButton>
@@ -183,8 +226,9 @@ export default function RoleTree({ isUpdate, onSelectRole }: { isUpdate: boolean
           }
         </List>
         <Snack {...snackProps} />
-        <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={handleCloseModal} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />
-        <Modal title="حذف سمت" isOpen={isOpenDeleteModal} onCloseModal={handleCloseModal} body={<Delete message={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} onDelete={handleDelete} />} />
+        <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />
+        <Modal title="حذف سمت" isOpen={isOpenDeleteModal} onCloseModal={() => setIsOpenDeleteModal(false)} body={<Delete message={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} onDelete={handleDelete} />} />
+        <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree isTransfer={true} onTransfer={handleTransferTo} />} />
       </Box>
     </>
   )
