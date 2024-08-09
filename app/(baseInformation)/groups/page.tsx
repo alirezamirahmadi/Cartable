@@ -33,7 +33,7 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
   const [anchorFolder, setAnchorFolder] = useState<null | HTMLElement>(null);
   const [anchorEdit, setAnchorEdit] = useState<null | HTMLElement>(null);
   const [snackProps, setSnackProps] = useState<SnackProps>();
-  const [checked, setChecked] = useState<string[]>([]);
+  const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
   const [isOpenTransferModal, setIsOpenTransferModal] = useState<boolean>(false);
 
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
   const handleTransferTo = async (root: string) => {
     setIsOpenTransferModal(false);
 
-    if (checked.includes(root)) {
+    if (checkedGroups.includes(root)) {
       setSnackProps({ context: "پوشه/گروه مقصد نمی تواند از پوشه/گروه های انتخاب شده جهت انتقال باشد", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
       return;
     }
@@ -132,29 +132,29 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
       headers: {
         "Content-Type": "Application/json"
       },
-      body: JSON.stringify({ groupIds: checked, root })
+      body: JSON.stringify({ groupIds: checkedGroups, root })
     }).then(res => {
       if (res.status === 201) {
         search ? loadGroupByTitle() : loadGroupByRoot();
-        setChecked([]);
+        setCheckedGroups([]);
       }
     })
   }
 
   const handleTransfer = () => {
-    isTransfer && onTransfer ? onTransfer(checked.length === 1 ? checked[0] : "") : setIsOpenTransferModal(true);
+    isTransfer && onTransfer ? onTransfer(checkedGroups.length === 1 ? checkedGroups[0] : "") : setIsOpenTransferModal(true);
   }
 
   const handleToggle = (groupId: string) => {
-    const index = checked.indexOf(groupId);
+    const index = checkedGroups.indexOf(groupId);
 
     if (!isTransfer) {
-      const tempChecked = [...checked];
+      const tempChecked = [...checkedGroups];
       index === -1 ? tempChecked.push(groupId) : tempChecked.splice(index, 1);
-      setChecked(tempChecked);
+      setCheckedGroups(tempChecked);
     }
     else {
-      setChecked(index === -1 ? [groupId] : []);
+      setCheckedGroups(index === -1 ? [groupId] : []);
     }
   }
 
@@ -278,7 +278,7 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
           <IconButton onClick={handleNewFolder} title="پوشه جدید">
             <CreateNewFolderIcon />
           </IconButton>
-          <IconButton onClick={handleTransfer} disabled={checked.length === 0} title={isTransfer ? "انتقال به" : "انتقال"}>
+          <IconButton onClick={handleTransfer} disabled={checkedGroups.length === 0} title={isTransfer ? "انتقال به" : "انتقال"}>
             {isTransfer ? <MoveDownIcon /> : <MoveUpIcon />}
           </IconButton>
           <TextSave anchor={anchorFolder} onAction={handleActionNewFolder} label="پوشه جدید" />
@@ -302,7 +302,7 @@ export default function Groups({ isTransfer, onTransfer }: { isTransfer?: boolea
           </ListItem>
           {groups.map((group: GroupType) => (
             <ListItem key={group._id} sx={{ py: 0, minHeight: 24 }}>
-              <Checkbox disabled={(isTransfer && group.kind === 2)} checked={checked.includes(group._id)} onChange={() => handleToggle(group._id)} />
+              <Checkbox disabled={(isTransfer && group.kind === 2)} checked={checkedGroups.includes(group._id)} onChange={() => handleToggle(group._id)} />
               <IconButton onClick={() => handleSubGroup(group)}>
                 {group.kind === 1 ? <FolderSharedIcon /> : <GroupIcon />}
               </IconButton>

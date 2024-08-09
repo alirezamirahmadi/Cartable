@@ -6,7 +6,15 @@ import connectToDB from "@/utils/db";
 const GET = async (request: Request, { params }: { params: { permissionId: string } }) => {
   connectToDB();
 
-  const permissions = await permissionModel.find({ root: params.permissionId !== "null" ? new mongoose.Types.ObjectId(params.permissionId) : null });
+  const { searchParams } = new URL(request.url);
+  const item = searchParams.get("item");
+
+  const permissions = await permissionModel.find(
+    {
+      root: params.permissionId !== "null" ? new mongoose.Types.ObjectId(params.permissionId) : null,
+      kind: item && item === "true" ? 3 : { $in: [1, 2] }
+    }
+  );
   if (permissions) {
     return Response.json(permissions, { status: 200 });
   }

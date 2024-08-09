@@ -3,7 +3,7 @@ type PermissionType = {
   title: string,
   showTitle: string,
   root: string,
-  items: number,
+  kind: number,
 }
 
 export type {
