@@ -6,6 +6,13 @@ type PermissionType = {
   kind: number,
 }
 
+type GroupPermissionType = {
+  _id: string,
+  refPermission: string,
+  refGroup: string,
+}
+
 export type {
-  PermissionType
+  PermissionType,
+  GroupPermissionType
 }

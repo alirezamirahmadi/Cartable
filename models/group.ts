@@ -11,6 +11,9 @@ const schema = new mongoose.Schema({
   kind: {
     type: Number, // 1- category, 2- user group
     required: true,
+  },
+  permissions: {
+    type: [mongoose.Types.ObjectId],
   }
 })
 

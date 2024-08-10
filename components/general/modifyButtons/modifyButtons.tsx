@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { IconButton, Box } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
-import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
+import EditIcon from '@mui/icons-material/Edit';
 
 import Modal from "../modal/modal";
 import Delete from "../delete/delete";
@@ -46,7 +46,7 @@ export default function ModifyButtons({ rowData, onAction, add, save, edit, omit
         }
         {edit &&
           <IconButton onClick={handleEdit} title="ویرایش">
-            <AppRegistrationIcon />
+            <EditIcon />
           </IconButton>
         }
         {omit &&
