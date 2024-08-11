@@ -8,6 +8,7 @@ type RoleType = {
   root: string | null,
   isDefault: boolean,
   isActive: boolean,
+  permissions?: string[],
 }
 
 export type {

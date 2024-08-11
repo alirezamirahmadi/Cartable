@@ -1,7 +1,8 @@
+import mongoose from "mongoose";
+
 // import groupPermissionModel from "@/models/groupPermission";
 import groupModel from "@/models/group";
 import connectToDB from "@/utils/db";
-import mongoose from "mongoose";
 
 const GET = async (request: Request) => {
   connectToDB();
@@ -23,7 +24,7 @@ const GET = async (request: Request) => {
   if (permissions) {
     return Response.json(permissions, { status: 200 });
   }
-  return Response.json({ message: "refPermission or refGroup is required" }, { status: 500 });
+  return Response.json({ message: "groupId is required and must be valid" }, { status: 500 });
 }
 
 const POST = async (request: Request) => {
@@ -32,7 +33,7 @@ const POST = async (request: Request) => {
   // const {permissions} = await request.json();
   // const newPermissions = await groupPermissionModel.insertMany(permissions);
   const { groupId, permissionIds } = await request.json();
-  const newPermissions = await groupModel.findByIdAndUpdate(groupId, { $push: { permissions: permissionIds } })
+  const newPermissions = await groupModel.findByIdAndUpdate(groupId, { $addToSet: { permissions: permissionIds } })
 
   if (newPermissions) {
     return Response.json({ message: "Permissions added successfully" }, { status: 201 });

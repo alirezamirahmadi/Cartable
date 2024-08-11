@@ -18,6 +18,9 @@ const schema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     required: true,
+  },
+  permissions: {
+    type: [mongoose.Types.ObjectId],
   }
 })
 
