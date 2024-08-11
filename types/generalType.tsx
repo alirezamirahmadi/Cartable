@@ -5,6 +5,13 @@ type SnackProps = {
   onCloseSnack: () => void,
 }
 
+type RoleGroupType = {
+  _id: String,
+  kind: number, // 1- role, 2- group
+  title: string,
+}
+
 export type {
-  SnackProps
+  SnackProps,
+  RoleGroupType
 }

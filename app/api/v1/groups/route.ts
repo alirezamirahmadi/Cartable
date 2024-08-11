@@ -6,13 +6,18 @@ const GET = async (request: Request) => {
 
   const { searchParams } = new URL(request.url);
   const title = searchParams.get("title");
+  const kind = searchParams.get("kind");
+  let groups = null;
 
-  const groups = await groupModel.find({ title: { $regex: `.*${title}.*` } });
+  if (title && !kind) groups = await groupModel.find({ title: { $regex: `.*${title}.*` } });
+  else if (!title && kind) groups = await groupModel.find({ kind });
+  else if (title && kind) groups = await groupModel.find({ title: { $regex: `.*${title}.*` }, kind });
+  else groups = await groupModel.find();
 
   if (groups) {
-    return Response.json(groups, { status: 200 })
+    return Response.json(groups, { status: 200 });
   }
-  return Response.json({ message: "not found" }, { status: 404 })
+  return Response.json({ message: "not found" }, { status: 404 });
 }
 
 
@@ -33,7 +38,7 @@ const PUT = async (request: Request) => {
   connectToDB();
 
   const { groupIds, root } = await request.json();
-  const group = await groupModel.updateMany({_id: { $in: groupIds }}, { $set: { root } });
+  const group = await groupModel.updateMany({ _id: { $in: groupIds } }, { $set: { root } });
 
   if (group) {
     return Response.json({ message: "Groups updated successfully" }, { status: 201 });

@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import GroupIcon from '@mui/icons-material/Group';
+import PersonIcon from '@mui/icons-material/Person';
 import SearchIcon from '@mui/icons-material/Search';
 import ReplyIcon from '@mui/icons-material/Reply';
 import CachedIcon from '@mui/icons-material/Cached';
@@ -216,7 +216,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
               <ListItem key={role._id} sx={{ py: 0, minHeight: 24 }}>
                 <Checkbox value={checked.includes(role._id ?? "")} onChange={() => handleToggle(role._id ?? "")} />
                 <IconButton onClick={() => handleSubRole(role)}>
-                  <GroupIcon />
+                  <PersonIcon />
                 </IconButton>
                 <ListItemButton sx={{ py: 0 }} selected={selectedRole?._id === role._id} onClick={(event) => handleSelectRole(role)}>
                   <ListItemText primary={role.title} />
