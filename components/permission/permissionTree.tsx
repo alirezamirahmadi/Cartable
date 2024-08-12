@@ -12,18 +12,23 @@ import CachedIcon from "@mui/icons-material/Cached";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
-import type { PermissionType } from "@/types/permissionType";
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
+import type { PermissionType } from "@/types/permissionType";
+import type { RoleGroupType } from "@/types/generalType";
+import Snack from "../general/snack/snack";
+import { SnackProps } from "@/types/generalType";
 
-export default function PermissionTree({ onSave }: { onSave: (PermissionIds: string[]) => void }): React.JSX.Element {
+export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupType | null }): React.JSX.Element {
 
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
   const [roots, setRoots] = useState<PermissionType[]>([{ _id: "null", title: "", showTitle: "خانه", root: "null", kind: 1 }])
   const [search, setSearch] = useState<string>("");
-  const [checkedPermissions, setCheckedPermissions] = useState<string[]>([]);
+  const [newPermissions, setNewPermissions] = useState<string[]>([]);
+  const [oldPermissions, setOldPermissions] = useState<string[]>([]);
   const [selectedPermission, setSelectedPermission] = useState<PermissionType>();
   const [openPermissionItems, setopenPermissionItems] = useState<string>("");
+  const [snackProps, setSnackProps] = useState<SnackProps>();
 
   useEffect(() => {
     loadPermissionByRoot();
@@ -32,6 +37,23 @@ export default function PermissionTree({ onSave }: { onSave: (PermissionIds: str
   useEffect(() => {
     loadPermissionByRoot();
   }, [roots]);
+
+  useEffect(() => {
+    setNewPermissions(oldPermissions ?? []);
+  }, [oldPermissions])
+
+  useEffect(() => {
+    loadOldPermission();
+  }, [roleGroup]);
+
+  const loadOldPermission = async () => {
+    roleGroup ?
+      await fetch(`api/v1/${roleGroup?.kind === 1 ? "rolePermissions?roleId" : "groupPermissions?groupId"}=${roleGroup?._id}`)
+        .then(res => res.status === 200 && res.json())
+        .then(data => setOldPermissions(data[0]?.permissions))
+      :
+      setOldPermissions([]);
+  }
 
   const loadPermissionByRoot = async () => {
     await fetch(`api/v1/permissions/${roots[roots.length - 1]._id}`)
@@ -69,10 +91,10 @@ export default function PermissionTree({ onSave }: { onSave: (PermissionIds: str
   }
 
   const handleToggle = (permissionId: string) => {
-    const index = checkedPermissions.indexOf(permissionId);
-    const tempChecked = [...checkedPermissions]
+    const index = newPermissions.indexOf(permissionId);
+    const tempChecked = [...newPermissions]
     index === -1 ? tempChecked.push(permissionId) : tempChecked.splice(index, 1);
-    setCheckedPermissions(tempChecked);
+    setNewPermissions(tempChecked);
   }
 
   const handleSubPermission = (permission: PermissionType) => {
@@ -102,7 +124,47 @@ export default function PermissionTree({ onSave }: { onSave: (PermissionIds: str
   }
 
   const handleSaveAction = (data: any, action: string) => {
-    action === "Save" && onSave(checkedPermissions);
+    if (!roleGroup) {
+      setSnackProps({ context: "لطفا گروه و یا سمت مورد نظر را انتخاب کنید", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+      return;
+    }
+
+    if (action === "Save") {
+      addNewPermissons()
+        .then(() => deleteTakenPermissons()
+          .then(() => {
+            loadOldPermission();
+            setSnackProps({ context: `مجوزهای مورد نظر برای ${roleGroup?.title} اعمال شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+          })
+        )
+        .catch(() => {
+          setSnackProps({ context: "ذخیره مجوزها با خطا موچه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+        })
+    }
+  }
+
+  const addNewPermissons = async () => {
+    const permissionIds: string[] = [...newPermissions].filter((permission: string) => !oldPermissions?.includes(permission));
+
+    permissionIds.length > 0 && await fetch(`api/v1/${roleGroup?.kind === 1 ? "rolePermissions" : "groupPermissions"}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify(roleGroup?.kind === 1 ? { roleId: roleGroup?._id, permissionIds } : { groupId: roleGroup?._id, permissionIds })
+    })
+  }
+
+  const deleteTakenPermissons = async () => {
+    const permissionIds: string[] = [...oldPermissions ?? []].filter((permission: string) => !newPermissions?.includes(permission));
+
+    permissionIds.length > 0 && await fetch(`api/v1/${roleGroup?.kind === 1 ? "rolePermissions" : "groupPermissions"}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify(roleGroup?.kind === 1 ? { roleId: roleGroup?._id, permissionIds } : { groupId: roleGroup?._id, permissionIds })
+    })
   }
 
   return (
@@ -139,7 +201,7 @@ export default function PermissionTree({ onSave }: { onSave: (PermissionIds: str
                   {permission.kind === 2 && openPermissionItems === permission._id && <ExpandLess />}
                   {permission.kind === 2 && openPermissionItems !== permission._id && <ExpandMore />}
                 </IconButton>
-                {permission.kind !== 1 && <Checkbox checked={checkedPermissions.includes(permission._id)} onChange={() => handleToggle(permission._id)} />}
+                {permission.kind !== 1 && <Checkbox checked={newPermissions.includes(permission._id)} onChange={() => handleToggle(permission._id)} />}
                 <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permission._id} onClick={() => setSelectedPermission(permission)}>
                   <ListItemText primary={permission.showTitle} />
                 </ListItemButton>
@@ -149,7 +211,7 @@ export default function PermissionTree({ onSave }: { onSave: (PermissionIds: str
                   <List component="div" disablePadding>
                     {permissionItems.map((permissionItem: PermissionType) => (
                       <ListItem key={permissionItem._id} sx={{ py: 0, pl: 7, maxHeight: 28 }}>
-                        <Checkbox checked={checkedPermissions.includes(permissionItem._id)} onChange={() => handleToggle(permissionItem._id)} />
+                        <Checkbox checked={newPermissions.includes(permissionItem._id)} onChange={() => handleToggle(permissionItem._id)} />
                         <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permissionItem._id} onClick={() => setSelectedPermission(permissionItem)}>
                           <ListItemText secondary={permissionItem.showTitle} />
                         </ListItemButton>
@@ -162,6 +224,7 @@ export default function PermissionTree({ onSave }: { onSave: (PermissionIds: str
           ))}
         </List>
       </Box >
+      <Snack {...snackProps} />
     </>
   )
 }

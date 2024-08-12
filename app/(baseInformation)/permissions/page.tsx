@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 
 import PermissionTree from "@/components/permission/permissionTree";
@@ -8,18 +9,16 @@ import { RoleGroupType } from "@/types/generalType";
 
 export default function Permission(): React.JSX.Element {
 
-  const handleSavePermissions = (permissionIds: string[]) => {
-    console.log(permissionIds);
-  }
+  const [selectedRoleGroup, setSelectedRoleGroup] = useState<RoleGroupType | null>();
 
   const handleSelectRoleGroup = (roleGroup: RoleGroupType | null) => {
-    console.log(roleGroup);
+    setSelectedRoleGroup(roleGroup);
   }
 
   return (
     <>
       <Box sx={{ display: "flex" }}>
-        <PermissionTree onSave={handleSavePermissions} />
+        <PermissionTree roleGroup={selectedRoleGroup} />
         <Box>
           <SelectRoleGroup onSelect={handleSelectRoleGroup} />
         </Box>

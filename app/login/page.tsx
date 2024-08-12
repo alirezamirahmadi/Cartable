@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 import regex from "@/utils/regex";
 import Snack from "@/components/general/snack/snack";
-import type { LoginType } from "@/types/authType";
+import type { LoginType } from "@/types/AuthType";
 import type { SnackProps } from "@/types/generalType";
 
 export default function Login(): React.JSX.Element {
@@ -34,7 +34,7 @@ export default function Login(): React.JSX.Element {
           router.replace("/")
           break;
         case 404:
-          setSnackProps({ context: "نام کاربری یا رمزعبور نادرست است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+          setSnackProps({ context: "نام کاربری یا رمزعبور نادرست است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
       }
     });
   }
