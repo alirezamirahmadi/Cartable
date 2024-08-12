@@ -13,12 +13,12 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
-import type { PermissionType } from "@/types/permissionType";
-import type { RoleGroupType } from "@/types/generalType";
 import Snack from "../general/snack/snack";
 import { SnackProps } from "@/types/generalType";
+import type { PermissionType } from "@/types/permissionType";
+import type { RoleGroupType } from "@/types/generalType";
 
-export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupType | null }): React.JSX.Element {
+export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: RoleGroupType | null, onSelect: (permission: PermissionType) => void }): React.JSX.Element {
 
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
@@ -40,11 +40,15 @@ export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupTyp
 
   useEffect(() => {
     setNewPermissions(oldPermissions ?? []);
-  }, [oldPermissions])
+  }, [oldPermissions]);
 
   useEffect(() => {
     loadOldPermission();
   }, [roleGroup]);
+
+  useEffect(() => {
+    selectedPermission && onSelect(selectedPermission);
+  }, [selectedPermission])
 
   const loadOldPermission = async () => {
     roleGroup ?
@@ -134,7 +138,7 @@ export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupTyp
         .then(() => deleteTakenPermissons()
           .then(() => {
             loadOldPermission();
-            setSnackProps({ context: `مجوزهای مورد نظر برای ${roleGroup?.title} اعمال شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+            setSnackProps({ context: `مجوزهای مورد نظر برای ${roleGroup?.title} اعمال شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
           })
         )
         .catch(() => {

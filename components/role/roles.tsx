@@ -72,7 +72,7 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
   const handleAction = (role: RoleType, action: string) => {
     switch (action) {
       case "Delete":
-        deleteMember(role);
+        // deleteMember(role);
         break;
     }
     onAction(role, action);
