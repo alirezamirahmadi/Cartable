@@ -1,22 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { Box, Divider } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 
 import PermissionTree from "@/components/permission/permissionTree";
 import SelectRoleGroup from "@/components/general/selectRoleGroup/selectRoleGroup";
 import Roles from "@/components/role/roles";
+import Groups from "@/components/group/groups";
 import Snack from "@/components/general/snack/snack";
 import type { SnackProps } from "@/types/generalType";
 import type { RoleGroupType } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
 import type { RoleType } from "@/types/RoleType";
+import type { GroupType } from "@/types/groupType";
 
 export default function Permission(): React.JSX.Element {
 
   const [selectedRoleGroup, setSelectedRoleGroup] = useState<RoleGroupType | null>();
   const [selectedPermission, setSelectedPermission] = useState<PermissionType>();
   const [rolesPermission, setRolesPermission] = useState<RoleType[]>([]);
+  const [groupsPermission, setGroupsPermission] = useState<GroupType[]>([]);
   const [snackProps, setSnackProps] = useState<SnackProps>();
 
   useEffect(() => {
@@ -58,14 +61,31 @@ export default function Permission(): React.JSX.Element {
         })
   }
 
+  const handleGroupsAction = (group: GroupType, action: string) => {
+
+  }
+
   return (
     <>
-      <Box sx={{ display: "flex" }}>
-        <PermissionTree roleGroup={selectedRoleGroup} onSelect={handleSelectPermission} />
-        <Box sx={{ width: "100%" }}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+        <Box sx={{ px: 1, marginX: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
+          <PermissionTree roleGroup={selectedRoleGroup} onSelect={handleSelectPermission} />
+        </Box>
+        <Box>
           <SelectRoleGroup onSelect={handleSelectRoleGroup} />
           <Divider variant="middle" sx={{ my: 2, mx: "auto" }} />
-          <Roles roles={rolesPermission} omit onAction={handleRolesAction} />
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap" }}>
+            <Box sx={{ px: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
+              <Typography variant="body1" sx={{ mt: 1 }}>سمت ها</Typography>
+              <Divider variant="middle" sx={{ my: 1, mx: "auto" }} />
+              <Roles roles={rolesPermission} omit onAction={handleRolesAction} />
+            </Box>
+            <Box sx={{ px: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
+              <Typography variant="body1" sx={{ mt: 1 }}>گروه ها</Typography>
+              <Divider variant="middle" sx={{ my: 1, mx: "auto" }} />
+              <Groups groups={groupsPermission} omit onAction={handleGroupsAction} />
+            </Box>
+          </Box>
         </Box>
       </Box>
       <Snack {...snackProps} />

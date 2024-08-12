@@ -2,7 +2,7 @@
 
 import GroupTree from "@/components/group/groupTree";
 
-export default function Groups(): React.JSX.Element {
+export default function GroupsPage(): React.JSX.Element {
 
   return (
     <>
