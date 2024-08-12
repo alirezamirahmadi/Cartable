@@ -11,7 +11,7 @@ import { RoleType } from "@/types/RoleType";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "../general/modal/modal";
 
-export default function Roles({ roles, onAction, add, edit, omit, newMember, refGroup }: 
+export default function Roles({ roles, onAction, add, edit, omit, newMember, refGroup }:
   { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, newMember?: boolean, refGroup?: string }): React.JSX.Element {
 
   const [search, setSearch] = useState<string>("");
@@ -55,13 +55,6 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
       })
   }
 
-  const deleteMember = async (deleteRole: RoleType) => {
-    await fetch(`api/v1/groupMembers?refGroup=${refGroup}&refRole=${deleteRole._id}`, {
-      method: "DELETE",
-    })
-      .then(res => res.status === 200 && setListRoles([...listRoles].filter((role: RoleType) => role._id !== deleteRole._id)))
-  }
-
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
@@ -70,11 +63,6 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
   }
 
   const handleAction = (role: RoleType, action: string) => {
-    switch (action) {
-      case "Delete":
-        // deleteMember(role);
-        break;
-    }
     onAction(role, action);
   }
 

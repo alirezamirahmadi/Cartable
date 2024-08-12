@@ -22,9 +22,6 @@ export default function Permission(): React.JSX.Element {
   useEffect(() => {
     loadRolesPermission();
   }, [selectedPermission]);
-  useEffect(() => {
-    console.log(rolesPermission);
-  }, [rolesPermission]);
 
   const loadRolesPermission = async () => {
     selectedPermission
@@ -44,7 +41,7 @@ export default function Permission(): React.JSX.Element {
     setSelectedPermission(permission);
   }
 
-  const handleActionRoles = async (role: RoleType, action: string) => {
+  const handleRolesAction = async (role: RoleType, action: string) => {
     selectedPermission && role && action === "Delete" &&
       await fetch(`api/v1/rolePermissions`, {
         method: "DELETE",
@@ -68,7 +65,7 @@ export default function Permission(): React.JSX.Element {
         <Box sx={{ width: "100%" }}>
           <SelectRoleGroup onSelect={handleSelectRoleGroup} />
           <Divider variant="middle" sx={{ my: 2, mx: "auto" }} />
-          <Roles roles={rolesPermission} omit onAction={handleActionRoles} />
+          <Roles roles={rolesPermission} omit onAction={handleRolesAction} />
         </Box>
       </Box>
       <Snack {...snackProps} />

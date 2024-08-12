@@ -73,19 +73,19 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         break;
     }
   }
-  
+
   const handleBreadcrumbs = (root: GroupType) => {
     setSelectedGroup(undefined);
-    
+
     const tempRoots: GroupType[] = [...roots];
     do {
       tempRoots.pop();
     }
     while (tempRoots[tempRoots.length - 1]._id !== root._id);
-    
+
     setRoots(tempRoots);
   }
-  
+
   const handleSearchGroup = () => {
     loadGroupByTitle();
   }
@@ -115,7 +115,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       setCheckedGroups(index === -1 ? [groupId] : []);
     }
   }
-  
+
   const handleTransfer = () => {
     isTransfer && onTransfer ? onTransfer(checkedGroups.length === 1 ? checkedGroups[0] : "") : setIsOpenTransferModal(true);
   }
@@ -144,7 +144,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
 
   const handleActionNewGroup = async (value: string) => {
     setAnchorGroup(null);
-    
+
     value && await fetch("api/v1/groups", {
       method: "POST",
       headers: {
@@ -241,6 +241,14 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         })
   }
 
+  const handleRolesAction = async (roleAction: RoleType, action: string) => {
+    roleAction && action === "Delete" &&
+      await fetch(`api/v1/groupMembers?refGroup=${openRolesModal.refGroup}&refRole=${roleAction._id}`, {
+        method: "DELETE",
+      })
+        .then(res => res.status === 200 && setRoles([...roles].filter((role: RoleType) => role._id !== roleAction._id)))
+  }
+
   return (
     <>
       <Box sx={{ width: '100%', maxWidth: 356, bgcolor: 'background.paper' }}>
@@ -294,7 +302,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         </List>
       </Box>
       <Snack {...snackProps} />
-      <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={() => { }} omit newMember refGroup={openRolesModal.refGroup} />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />
+      <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleRolesAction} omit newMember refGroup={openRolesModal.refGroup} />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />
       <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<GroupTree isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />
     </>
   )
