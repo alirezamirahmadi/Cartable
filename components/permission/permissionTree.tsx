@@ -18,7 +18,7 @@ import { SnackProps } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
 import type { RoleGroupType } from "@/types/generalType";
 
-export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: RoleGroupType | null, onSelect: (permission: PermissionType) => void }): React.JSX.Element {
+export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: RoleGroupType | null, onSelect: (permission: PermissionType | undefined) => void }): React.JSX.Element {
 
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
@@ -47,7 +47,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
   }, [roleGroup]);
 
   useEffect(() => {
-    selectedPermission && onSelect(selectedPermission);
+    onSelect(selectedPermission);
   }, [selectedPermission])
 
   const loadOldPermission = async () => {

@@ -23,7 +23,10 @@ export default function Permission(): React.JSX.Element {
   const [snackProps, setSnackProps] = useState<SnackProps>();
 
   useEffect(() => {
-    loadRolesPermission();
+    Promise.all([
+      loadGroupsPermission(),
+      loadRolesPermission(),
+    ])
   }, [selectedPermission]);
 
   const loadRolesPermission = async () => {
@@ -36,12 +39,14 @@ export default function Permission(): React.JSX.Element {
       setRolesPermission([]);
   }
 
-  const handleSelectRoleGroup = (roleGroup: RoleGroupType | null) => {
-    setSelectedRoleGroup(roleGroup);
-  }
-
-  const handleSelectPermission = (permission: PermissionType) => {
-    setSelectedPermission(permission);
+  const loadGroupsPermission = async () => {
+    selectedPermission
+      ?
+      await fetch(`api/v1/groupPermissions/${selectedPermission._id}`)
+        .then(res => res.status === 200 && res.json())
+        .then(data => setGroupsPermission(data))
+      :
+      setGroupsPermission([]);
   }
 
   const handleRolesAction = async (role: RoleType, action: string) => {
@@ -61,27 +66,40 @@ export default function Permission(): React.JSX.Element {
         })
   }
 
-  const handleGroupsAction = (group: GroupType, action: string) => {
-
+  const handleGroupsAction = async (group: GroupType, action: string) => {
+    selectedPermission && group && action === "Delete" &&
+      await fetch(`api/v1/groupPermissions`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "Application/json"
+        },
+        body: JSON.stringify({ groupId: group._id, permissionIds: [selectedPermission._id] })
+      })
+        .then(res => {
+          if (res.status === 200) {
+            loadGroupsPermission();
+            setSnackProps({ context: `مجوز مورد نظر گرفته شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+          }
+        })
   }
 
   return (
     <>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
         <Box sx={{ px: 1, marginX: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
-          <PermissionTree roleGroup={selectedRoleGroup} onSelect={handleSelectPermission} />
+          <PermissionTree roleGroup={selectedRoleGroup} onSelect={(permission) => setSelectedPermission(permission)} />
         </Box>
         <Box>
-          <SelectRoleGroup onSelect={handleSelectRoleGroup} />
+          <SelectRoleGroup onSelect={(roleGroup) => setSelectedRoleGroup(roleGroup)} />
           <Divider variant="middle" sx={{ my: 2, mx: "auto" }} />
           <Box sx={{ display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap" }}>
             <Box sx={{ px: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
-              <Typography variant="body1" sx={{ mt: 1 }}>سمت ها</Typography>
+              <Typography variant="body1" sx={{ mt: 1 }}>سمت های دارای مجوز انتخاب شده</Typography>
               <Divider variant="middle" sx={{ my: 1, mx: "auto" }} />
               <Roles roles={rolesPermission} omit onAction={handleRolesAction} />
             </Box>
             <Box sx={{ px: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
-              <Typography variant="body1" sx={{ mt: 1 }}>گروه ها</Typography>
+              <Typography variant="body1" sx={{ mt: 1 }}>گروه های دارای مجوز انتخاب شده</Typography>
               <Divider variant="middle" sx={{ my: 1, mx: "auto" }} />
               <Groups groups={groupsPermission} omit onAction={handleGroupsAction} />
             </Box>

@@ -61,7 +61,7 @@ export default function Groups({ groups, onAction, add, edit, omit }:
               <ListItem alignItems="center">
                 <ListItem alignItems="flex-start" sx={{ p: 0 }}>
                   {group.kind === 1 ? <FolderSharedIcon /> : <GroupIcon />}
-                  <ListItemText primary={group.title} sx={{ cursor: "pointer" }} />
+                  <ListItemText primary={group.title} sx={{ cursor: "pointer", mx: 1 }} />
                 </ListItem>
                 <ModifyButtons add={add} edit={edit} omit={omit} rowData={group} onAction={handleAction} omitMessage={`آیا از حذف "${group.title}" اطمینان دارید؟`} />
               </ListItem>
