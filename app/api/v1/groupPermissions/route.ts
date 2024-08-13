@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-// import groupPermissionModel from "@/models/groupPermission";
 import groupModel from "@/models/group";
 import connectToDB from "@/utils/db";
 
@@ -8,18 +7,21 @@ const GET = async (request: Request) => {
   connectToDB();
 
   const { searchParams } = new URL(request.url);
-  // const refPermission = searchParams.get("refPermission");
   const groupId = searchParams.get("groupId");
+  const roleId = searchParams.get("roleId");
+  let permissions = null;
 
-  // const permissions = await groupPermissionModel.find(refPermission
-  //   ? { refPermission: new mongoose.Types.ObjectId(refPermission) }
-  //   : { refGroup: new mongoose.Types.ObjectId(refGroup ?? "") }
-  // )
-
-  const permissions = await groupModel.aggregate()
-    .match({ _id: new mongoose.Types.ObjectId(groupId ?? "") })
-    .project({ "_id": 0, "permissions": 1 })
-
+  if (groupId) {
+    permissions = await groupModel.aggregate()
+      .match({ _id: new mongoose.Types.ObjectId(groupId ?? "") })
+      .project({ "_id": 0, "permissions": 1 })
+  }
+  else if (roleId) {
+    permissions = await groupModel.aggregate()
+      .lookup({ from: "groupmembers", localField: "_id", foreignField: "refGroup", as: "members" })
+      .match({ "members.refRole": new mongoose.Types.ObjectId(roleId) })
+      .project({ "_id": 0, "permissions": 1 })
+  }
 
   if (permissions) {
     return Response.json(permissions, { status: 200 });
@@ -30,8 +32,6 @@ const GET = async (request: Request) => {
 const POST = async (request: Request) => {
   connectToDB();
 
-  // const {permissions} = await request.json();
-  // const newPermissions = await groupPermissionModel.insertMany(permissions);
   const { groupId, permissionIds } = await request.json();
   const newPermissions = await groupModel.findByIdAndUpdate(groupId, { $addToSet: { permissions: permissionIds } })
 
@@ -44,8 +44,6 @@ const POST = async (request: Request) => {
 const DELETE = async (request: Request) => {
   connectToDB();
 
-  // const permissions = await request.json();
-  // const deletedPermissions = await groupPermissionModel.deleteMany(permissions);
   const { groupId, permissionIds } = await request.json();
   const deletedPermissions = await groupModel.findByIdAndUpdate(groupId, { $pullAll: { permissions: permissionIds } })
 

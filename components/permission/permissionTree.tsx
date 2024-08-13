@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   ListItem, ListItemText, ListItemButton, List, Box, IconButton, Checkbox, TextField, Typography,
-  Breadcrumbs, Button, Collapse
+  Breadcrumbs, Button, Collapse, Tooltip
 } from "@mui/material";
 import RuleFolderIcon from '@mui/icons-material/RuleFolder';
 import SearchIcon from '@mui/icons-material/Search';
@@ -11,6 +11,7 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import CachedIcon from "@mui/icons-material/Cached";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import GroupIcon from '@mui/icons-material/Group';
 
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
 import Snack from "../general/snack/snack";
@@ -26,6 +27,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
   const [search, setSearch] = useState<string>("");
   const [newPermissions, setNewPermissions] = useState<string[]>([]);
   const [oldPermissions, setOldPermissions] = useState<string[]>([]);
+  const [roleInGroupsPermissions, setRoleInGroupsPermissions] = useState<string[]>([]);
   const [selectedPermission, setSelectedPermission] = useState<PermissionType>();
   const [openPermissionItems, setopenPermissionItems] = useState<string>("");
   const [snackProps, setSnackProps] = useState<SnackProps>();
@@ -43,14 +45,32 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
   }, [oldPermissions]);
 
   useEffect(() => {
-    loadOldPermission();
+    Promise.all([
+      loadRoleGroupPermission(),
+      loadRoleInGroupPermission(),
+    ])
   }, [roleGroup]);
 
   useEffect(() => {
     onSelect(selectedPermission);
-  }, [selectedPermission])
+  }, [selectedPermission]);
 
-  const loadOldPermission = async () => {
+  const loadRoleInGroupPermission = async () => {
+    roleGroup?.kind === 1 ?
+      await fetch(`api/v1/groupPermissions?roleId=${roleGroup._id}`)
+        .then(res => res.status === 200 && res.json())
+        .then(data => {
+          const tempPermissions: string[] = [];
+          data.map((groupPermission: any) => {
+            tempPermissions.push(...groupPermission.permissions)
+          })
+          setRoleInGroupsPermissions(tempPermissions);
+        })
+      :
+      setRoleInGroupsPermissions([]);
+  }
+
+  const loadRoleGroupPermission = async () => {
     roleGroup ?
       await fetch(`api/v1/${roleGroup?.kind === 1 ? "rolePermissions?roleId" : "groupPermissions?groupId"}=${roleGroup?._id}`)
         .then(res => res.status === 200 && res.json())
@@ -137,7 +157,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
       addNewPermissons()
         .then(() => deleteTakenPermissons()
           .then(() => {
-            loadOldPermission();
+            loadRoleGroupPermission();
             setSnackProps({ context: `مجوزهای مورد نظر برای ${roleGroup?.title} اعمال شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
           })
         )
@@ -209,6 +229,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
                 <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permission._id} onClick={() => setSelectedPermission(permission)}>
                   <ListItemText primary={permission.showTitle} />
                 </ListItemButton>
+                {roleInGroupsPermissions.includes(permission._id) && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
               </ListItem>
               {permission.kind === 2 &&
                 <Collapse in={openPermissionItems === permission._id} timeout="auto" unmountOnExit>
@@ -219,6 +240,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
                         <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permissionItem._id} onClick={() => setSelectedPermission(permissionItem)}>
                           <ListItemText secondary={permissionItem.showTitle} />
                         </ListItemButton>
+                        {roleInGroupsPermissions.includes(permissionItem._id) && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
                       </ListItem>
                     ))}
                   </List>
