@@ -8,23 +8,40 @@ import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import GroupIcon from '@mui/icons-material/Group';
 
 import SearchIcon from '@mui/icons-material/Search';
-import type { GroupType } from "@/types/groupType";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
+import Modal from "../general/modal/modal";
+import type { GroupType } from "@/types/groupType";
 
-export default function Groups({ groups, onAction, add, edit, omit }:
-  { groups: GroupType[], onAction: (role: GroupType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean }): React.JSX.Element {
+export default function Groups({ groups, onAction, add, edit, omit, selectGroup }:
+  { groups: GroupType[], onAction: (role: GroupType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, selectGroup?: boolean }): React.JSX.Element {
 
   const [search, setSearch] = useState<string>("");
   const [listGroups, setListGroups] = useState<GroupType[]>([]);
   const [filteredGroups, setFilteredGroups] = useState<GroupType[]>([]);
+  const [isOpenSelectGroupModal, setIsOpenSelectGroupModal] = useState<boolean>(false);
+  const [allGroups, setAllGroups] = useState<GroupType[]>([]);
+
+  useEffect(() => {
+    loadGroupData();
+  }, []);
 
   useEffect(() => {
     setListGroups(groups);
-  }, [groups])
+  }, [groups]);
 
   useEffect(() => {
     setFilteredGroups(listGroups);
-  }, [listGroups])
+  }, [listGroups]);
+
+  const loadGroupData = async () => {
+    await fetch(`api/v1/groups?kind=2`)
+      .then(res => res.status === 200 && res.json())
+      .then(data => setAllGroups(data))
+  }
+
+  const handleSelectGroupAction = (group: GroupType, action: string) => {
+    onAction(group, "SelectGroup");
+  }
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
@@ -40,6 +57,9 @@ export default function Groups({ groups, onAction, add, edit, omit }:
   return (
     <>
       <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', py: 0 }}>
+        {selectGroup &&
+          <ModifyButtons add onAction={() => setIsOpenSelectGroupModal(true)} />
+        }
         <ListItem component="div" disablePadding>
           <ListItemButton sx={{ height: 56 }}>
             <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
@@ -70,6 +90,7 @@ export default function Groups({ groups, onAction, add, edit, omit }:
           ))
         }
       </List>
+      <Modal isOpen={isOpenSelectGroupModal} title="انتخاب یک گروه" body={<Groups add groups={allGroups} onAction={handleSelectGroupAction} />} onCloseModal={() => setIsOpenSelectGroupModal(false)} />
     </>
   )
 }
