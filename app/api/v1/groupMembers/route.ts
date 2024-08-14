@@ -41,6 +41,11 @@ const POST = async (request: Request) => {
 
   const { refGroup, refRole } = await request.json();
 
+  const duplicate = await groupMemberModel.find({ refGroup, refRole });
+  if (duplicate.length > 0) {
+    return Response.json({ message: "The member is duplicate" }, { status: 403 });
+  }
+
   const member = await groupMemberModel.create({ refGroup, refRole });
   if (member) {
     return Response.json({ message: "Member added sucessfully" }, { status: 201 })

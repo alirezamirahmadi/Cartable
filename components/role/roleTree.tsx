@@ -146,10 +146,33 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
   const handleMemberGroupsAction = (group: GroupType, action: string) => {
     switch (action) {
       case "SelectGroup":
+        addMemberGroup(group._id);
         break;
       case "Delete":
+        deleteMemberGroup(group._id);
         break;
     }
+  }
+
+  const addMemberGroup = async (refGroup: string) => {
+    selectedRole && await fetch(`api/v1/groupMembers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({ refGroup, refRole: selectedRole._id })
+    })
+      .then(res => { res.status === 201 && loadMemberGroups() });
+  }
+
+  const deleteMemberGroup = async (refGroup: string) => {
+    selectedRole && await fetch(`api/v1/groupMembers?refGroup=${refGroup}&refRole=${selectedRole._id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "Application/json"
+      }
+    })
+      .then(res => { res.status === 200 && loadMemberGroups() });
   }
 
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

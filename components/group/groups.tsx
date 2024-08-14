@@ -40,6 +40,7 @@ export default function Groups({ groups, onAction, add, edit, omit, selectGroup 
   }
 
   const handleSelectGroupAction = (group: GroupType, action: string) => {
+    setIsOpenSelectGroupModal(false);
     onAction(group, "SelectGroup");
   }
 
@@ -58,7 +59,9 @@ export default function Groups({ groups, onAction, add, edit, omit, selectGroup 
     <>
       <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', py: 0 }}>
         {selectGroup &&
-          <ModifyButtons add onAction={() => setIsOpenSelectGroupModal(true)} />
+          <Box sx={{ display: "flex" }}>
+            <ModifyButtons add onAction={() => setIsOpenSelectGroupModal(true)} />
+          </Box>
         }
         <ListItem component="div" disablePadding>
           <ListItemButton sx={{ height: 56 }}>
