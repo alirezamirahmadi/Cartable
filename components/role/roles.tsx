@@ -7,9 +7,9 @@ import {
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { Add } from "@mui/icons-material";
-import { RoleType } from "@/types/RoleType";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "../general/modal/modal";
+import type { RoleType } from "@/types/RoleType";
 
 export default function Roles({ roles, onAction, add, edit, omit, newMember, refGroup }:
   { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, newMember?: boolean, refGroup?: string }): React.JSX.Element {

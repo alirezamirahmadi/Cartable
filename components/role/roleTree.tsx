@@ -11,6 +11,7 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import CachedIcon from '@mui/icons-material/Cached';
 import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
+import GroupIcon from '@mui/icons-material/Group';
 
 import Modal from '../general/modal/modal';
 import RoleModify from './roleModify';
@@ -18,6 +19,8 @@ import Snack from '../general/snack/snack';
 import ModifyButtons from '../general/modifyButtons/modifyButtons';
 import type { RoleType } from '@/types/RoleType';
 import type { SnackProps } from '@/types/generalType';
+import { GroupType } from '@/types/groupType';
+import Groups from '../group/groups';
 
 export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfer }:
   { isUpdate?: boolean, isTransfer?: boolean, onSelectRole?: (role: RoleType | undefined) => void, onTransfer?: (root: string) => void }): React.JSX.Element {
@@ -26,10 +29,12 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [isOpenNewModal, setIsOpenNewModal] = useState(false);
   const [isOpenTransferModal, setIsOpenTransferModal] = useState<boolean>(false);
+  const [isOpenMemberGroupsModal, setIsOpenMemberGroupsModal] = useState<boolean>(false);
   const [selectedRole, setSelectedRole] = useState<RoleType>();
   const [treeData, setTreeData] = useState<RoleType[]>([]);
   const [search, setSearch] = useState<string>("");
   const [checked, setChecked] = useState<string[]>([]);
+  const [memberGroups, setMemberGroups] = useState<GroupType[]>([]);
 
   useEffect(() => {
     loadRoleByRoot();
@@ -57,6 +62,12 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
     await fetch(`api/v1/roles?title=${search}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setTreeData(data));
+  }
+
+  const loadMemberGroups = async () => {
+    selectedRole && await fetch(`api/v1/groupMembers?refRole=${selectedRole?._id}`)
+      .then(res => res.status === 200 && res.json())
+      .then(data => setMemberGroups(data))
   }
 
   const handleBreadcrumbs = (root: RoleType) => {
@@ -128,6 +139,19 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
     }
   }
 
+  const handleMemberGroups = () => {
+    loadMemberGroups().then(() => setIsOpenMemberGroupsModal(true));
+  }
+
+  const handleMemberGroupsAction = (group: GroupType, action: string) => {
+    switch (action) {
+      case "SelectGroup":
+        break;
+      case "Delete":
+        break;
+    }
+  }
+
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
@@ -148,7 +172,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
         setIsOpenNewModal(true);
         break;
       case "Delete":
-        handleDelete();
+        deleteRole();
     }
   }
 
@@ -160,7 +184,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
     }
   }
 
-  const handleDelete = async () => {
+  const deleteRole = async () => {
     await fetch(`api/v1/roles/${selectedRole?._id}`, {
       method: "DELETE"
     })
@@ -188,6 +212,9 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
         <Box sx={{ display: "flex" }}>
           <IconButton onClick={handleTransfer} disabled={checked.length === 0} title={isTransfer ? "انتقال به" : "انتقال"}>
             {isTransfer ? <MoveDownIcon /> : <MoveUpIcon />}
+          </IconButton>
+          <IconButton onClick={handleMemberGroups} disabled={selectedRole ? false : true} title="گروه های عضو">
+            <GroupIcon />
           </IconButton>
           <ModifyButtons add omit={selectedRole ? true : false} onAction={handleModifyRoleAction} omitMessage={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} />
         </Box>
@@ -222,6 +249,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
         <Snack {...snackProps} />
         <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />
         <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree isTransfer={true} onTransfer={handleTransferTo} />} />
+        <Modal title="گروه های عضو" isOpen={isOpenMemberGroupsModal} onCloseModal={() => setIsOpenMemberGroupsModal(false)} body={<Groups groups={memberGroups} selectGroup omit onAction={handleMemberGroupsAction} />} />
       </Box>
     </>
   )

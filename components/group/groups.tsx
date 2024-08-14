@@ -13,7 +13,7 @@ import Modal from "../general/modal/modal";
 import type { GroupType } from "@/types/groupType";
 
 export default function Groups({ groups, onAction, add, edit, omit, selectGroup }:
-  { groups: GroupType[], onAction: (role: GroupType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, selectGroup?: boolean }): React.JSX.Element {
+  { groups: GroupType[], onAction: (group: GroupType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, selectGroup?: boolean }): React.JSX.Element {
 
   const [search, setSearch] = useState<string>("");
   const [listGroups, setListGroups] = useState<GroupType[]>([]);
