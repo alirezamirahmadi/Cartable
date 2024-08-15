@@ -167,10 +167,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
 
   const deleteMemberGroup = async (refGroup: string) => {
     selectedRole && await fetch(`api/v1/groupMembers?refGroup=${refGroup}&refRole=${selectedRole._id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "Application/json"
-      }
+      method: "DELETE"
     })
       .then(res => { res.status === 200 && loadMemberGroups() });
   }

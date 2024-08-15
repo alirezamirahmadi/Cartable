@@ -3,21 +3,20 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import {
   ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar,
-  Avatar, Typography, Box, IconButton
+  Avatar, Typography, Box
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { Add } from "@mui/icons-material";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import Modal from "../general/modal/modal";
 import type { RoleType } from "@/types/RoleType";
 
-export default function Roles({ roles, onAction, add, edit, omit, newMember, refGroup }:
-  { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, newMember?: boolean, refGroup?: string }): React.JSX.Element {
+export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
+  { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, selectRole?: boolean }): React.JSX.Element {
 
   const [search, setSearch] = useState<string>("");
   const [listRoles, setListRoles] = useState<RoleType[]>([]);
   const [filteredRoles, setFilteredRoles] = useState<RoleType[]>([]);
-  const [isOpenNewMemberModal, setIsOpenNewMemberModal] = useState<boolean>(false);
+  const [isOpenSelectRoleModal, setIsOpenSelectRoleModal] = useState<boolean>(false);
   const [allRoles, setAllRoles] = useState<RoleType[]>([]);
 
   useEffect(() => {
@@ -38,23 +37,6 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
       .then(data => setAllRoles(data))
   }
 
-  const addNewMember = async (role: RoleType) => {
-    refGroup && await fetch("api/v1/groupMembers", {
-      method: "POST",
-      headers: {
-        "Content-Type": "Application/json"
-      },
-      body: JSON.stringify({ refGroup, refRole: role._id })
-    })
-      .then(res => {
-        if (res.status === 201) {
-          setIsOpenNewMemberModal(false);
-          onAction(role, "NewMember");
-          setListRoles([...listRoles, role]);
-        }
-      })
-  }
-
   const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const searchText = event.target.value;
     setSearch(searchText);
@@ -66,23 +48,18 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
     onAction(role, action);
   }
 
-  const handleNewMemberAction = (role: RoleType, action: string) => {
-    switch (action) {
-      case "Add":
-        addNewMember(role);
-        break;
-    }
+  const handleSelectRoleAction = (role: RoleType, action: string) => {
+    setIsOpenSelectRoleModal(false);
+    onAction(role, "SelectRole");
   }
 
   return (
     <>
       <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', py: 0 }}>
-        {newMember &&
-          <ListItem sx={{ py: 0 }}>
-            <IconButton onClick={() => setIsOpenNewMemberModal(true)} title="عضو جدید">
-              <Add />
-            </IconButton>
-          </ListItem>
+        {selectRole &&
+          <Box sx={{ display: "flex" }}>
+            <ModifyButtons add onAction={() => setIsOpenSelectRoleModal(true)} />
+          </Box>
         }
         <ListItem component="div" disablePadding>
           <ListItemButton sx={{ height: 56 }}>
@@ -116,7 +93,7 @@ export default function Roles({ roles, onAction, add, edit, omit, newMember, ref
           ))
         }
       </List>
-      <Modal isOpen={isOpenNewMemberModal} title="انتخاب عضو جدید" body={<Roles roles={allRoles} onAction={handleNewMemberAction} add />} onCloseModal={() => setIsOpenNewMemberModal(false)} />
+      <Modal isOpen={isOpenSelectRoleModal} title="انتخاب عضو جدید" body={<Roles roles={allRoles} onAction={handleSelectRoleAction} add />} onCloseModal={() => setIsOpenSelectRoleModal(false)} />
     </>
   )
 }

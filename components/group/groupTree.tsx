@@ -56,7 +56,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       .then(data => setGroups(data))
   }
 
-  const loadRoleData = async (refGroup: string) => {
+  const loadGroupMembers = async (refGroup: string) => {
     await fetch(`api/v1/groupMembers?refGroup=${refGroup}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setRoles(data))
@@ -69,7 +69,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         setRoots([...roots, group]);
         break;
       case 2:
-        loadRoleData(group._id).then(() => setOpenRolesModal({ isOpen: true, refGroup: group._id }))
+        loadGroupMembers(group._id).then(() => setOpenRolesModal({ isOpen: true, refGroup: group._id }))
         break;
     }
   }
@@ -186,7 +186,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         setAnchorEdit(document.getElementById("ibtnNewGroup"));
         break;
       case "Delete":
-        handleDeleteGroup();
+        deleteGroup();
         break;
     }
   }
@@ -217,7 +217,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       })
   }
 
-  const handleDeleteGroup = async () => {
+  const deleteGroup = async () => {
     selectedGroup &&
       await fetch(`api/v1/groups/${selectedGroup._id}`, {
         method: "DELETE"
@@ -241,12 +241,33 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         })
   }
 
-  const handleRolesAction = async (roleAction: RoleType, action: string) => {
-    roleAction && action === "Delete" &&
-      await fetch(`api/v1/groupMembers?refGroup=${openRolesModal.refGroup}&refRole=${roleAction._id}`, {
-        method: "DELETE",
-      })
-        .then(res => res.status === 200 && setRoles([...roles].filter((role: RoleType) => role._id !== roleAction._id)))
+  const handleGroupMembersAction = async (role: RoleType, action: string) => {
+    switch (action) {
+      case "SelectRole":
+        addGroupMember(role);
+        break;
+      case "Delete":
+        deleteGroupMember(role._id);
+        break;
+    }
+  }
+
+  const addGroupMember = async (role: RoleType) => {
+    openRolesModal && await fetch(`api/v1/groupMembers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({ refGroup: openRolesModal.refGroup, refRole: role._id })
+    })
+      .then(res => { res.status === 201 && loadGroupMembers(openRolesModal.refGroup) })
+  }
+
+  const deleteGroupMember = async (refRole: string) => {
+    openRolesModal && await fetch(`api/v1/groupMembers?refGroup=${openRolesModal.refGroup}&refRole=${refRole}`, {
+      method: "DELETE",
+    })
+      .then(res => { res.status === 200 && loadGroupMembers(openRolesModal.refGroup) })
   }
 
   return (
@@ -302,7 +323,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         </List>
       </Box>
       <Snack {...snackProps} />
-      <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleRolesAction} omit newMember refGroup={openRolesModal.refGroup} />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />
+      <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleGroupMembersAction} omit selectRole />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />
       <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<GroupTree isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />
     </>
   )
