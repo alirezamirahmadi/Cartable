@@ -23,7 +23,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
 
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
-  const [roots, setRoots] = useState<PermissionType[]>([{ _id: "null", title: "", showTitle: "خانه", root: "null", kind: 1 }])
+  const [roots, setRoots] = useState<PermissionType[]>([{ _id: "null", title: "", showTitle: "خانه", root: "-1", kind: 1 }])
   const [search, setSearch] = useState<string>("");
   const [newPermissions, setNewPermissions] = useState<string[]>([]);
   const [oldPermissions, setOldPermissions] = useState<string[]>([]);

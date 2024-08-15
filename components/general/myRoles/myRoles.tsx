@@ -20,13 +20,13 @@ export default function MyRoles(): React.JSX.Element {
   }, []);
 
   const loadMyRoles = async () => {
-    await fetch(`api/v1/auth/me`)
+    await fetch(`api/v1/roles?refPerson=${me._id}`)
       .then(res => res.status === 200 && res.json())
-      .then(data => setMyRoles(data.roles))
+      .then(data => setMyRoles(data))
   }
 
   const handleChangeRole = async (role: any) => {
-    role._id !== me.selectedRole._id &&
+    role._id !== me.defaultRole._id &&
       await fetch("api/v1/auth/me", {
         method: "PUT",
         headers: {
@@ -36,7 +36,7 @@ export default function MyRoles(): React.JSX.Element {
       })
         .then(res => {
           if (res.status === 201) {
-            dispatch(changeRole({ ...me, selectedRole: role }));
+            dispatch(changeRole({ ...me, defaultRole: role }));
             router.replace("/");
           }
         })
@@ -50,7 +50,7 @@ export default function MyRoles(): React.JSX.Element {
             <ListItem disablePadding >
               <ListItemButton onClick={() => handleChangeRole(role)}>
                 <ListItemIcon>
-                  {role._id === me.selectedRole._id &&
+                  {role._id === me.defaultRole._id &&
                     <CheckIcon fontSize="small" />
                   }
                 </ListItemIcon>

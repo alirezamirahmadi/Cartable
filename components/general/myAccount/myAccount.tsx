@@ -104,7 +104,7 @@ export default function MyAccount(): React.JSX.Element {
           onClose={handleCloseUserMenu}
         >
           <MenuItem >
-            <ListItemText primary={`${me.firstName} ${me.lastName}`} secondary={me.selectedRole.title} />
+            <ListItemText primary={`${me.firstName} ${me.lastName}`} secondary={me.defaultRole.title} />
           </MenuItem>
           <MenuItem onClick={handleMyRoles}>
             <Typography textAlign="right">سمت های من</Typography>

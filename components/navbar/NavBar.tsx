@@ -34,6 +34,7 @@ export default function NavBar() {
     setMenuItemSelected(pathName);
     dispatch(getMe());
   }, [])
+  console.log(me)
 
   if (!me.isLogin) {
     return (<></>);
