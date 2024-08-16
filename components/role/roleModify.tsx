@@ -76,6 +76,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
   }
 
   const handleSelectedPerson = (personId: string) => {
+    console.log(personId)
     setRefPerson(personId);
   }
 

@@ -20,6 +20,11 @@ export default function NavBar() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [menuItemSelected, setMenuItemSelected] = useState<string>("");
 
+  useEffect(() => {
+    setMenuItemSelected(pathName);
+    dispatch(getMe());
+  }, []);
+
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   }
@@ -29,12 +34,6 @@ export default function NavBar() {
     setMenuItemSelected(href);
     router?.replace(href);
   }
-
-  useEffect(() => {
-    setMenuItemSelected(pathName);
-    dispatch(getMe());
-  }, [])
-  console.log(me)
 
   if (!me.isLogin) {
     return (<></>);
