@@ -5,9 +5,10 @@ import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Button } 
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import { useForm } from "react-hook-form";
 
-import type { PersonType } from "@/types/personType";
 import AutoComplete from "../general/autoComplete/autoComplete";
+import SelectPerson from "../general/selectPerson/selectPerson";
 import Snack from "../general/snack/snack";
+import type { PersonType } from "@/types/personType";
 import type { SnackProps } from "@/types/generalType";
 
 export default function RoleModify({ role, root, onModify }: { role?: any, root: string | null, onModify?: (isModify: boolean) => void }): React.JSX.Element {
@@ -28,7 +29,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
   }, [])
 
   const loadPersonData = async () => {
-    await fetch("api/v1/persons")
+    await fetch(`api/v1/persons?limited=true`)
       .then(res => res.json())
       .then(res => { setPersons(res) })
   }
@@ -75,8 +76,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
       })
   }
 
-  const handleSelectedPerson = (personId: string) => {
-    console.log(personId)
+  const handleSelectedPerson = (personId: string | null) => {
     setRefPerson(personId);
   }
 
@@ -85,7 +85,8 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
       <div className="lg:col-span-3 md:col-span-2">
         <div className="flex flex-wrap gap-4 justify-center">
           <TextField {...register("title")} required error={errors.title ? true : false} helperText={errors.title ? "لطفا عنوان را وارد کنید" : ""} size="small" label={<Typography variant="body1" sx={{ display: "inline" }}>عنوان</Typography>} />
-          <AutoComplete options={persons} defaultValueId={role?.person?._id ?? ""} getSelectedId={handleSelectedPerson} inputProps={{ label: "شخص", size: "small", width: 300 }} key={JSON.stringify(persons)} />
+          <AutoComplete options={persons} defaultValueId={role?.person?._id ?? null} getSelectedId={handleSelectedPerson} inputProps={{ label: "شخص", size: "small", width: 300 }} key={JSON.stringify(persons)} />
+          {/* <SelectPerson options={persons} defaultValueId={role?.person?._id ?? ""} getSelectedId={handleSelectedPerson} inputProps={{ label: "شخص", size: "small", width: 300 }} key={JSON.stringify(persons)} /> */}
           <FormGroup>
             <FormControlLabel control={<Checkbox {...register("isActive")} defaultChecked={role ? getValues("isActive") : false} color="primary" />} label="فعال" />
           </FormGroup>

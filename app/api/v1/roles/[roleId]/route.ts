@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import roleModel from "@/models/role";
 import connectToDB from "@/utils/db";
 
@@ -35,6 +37,16 @@ const PUT = async (request: Request, { params }: { params: { roleId: string } })
 
 const DELETE = async (request: Request, { params }: { params: { roleId: string } }) => {
   connectToDB();
+
+  const roleUsed = await roleModel.aggregate()
+    .match({ _id: new mongoose.Types.ObjectId(params.roleId) })
+    .lookup({ from: "groupmembers", localField: "_id", foreignField: "refRole", as: "groupmembers" })
+    .lookup({ from: "sends", localField: "_id", foreignField: "refRole", as: "sends" })
+    .lookup({ from: "receives", localField: "_id", foreignField: "refRole", as: "receives" })
+
+  if (roleUsed[0].groupmembers.length > 0 || roleUsed[0].sends.length > 0 || roleUsed[0].receives.length > 0 || roleUsed[0].refPerson !== null) {
+    return Response.json({ message: "This role used in groupmembers/send/receive or has a person" }, { status: 403 })
+  }
 
   const role = await roleModel.findByIdAndDelete(params.roleId);
 

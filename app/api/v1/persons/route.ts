@@ -9,18 +9,23 @@ const GET = async (request: Request) => {
   let response: { json: any, status: number } = { json: null, status: 501 };
   let person;
   const { searchParams } = new URL(request.url);
+  let username = searchParams.get("username");
+  let password = searchParams.get("password");
+  let limited = searchParams.get("limited");
 
   if (searchParams.size === 0) {
-    person = await personModel.aggregate()
-      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" });
+    person = await personModel.find();
   }
-  else {
-    let username = searchParams.get("username");
-    let password = searchParams.get("password");
-    // person = await personModel.find({ account: { username, password, isActive: true } }).exec();
+  else if (limited === "true") {
     person = await personModel.aggregate()
-      .match({ account: { username, password, isActive: true } })
-      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" });
+      .match({ isActive: true })
+      .project({ "code": 1, "firstName": 1, "lastName": 1, "gender": 1, "phone": 1 })
+  }
+  else if (username && password) {
+    person = await personModel.find({ account: { username, password, isActive: true } }).exec();
+    // person = await personModel.aggregate()
+    //   .match({ account: { username, password, isActive: true } })
+    //   .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" });
   }
 
   response = person ? { json: person, status: 200 } : { json: { message: "Persons not found" }, status: 404 };
@@ -50,7 +55,7 @@ const POST = async (request: Request) => {
   const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account: { ...account, password: hashedPassword } });
 
   if (person) {
-    return Response.json({ message: "Person created successfully" }, {status: 201});
+    return Response.json({ message: "Person created successfully" }, { status: 201 });
   }
   return Response.json({ message: "Person is not created" }, { status: 500 });
 }
