@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import RoleModify from "@/components/role/roleModify";
 import RoleTree from "@/components/role/roleTree";
-import { RoleType } from "@/types/RoleType";
+import { RoleType } from "@/types/roleType";
 import Loading from "@/components/general/loading/loading";
 import Snack from "@/components/general/snack/snack";
 import type { SnackProps } from "@/types/generalType";

@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Box, Typography, Modal as MUIModal, IconButton, Divider } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
 
-export default function Modal({ title, isOpen, body, fullWidth, onCloseModal }: { title: string, isOpen: boolean, body: React.ReactNode, fullWidth?:boolean, onCloseModal: () => void }): React.JSX.Element {
-  
+const Modal = memo(({ title, isOpen, body, fullWidth, onCloseModal }:
+  { title: string, isOpen: boolean, body: React.ReactNode, fullWidth?: boolean, onCloseModal: () => void }): React.JSX.Element => {
+
   const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -19,7 +20,7 @@ export default function Modal({ title, isOpen, body, fullWidth, onCloseModal }: 
     maxHeight: "98%",
     pb: 2,
     px: 4,
-    overflow:"auto",
+    overflow: "auto",
   };
 
   const [open, setOpen] = useState(false);
@@ -49,4 +50,8 @@ export default function Modal({ title, isOpen, body, fullWidth, onCloseModal }: 
       </MUIModal>
     </div>
   );
-}
+},
+  (prevProps, nextProps) => prevProps.title === nextProps.title && prevProps.isOpen === nextProps.isOpen
+)
+
+export default Modal;

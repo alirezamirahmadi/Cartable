@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, ChangeEvent } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Box, IconButton, ListItem, ListItemText, ListItemButton, Breadcrumbs, Button, List, TextField, Checkbox,
   Typography
@@ -13,11 +14,12 @@ import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 import GroupIcon from '@mui/icons-material/Group';
 
-import Modal from '../general/modal/modal';
+// import Modal from '../general/modal/modal';
+const Modal = dynamic(() => import('../general/modal/modal'));
 import RoleModify from './roleModify';
 import Snack from '../general/snack/snack';
 import ModifyButtons from '../general/modifyButtons/modifyButtons';
-import type { RoleType } from '@/types/RoleType';
+import type { RoleType } from '@/types/roleType';
 import type { SnackProps } from '@/types/generalType';
 import { GroupType } from '@/types/groupType';
 import Groups from '../group/groups';
@@ -267,9 +269,9 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
           }
         </List>
         <Snack {...snackProps} />
-        <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />
-        <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree isTransfer={true} onTransfer={handleTransferTo} />} />
-        <Modal title="گروه های عضو" isOpen={isOpenMemberGroupsModal} onCloseModal={() => setIsOpenMemberGroupsModal(false)} body={<Groups groups={memberGroups} selectGroup omit onAction={handleMemberGroupsAction} />} />
+        {isOpenNewModal && <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />}
+        {isOpenTransferModal && <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree isTransfer={true} onTransfer={handleTransferTo} />} />}
+        {isOpenMemberGroupsModal && <Modal title="گروه های عضو" isOpen={isOpenMemberGroupsModal} onCloseModal={() => setIsOpenMemberGroupsModal(false)} body={<Groups groups={memberGroups} selectGroup omit onAction={handleMemberGroupsAction} />} />}
       </Box>
     </>
   )
