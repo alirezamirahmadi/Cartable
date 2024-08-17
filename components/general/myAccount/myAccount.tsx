@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Box, IconButton, Typography, Menu, Avatar, Tooltip, MenuItem, ListItemText } from "@mui/material";
 import { useCookies } from "react-cookie";
 import { useTheme } from "next-themes";
@@ -14,7 +14,7 @@ import ChangePassword from "@/components/changePassword/changePassword";
 import Snack from "../snack/snack";
 import MyRoles from "../myRoles/myRoles";
 
-export default function MyAccount(): React.JSX.Element {
+const MyAccount = memo((): React.JSX.Element => {
 
   const [isOpenSnack, setIsOpenSnack] = useState<boolean>(false);
   const [snackContext, setSnackContext] = useState<string>("");
@@ -127,4 +127,6 @@ export default function MyAccount(): React.JSX.Element {
       <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={handleCloseSnack} />
     </>
   )
-}
+})
+
+export default MyAccount;

@@ -28,15 +28,18 @@ const GET = async () => {
         "firstName": 1, "lastName": 1, "roles._id": 1, "roles.root": 1, "roles.title": 1, "roles.isDefault": 1,
         "roles.permissions": 1, "groups.permissions": 1
       })
-      .addFields({ "permissions": []})
+      .addFields({ "permissions": [] })
       .limit(1);
 
     const groupsPermission = new Set();
-    person[0].groups.map((group: any) => group.permissions.map((permission: any) => groupsPermission.add(permission.toString())))
-    person[0].roles.permissions.map((permission: any) => groupsPermission.add(permission.toString()))
-
-    person[0].roles.permissions = null;
-    person[0].groups = null;
+    if (person[0].groups) {
+      person[0].groups?.map((group: any) => group.permissions.map((permission: any) => groupsPermission.add(permission.toString())))
+      person[0].groups = null;
+    }
+    if (person[0].roles && person[0].roles.permissions) {
+      person[0].roles?.permissions.map((permission: any) => groupsPermission.add(permission.toString()))
+      person[0].roles.permissions = null;
+    }
     person[0].permissions = Array.from(groupsPermission);
 
     return person && Response.json(person[0], { status: 200 });

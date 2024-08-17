@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Button, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -8,10 +8,10 @@ import AdbIcon from "@mui/icons-material/Adb";
 
 import { MainMenuData } from "@/utils/data";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { getMe, clearMe } from "@/lib/features/me/meSlice";
+import { getMe } from "@/lib/features/me/meSlice";
 import MyAccount from "../general/myAccount/myAccount";
 
-export default function NavBar() {
+export default function NavBar(): React.JSX.Element {
 
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);

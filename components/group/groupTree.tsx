@@ -13,7 +13,7 @@ import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 
 import type { GroupType } from "@/types/groupType";
-import type { RoleType } from "@/types/RoleType";
+import type { RoleType } from "@/types/roleType";
 import type { SnackProps } from "@/types/generalType";
 import Roles from "@/components/role/roles";
 import Modal from "@/components/general/modal/modal";
