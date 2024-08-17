@@ -14,15 +14,14 @@ import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 import GroupIcon from '@mui/icons-material/Group';
 
-// import Modal from '../general/modal/modal';
 const Modal = dynamic(() => import('../general/modal/modal'));
+const Snack = dynamic(() => import('../general/snack/snack'));
 import RoleModify from './roleModify';
-import Snack from '../general/snack/snack';
 import ModifyButtons from '../general/modifyButtons/modifyButtons';
+import Groups from '../group/groups';
 import type { RoleType } from '@/types/roleType';
 import type { SnackProps } from '@/types/generalType';
-import { GroupType } from '@/types/groupType';
-import Groups from '../group/groups';
+import type { GroupType } from '@/types/groupType';
 
 export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfer }:
   { isUpdate?: boolean, isTransfer?: boolean, onSelectRole?: (role: RoleType | undefined) => void, onTransfer?: (root: string) => void }): React.JSX.Element {
@@ -268,7 +267,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
             ))
           }
         </List>
-        <Snack {...snackProps} />
+        {snackProps.isOpen && <Snack {...snackProps} />}
         {isOpenNewModal && <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />}
         {isOpenTransferModal && <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree isTransfer={true} onTransfer={handleTransferTo} />} />}
         {isOpenMemberGroupsModal && <Modal title="گروه های عضو" isOpen={isOpenMemberGroupsModal} onCloseModal={() => setIsOpenMemberGroupsModal(false)} body={<Groups groups={memberGroups} selectGroup omit onAction={handleMemberGroupsAction} />} />}

@@ -1,15 +1,15 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import { Stack, Snackbar, AlertProps, Typography } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 
-import type { SnackProps } from "@/types/general";
+import type { SnackProps } from "@/types/generalType";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-export default function Snack({ context, severity, isOpen, onCloseSnack }: SnackProps): React.JSX.Element {
+const Snack = memo(({ context, severity, isOpen, onCloseSnack }: SnackProps): React.JSX.Element => {
 
   const [open, setOpen] = React.useState(false);
 
@@ -39,4 +39,6 @@ export default function Snack({ context, severity, isOpen, onCloseSnack }: Snack
       </Stack>
     </div>
   );
-}
+})
+
+export default Snack;
