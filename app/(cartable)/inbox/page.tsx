@@ -72,7 +72,7 @@ export default function Inbox(): React.JSX.Element {
   }, [])
 
   const loadCollectionData = async () => {
-    collectionId && me && await fetch(`api/v1/cartable/inbox/${collectionId}?roleId=${me.selectedRole._id}`)
+    collectionId && me && await fetch(`api/v1/cartable/inbox/${collectionId}?roleId=${me.defaultRole._id}`)
       .then(res => res.status === 200 && res.json())
       .then(data => {
         setDocuments(data);
@@ -128,7 +128,7 @@ export default function Inbox(): React.JSX.Element {
           <SideBar place="inbox" />
         </Box>
         <Box sx={{ width: "100%", mx: 1 }}>
-          <TopBar />
+          <TopBar  place="inbox"/>
           <ReactDataTable rows={documents} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
         </Box>
       </Box>

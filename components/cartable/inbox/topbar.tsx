@@ -1,11 +1,11 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Box, AppBar, Toolbar, IconButton, Menu, Container, MenuItem, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import SideBar from '../sidebar';
 
-export default function TopBar(): React.JSX.Element {
+const TopBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Element => {
 
   const [showType, setShowType] = useState<string>("1");
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -37,10 +37,10 @@ export default function TopBar(): React.JSX.Element {
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' }, }}
             >
-              <SideBar />
+              <SideBar place={place} />
             </Menu>
           </Box>
-          <FormControl>
+          {place === "inbox" && <FormControl>
             <InputLabel>نمایش</InputLabel>
             <Select value={showType} label="نمایش" onChange={handleChangeShowType}>
               <MenuItem value={1}>کلیه مدارک کارتابل</MenuItem>
@@ -49,9 +49,11 @@ export default function TopBar(): React.JSX.Element {
               <MenuItem value={4}>مدارک ارجاع شده</MenuItem>
               <MenuItem value={5}>مدارک ارجاع نشده</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl>}
         </Toolbar>
       </Container>
     </AppBar>
   );
-}
+})
+
+export default TopBar;

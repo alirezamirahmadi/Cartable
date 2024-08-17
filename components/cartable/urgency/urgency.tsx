@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, memo } from "react";
 import { Select, MenuItem, SelectChangeEvent, FormControl } from "@mui/material";
 
 import type { UrgencyType } from "@/types/cartableType";
 
-export default function Urgency({ defaultValue, onChange }: { defaultValue: UrgencyType, onChange: (value: UrgencyType) => void }): React.JSX.Element {
+const Urgency = memo(({ defaultValue, onChange }:
+  { defaultValue: UrgencyType, onChange: (value: UrgencyType) => void }): React.JSX.Element => {
 
   const [urgencies, setUrgencies] = useState<UrgencyType[]>();
   const [urgency, setUrgency] = useState<UrgencyType>({ _id: "", title: "" });
@@ -19,10 +20,10 @@ export default function Urgency({ defaultValue, onChange }: { defaultValue: Urge
   }, [])
 
   useEffect(() => {
-    if(urgencies){
+    if (urgencies) {
       setUrgency(defaultValue._id ? defaultValue : urgencies[0]);
       !defaultValue._id && onChange(urgencies[0]);
-    } 
+    }
   }, [urgencies])
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -43,4 +44,8 @@ export default function Urgency({ defaultValue, onChange }: { defaultValue: Urge
       </FormControl>
     </>
   )
-}
+},
+  (prevProps, nextProps) => prevProps.defaultValue === nextProps.defaultValue
+)
+
+export default Urgency;

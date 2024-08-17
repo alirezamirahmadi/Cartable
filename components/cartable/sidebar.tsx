@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent, memo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { TextField, InputAdornment, Typography, Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, IconButton, Tooltip, Badge } from "@mui/material";
 import { styled } from '@mui/material/styles';
@@ -27,7 +27,7 @@ const Collections = styled(List)<{ component?: React.ElementType }>({
   },
 });
 
-export default function SideBar({ place }: { place: "inbox" | "outbox" }): React.JSX.Element {
+const SideBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Element => {
 
   const me = useAppSelector(state => state.me);
   const searchParams = useSearchParams();
@@ -47,7 +47,7 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
   }, [collections])
 
   const loadCollectionData = async () => {
-    place && me && await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/${place}?roleId=${me.selectedRole._id}`, {
+    place && me && await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/${place}?roleId=${me.defaultRole._id}`, {
       method: "GET",
       headers: {
         "Get-Type": "all"
@@ -58,7 +58,7 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
   }
 
   const loadNonObserved = async (inboxList: InboxListType[]) => {
-    await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/inbox?roleId=${me.selectedRole._id}`, {
+    await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/inbox?roleId=${me.defaultRole._id}`, {
       method: "GET",
       headers: {
         "Get-Type": "nonObserved"
@@ -71,7 +71,7 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
   const handleCollectionData = (data: any) => {
     const myCollections = new Array<InboxListType>();
 
-    data?.map((collection: any) => {
+    data && data?.map((collection: any) => {
       myCollections.push({ _id: collection?._id?._id ? collection?._id?._id[0] : "", title: collection?._id?.showTitle ? collection?._id?.showTitle[0] : "", count: 0 });
     })
     place === "inbox" ? loadNonObserved(myCollections) : setCollections(myCollections);
@@ -164,4 +164,6 @@ export default function SideBar({ place }: { place: "inbox" | "outbox" }): React
       </Paper>
     </Box>
   );
-}
+})
+
+export default SideBar;

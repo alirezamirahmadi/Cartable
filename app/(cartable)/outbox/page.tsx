@@ -13,6 +13,7 @@ import Buttons from "@/components/cartable/buttons";
 import Modal from "@/components/general/modal/modal";
 import Send from "@/components/cartable/send/send";
 import Circulation from "@/components/cartable/details/circulation/circulation";
+import TopBar from "@/components/cartable/inbox/topbar";
 
 export default function Outbox(): React.JSX.Element {
 
@@ -51,7 +52,7 @@ export default function Outbox(): React.JSX.Element {
   }, [collectionId])
 
   const loadCollectionData = async () => {
-    collectionId && me && await fetch(`api/v1/cartable/outbox/${collectionId}?roleId=${me.selectedRole._id}`)
+    collectionId && me && await fetch(`api/v1/cartable/outbox/${collectionId}?roleId=${me.defaultRole._id}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setDocuments(data))
   }
@@ -83,6 +84,7 @@ export default function Outbox(): React.JSX.Element {
           <SideBar place="outbox" />
         </Box>
         <Box sx={{ width: "100%", mx: 1 }}>
+          <TopBar place="outbox" />
           <ReactDataTable rows={documents} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
         </Box>
       </Box>

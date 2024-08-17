@@ -72,8 +72,7 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
   }, [deleteReceiver])
 
   const loadRoleData = async () => {
-    // await fetch("api/v1/roles")
-    await fetch(`api/v1/roles/myConnections?roleId=${me.selectedRole._id}&root=${me.selectedRole.root}`)
+    await fetch(`api/v1/roles/myConnections?roleId=${me.defaultRole._id}&root=${me.defaultRole.root}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setRoles(data))
   }
@@ -111,7 +110,7 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ refPerson: me._id, refRole: me.selectedRole._id, refCollection, refDocument, sendDate: new Date(), parentReceive })
+      body: JSON.stringify({ refPerson: me._id, refRole: me.defaultRole._id, refCollection, refDocument, sendDate: new Date(), parentReceive })
     })
       .then(res => res.status === 201 && res.json())
 
