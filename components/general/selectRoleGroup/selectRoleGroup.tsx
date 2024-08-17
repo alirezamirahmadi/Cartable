@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Box, Autocomplete, TextField, Typography } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
@@ -9,7 +9,7 @@ import type { RoleType } from "@/types/RoleType";
 import type { RoleGroupType } from "@/types/generalType";
 import { GroupType } from "@/types/groupType";
 
-export default function SelectRoleGroup({ onSelect }: { onSelect: (roleGroup: RoleGroupType | null) => void }): React.JSX.Element {
+const SelectRoleGroup = memo(({ onSelect }: { onSelect: (roleGroup: RoleGroupType | null) => void }): React.JSX.Element => {
 
   const [rolesAndGroups, setRolesAndGroups] = useState<RoleGroupType[]>([]);
 
@@ -62,4 +62,10 @@ export default function SelectRoleGroup({ onSelect }: { onSelect: (roleGroup: Ro
       />
     </>
   )
-}
+},
+  () => {
+    return true;
+  }
+)
+
+export default SelectRoleGroup;
