@@ -12,7 +12,7 @@ export default function theme() {
 
   const darkMode = useAppSelector(state => state.darkMode);
   const [mode, setMode] = useState<boolean>(darkMode);
-
+console.log(darkMode, mode)
   useEffect(() => {
     setMode(darkMode);
   }, [darkMode])

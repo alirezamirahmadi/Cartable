@@ -219,8 +219,8 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
             </IconButton>
           </ListItem>
           {permissions.map((permission: PermissionType) => (
-            <>
-              <ListItem key={permission._id} sx={{ py: 0, minHeight: 24 }}>
+            <Box key={permission._id}>
+              <ListItem sx={{ py: 0, minHeight: 24 }}>
                 <IconButton sx={{ px: 0 }} onClick={() => handleSubPermission(permission)} disabled={permission.kind === 3}>
                   {permission.kind === 1 && <RuleFolderIcon />}
                   {permission.kind === 2 && openPermissionItems === permission._id && <ExpandLess />}
@@ -247,11 +247,11 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
                   </List>
                 </Collapse>
               }
-            </>
+            </Box>
           ))}
         </List>
       </Box >
-      
+
       {snackProps.isOpen && <Snack {...snackProps} />}
     </>
   )

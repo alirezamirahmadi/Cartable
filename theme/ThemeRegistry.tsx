@@ -5,7 +5,6 @@ import createCache from '@emotion/cache';
 import { useServerInsertedHTML } from 'next/navigation';
 import { CacheProvider, ThemeProvider } from '@emotion/react';
 import { ThemeProvider as NextThemeProvider } from 'next-themes';
-// import CssBaseline from '@mui/material/CssBaseline';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 
@@ -58,7 +57,6 @@ export default function ThemeRegistry({ options, children }: { options: any, chi
     <CacheProvider value={cache}>
       <NextThemeProvider attribute="class" storageKey="theme" defaultTheme="light">
         <ThemeProvider theme={theme()}>
-          {/* <CssBaseline /> */}
           {children}
         </ThemeProvider>
       </NextThemeProvider>

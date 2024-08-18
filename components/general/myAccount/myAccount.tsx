@@ -27,7 +27,7 @@ const MyAccount = memo((): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
   const router = useRouter();
-
+console.log(resolvedTheme)
   useEffect(() => {
     dispatch(changeMode(cookies["dark-mode"] ?? false));
   }, [])
@@ -42,8 +42,8 @@ const MyAccount = memo((): React.JSX.Element => {
 
   const handleDarkMode = () => {
     dispatch(changeMode(!cookies["dark-mode"]));
-    setTheme(resolvedTheme === "light" ? "dark" : "light");
-    setCookie("dark-mode", !cookies["dark-mode"]);
+    setTheme(cookies["dark-mode"] ? "light" : "dark");
+    setCookie("dark-mode", !cookies["dark-mode"], { maxAge: 2_592_000 });
     setAnchorElUser(null);
   }
 
@@ -115,7 +115,7 @@ const MyAccount = memo((): React.JSX.Element => {
           </MenuItem>
         </Menu>
       </Box>
-      
+
       {snackProps.isOpen && <Snack {...snackProps} />}
       {isOpenPasswordModal && <Modal title="تغییر رمزعبور" isOpen={isOpenPasswordModal} body={<ChangePassword onChangePassword={changePasswordSuccess} onError={handleError} />} onCloseModal={handleCloseModal} />}
       {isOpenRolesModal && <Modal title="سمت های من" isOpen={isOpenRolesModal} body={<MyRoles />} onCloseModal={handleCloseModal} />}

@@ -13,7 +13,7 @@ import Delete from "../delete/delete";
 
 const ModifyButtons = memo(({ rowData, onAction, add, save, edit, omit, omitMessage }:
   { rowData?: any, onAction: (data: any, action: string) => void, add?: boolean, save?: boolean, edit?: boolean, omit?: boolean, omitMessage?: string }): React.JSX.Element => {
-  console.log(25)
+
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
 
   const handleAdd = () => {
