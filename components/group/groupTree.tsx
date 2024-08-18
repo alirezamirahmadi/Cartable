@@ -14,9 +14,9 @@ import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 
 const Modal = dynamic(() => import("@/components/general/modal/modal"));
+const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import Roles from "@/components/role/roles";
 import TextSave from "@/components/general/textSave/textSave";
-import Snack from "@/components/general/snack/snack";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import type { GroupType } from "@/types/groupType";
 import type { RoleType } from "@/types/roleType";
@@ -323,7 +323,8 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
           ))}
         </List>
       </Box>
-      <Snack {...snackProps} />
+      
+      {snackProps.isOpen && <Snack {...snackProps} />}
       {openRolesModal.isOpen && <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleGroupMembersAction} omit selectRole />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />}
       {isOpenTransferModal && <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<GroupTree isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />}
     </>

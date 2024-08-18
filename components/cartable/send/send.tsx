@@ -1,17 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import { IconButton, useTheme, ListItemText, TextField, Button } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import CloseIcon from '@mui/icons-material/Close';
 
+const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import { useAppSelector } from "@/lib/hooks";
 import Roles from "../../role/roles";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Urgency from "../urgency/urgency";
-import Snack from "@/components/general/snack/snack";
 import type { ReceiverType, UrgencyType, ReceiveType } from "@/types/cartableType";
 import type { SnackProps } from "@/types/generalType";
 import type { RoleType } from "@/types/roleType";
@@ -151,7 +152,8 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
         <Button variant="outlined" color="primary" onClick={() => onClose()} startIcon={<CloseIcon />}>انصراف</Button>
         <Button variant="contained" color="primary" disabled={receivers && receivers.length > 0 ? false : true} onClick={handleSubmit} startIcon={<KeyboardArrowUpOutlinedIcon />}>ارسال</Button>
       </div>
-      <Snack {...snackProps} />
+      
+      {snackProps.isOpen && <Snack {...snackProps} />}
     </>
   )
 }

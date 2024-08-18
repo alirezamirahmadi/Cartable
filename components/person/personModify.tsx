@@ -9,8 +9,8 @@ import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import type { Value as DatePickerType } from "react-multi-date-picker";
 
-import { PersonType } from "@/types/personType";
 import regex from "@/utils/regex";
+import type { PersonType } from "@/types/personType";
 
 export default function PersonModify({ person, onModify }: { person?: PersonType, onModify: (isModify: boolean) => void }): React.JSX.Element {
 

@@ -7,7 +7,7 @@ import GroupIcon from '@mui/icons-material/Group';
 
 import type { RoleType } from "@/types/roleType";
 import type { RoleGroupType } from "@/types/generalType";
-import { GroupType } from "@/types/groupType";
+import type { GroupType } from "@/types/groupType";
 
 const SelectRoleGroup = memo(({ onSelect }: { onSelect: (roleGroup: RoleGroupType | null) => void }): React.JSX.Element => {
 

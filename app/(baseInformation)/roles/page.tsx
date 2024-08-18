@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 
+const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import RoleModify from "@/components/role/roleModify";
 import RoleTree from "@/components/role/roleTree";
 import { RoleType } from "@/types/roleType";
 import Loading from "@/components/general/loading/loading";
-import Snack from "@/components/general/snack/snack";
 import type { SnackProps } from "@/types/generalType";
 
 export default function RolesPage(): React.JSX.Element {
@@ -43,7 +44,7 @@ export default function RolesPage(): React.JSX.Element {
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
         <RoleTree onSelectRole={handleSelectRole} isUpdate={isRolesUpdate} />
         {!isLoading ? <RoleModify root={root} role={role} onModify={handleModify} /> : <Loading />}
-        <Snack {...snackProps} />
+        {snackProps.isOpen && <Snack {...snackProps} />}
       </div>
     </>
   )

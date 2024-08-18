@@ -96,6 +96,7 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
           ))
         }
       </List>
+      
       {isOpenSelectRoleModal && <Modal isOpen={isOpenSelectRoleModal} title="انتخاب عضو جدید" body={<Roles roles={allRoles} onAction={handleSelectRoleAction} add />} onCloseModal={() => setIsOpenSelectRoleModal(false)} />}
     </>
   )

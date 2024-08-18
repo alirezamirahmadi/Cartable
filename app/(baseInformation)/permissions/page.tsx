@@ -1,17 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { Box, Divider, Typography } from "@mui/material";
 
+const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import PermissionTree from "@/components/permission/permissionTree";
 import SelectRoleGroup from "@/components/general/selectRoleGroup/selectRoleGroup";
 import Roles from "@/components/role/roles";
 import Groups from "@/components/group/groups";
-import Snack from "@/components/general/snack/snack";
 import type { SnackProps } from "@/types/generalType";
 import type { RoleGroupType } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
-import type { RoleType } from "@/types/RoleType";
+import type { RoleType } from "@/types/roleType";
 import type { GroupType } from "@/types/groupType";
 
 export default function Permission(): React.JSX.Element {
@@ -20,7 +21,7 @@ export default function Permission(): React.JSX.Element {
   const [selectedPermission, setSelectedPermission] = useState<PermissionType>();
   const [rolesPermission, setRolesPermission] = useState<RoleType[]>([]);
   const [groupsPermission, setGroupsPermission] = useState<GroupType[]>([]);
-  const [snackProps, setSnackProps] = useState<SnackProps>();
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   useEffect(() => {
     Promise.all([
@@ -106,7 +107,8 @@ export default function Permission(): React.JSX.Element {
           </Box>
         </Box>
       </Box>
-      <Snack {...snackProps} />
+      
+      {snackProps.isOpen && <Snack {...snackProps} />}
     </>
   )
 }

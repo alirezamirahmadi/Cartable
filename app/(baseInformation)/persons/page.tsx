@@ -8,8 +8,8 @@ import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import { PersonType } from "@/types/personType";
 
 const Modal = dynamic(() => import("@/components/general/modal/modal"));
+const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
-import Snack from "@/components/general/snack/snack";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import type { SnackProps } from "@/types/generalType";
 
@@ -95,7 +95,8 @@ export default function Persons(): React.JSX.Element {
       <PersonModify onModify={handleModify} />
       <Divider sx={{ mx: "Auto", width: "90%", my: 2 }} />
       <ReactDataTable direction="rtl" rows={personData} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
-      <Snack {...snackProps} />
+      
+      {snackProps.isOpen && <Snack {...snackProps} />}
       {isOpenEditModal && <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify onModify={handleModify} person={rowData} />} />}
     </>
   )

@@ -94,6 +94,7 @@ export default function Groups({ groups, onAction, add, edit, omit, selectGroup 
           ))
         }
       </List>
+      
       {isOpenSelectGroupModal && <Modal isOpen={isOpenSelectGroupModal} title="انتخاب یک گروه" body={<Groups add groups={allGroups} onAction={handleSelectGroupAction} />} onCloseModal={() => setIsOpenSelectGroupModal(false)} />}
     </>
   )

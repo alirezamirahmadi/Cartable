@@ -8,20 +8,20 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
 const Modal = dynamic(() => import("../modal/modal"));
+const Snack = dynamic(() => import("../snack/snack"));
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { clearMe } from "@/lib/features/me/meSlice";
 import { changeMode } from "@/lib/features/darkMode/darkSlice";
 import ChangePassword from "@/components/changePassword/changePassword";
-import Snack from "../snack/snack";
 import MyRoles from "../myRoles/myRoles";
+import type { SnackProps } from "@/types/generalType";
 
 const MyAccount = memo((): React.JSX.Element => {
 
-  const [isOpenSnack, setIsOpenSnack] = useState<boolean>(false);
-  const [snackContext, setSnackContext] = useState<string>("");
   const [isOpenPasswordModal, setIsOpenPasswordModal] = useState<boolean>(false);
   const [isOpenRolesModal, setIsOpenRolesModal] = useState<boolean>(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const { resolvedTheme, setTheme } = useTheme();
   const [cookies, setCookie,] = useCookies(["dark-mode"]);
   const dispatch = useAppDispatch();
@@ -74,18 +74,12 @@ const MyAccount = memo((): React.JSX.Element => {
   }
 
   const handleError = (context: string) => {
-    setSnackContext(context);
-    setIsOpenSnack(true);
-  }
-
-  const handleCloseSnack = () => {
-    setIsOpenSnack(false);
+    setSnackProps({ context, isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
   }
 
   const changePasswordSuccess = () => {
     setIsOpenPasswordModal(false);
-    setSnackContext("رمزعبور با موفقیت تغییر کرد");
-    setIsOpenSnack(true);
+    setSnackProps({ context: "رمزعبور با موفقیت تغییر کرد", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
   }
 
   return (
@@ -121,10 +115,8 @@ const MyAccount = memo((): React.JSX.Element => {
           </MenuItem>
         </Menu>
       </Box>
-
-      <Snack context={snackContext} isOpen={isOpenSnack} severity="error" onCloseSnack={handleCloseSnack} />
-      <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={handleCloseSnack} />
       
+      {snackProps.isOpen && <Snack {...snackProps} />}
       {isOpenPasswordModal && <Modal title="تغییر رمزعبور" isOpen={isOpenPasswordModal} body={<ChangePassword onChangePassword={changePasswordSuccess} onError={handleError} />} onCloseModal={handleCloseModal} />}
       {isOpenRolesModal && <Modal title="سمت های من" isOpen={isOpenRolesModal} body={<MyRoles />} onCloseModal={handleCloseModal} />}
     </>

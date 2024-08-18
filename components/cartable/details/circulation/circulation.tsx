@@ -8,9 +8,9 @@ import * as shamsi from "shamsi-date-converter";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 
 const Modal = dynamic(() => import("@/components/general/modal/modal"));
+const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import { useAppSelector } from "@/lib/hooks";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
-import Snack from "@/components/general/snack/snack";
 import Delete from "@/components/general/delete/delete";
 import type { SnackProps } from "@/types/generalType";
 
@@ -105,7 +105,8 @@ export default function Circulation({ refCollection, refDocument, place, onClose
   return (
     <>
       <ReactDataTable rows={circulations ?? []} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
-      <Snack {...snackProps} />
+
+      {snackProps.isOpen && <Snack {...snackProps} />}
       {isOpenDeleteModal && <Modal isOpen={isOpenDeleteModal} title="فراخوانی ارسال" body={<Delete message={`آیا از حذف ارسال مطمئن هستید؟`} onDelete={handleDeleteSend} />} onCloseModal={() => setIsOpenDeleteModal(false)} />}
     </>
   )
