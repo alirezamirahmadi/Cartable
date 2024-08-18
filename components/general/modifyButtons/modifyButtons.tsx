@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import dynamic from "next/dynamic";
 import { IconButton, Box } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,8 +11,9 @@ import EditIcon from '@mui/icons-material/Edit';
 const Modal = dynamic(() => import("../modal/modal"));
 import Delete from "../delete/delete";
 
-export default function ModifyButtons({ rowData, onAction, add, save, edit, omit, omitMessage }: { rowData?: any, onAction: (data: any, action: string) => void, add?: boolean, save?: boolean, edit?: boolean, omit?: boolean, omitMessage?: string }): React.JSX.Element {
-
+const ModifyButtons = memo(({ rowData, onAction, add, save, edit, omit, omitMessage }:
+  { rowData?: any, onAction: (data: any, action: string) => void, add?: boolean, save?: boolean, edit?: boolean, omit?: boolean, omitMessage?: string }): React.JSX.Element => {
+  console.log(25)
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
 
   const handleAdd = () => {
@@ -59,4 +60,10 @@ export default function ModifyButtons({ rowData, onAction, add, save, edit, omit
       {isOpenDeleteModal && <Modal title="حذف" isOpen={isOpenDeleteModal} body={<Delete message={omitMessage ?? ""} onDelete={handleDelete} />} onCloseModal={() => setIsOpenDeleteModal(false)} />}
     </>
   )
-}
+},
+  (prevProps, nextProps) => prevProps.rowData === undefined && nextProps.rowData === undefined &&
+    prevProps.add === nextProps.add && prevProps.edit === nextProps.edit && prevProps.omit === nextProps.omit &&
+    prevProps.omitMessage === nextProps.omitMessage && prevProps.save === nextProps.save
+)
+
+export default ModifyButtons;

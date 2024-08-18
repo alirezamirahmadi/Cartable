@@ -267,6 +267,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
             ))
           }
         </List>
+        
         {snackProps.isOpen && <Snack {...snackProps} />}
         {isOpenNewModal && <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />}
         {isOpenTransferModal && <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree isTransfer={true} onTransfer={handleTransferTo} />} />}
