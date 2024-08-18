@@ -1,15 +1,16 @@
 "use client"
 
 import { useState, useEffect, memo } from "react";
+import dynamic from "next/dynamic";
 import { Box, IconButton, Typography, Menu, Avatar, Tooltip, MenuItem, ListItemText } from "@mui/material";
 import { useCookies } from "react-cookie";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
+const Modal = dynamic(() => import("../modal/modal"));
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { clearMe } from "@/lib/features/me/meSlice";
 import { changeMode } from "@/lib/features/darkMode/darkSlice";
-import Modal from "../modal/modal";
 import ChangePassword from "@/components/changePassword/changePassword";
 import Snack from "../snack/snack";
 import MyRoles from "../myRoles/myRoles";
@@ -120,11 +121,12 @@ const MyAccount = memo((): React.JSX.Element => {
           </MenuItem>
         </Menu>
       </Box>
-      <Modal title="تغییر رمزعبور" isOpen={isOpenPasswordModal} body={<ChangePassword onChangePassword={changePasswordSuccess} onError={handleError} />} onCloseModal={handleCloseModal} />
-      <Modal title="سمت های من" isOpen={isOpenRolesModal} body={<MyRoles />} onCloseModal={handleCloseModal} />
 
       <Snack context={snackContext} isOpen={isOpenSnack} severity="error" onCloseSnack={handleCloseSnack} />
       <Snack context={snackContext} isOpen={isOpenSnack} severity="success" onCloseSnack={handleCloseSnack} />
+      
+      {isOpenPasswordModal && <Modal title="تغییر رمزعبور" isOpen={isOpenPasswordModal} body={<ChangePassword onChangePassword={changePasswordSuccess} onError={handleError} />} onCloseModal={handleCloseModal} />}
+      {isOpenRolesModal && <Modal title="سمت های من" isOpen={isOpenRolesModal} body={<MyRoles />} onCloseModal={handleCloseModal} />}
     </>
   )
 })

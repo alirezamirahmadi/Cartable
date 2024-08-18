@@ -1,16 +1,17 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive"
 import { Box, useTheme, Typography } from "@mui/material";
 import * as shamsi from "shamsi-date-converter";
 import { useSearchParams } from "next/navigation";
 
+const Modal = dynamic(() => import("@/components/general/modal/modal"));
 import { useAppSelector } from "@/lib/hooks";
 import SideBar from "@/components/cartable/sidebar"
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Buttons from "@/components/cartable/buttons";
-import Modal from "@/components/general/modal/modal";
 import Send from "@/components/cartable/send/send";
 import Circulation from "@/components/cartable/details/circulation/circulation";
 import TopBar from "@/components/cartable/inbox/topbar";
@@ -88,8 +89,8 @@ export default function Outbox(): React.JSX.Element {
           <ReactDataTable rows={documents} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
         </Box>
       </Box>
-      <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={selectedDocument?.refDocument} parentReceive={selectedDocument?.parentReceive} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />
-      <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={selectedDocument?.refDocument} place="outbox" onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />
+      {isOpenSendModal && <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={selectedDocument?.refDocument} parentReceive={selectedDocument?.parentReceive} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />}
+      {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={selectedDocument?.refDocument} place="outbox" onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />}
     </>
   )
 }

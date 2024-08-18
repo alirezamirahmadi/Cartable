@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, ChangeEvent } from "react";
+import dynamic from "next/dynamic";
 import { Box, List, ListItemButton, TextField, ListItemText, ListItem, IconButton, Typography, Checkbox, Breadcrumbs, Button } from "@mui/material"
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import GroupIcon from '@mui/icons-material/Group';
@@ -12,14 +13,14 @@ import CachedIcon from '@mui/icons-material/Cached';
 import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 
-import type { GroupType } from "@/types/groupType";
-import type { RoleType } from "@/types/roleType";
-import type { SnackProps } from "@/types/generalType";
+const Modal = dynamic(() => import("@/components/general/modal/modal"));
 import Roles from "@/components/role/roles";
-import Modal from "@/components/general/modal/modal";
 import TextSave from "@/components/general/textSave/textSave";
 import Snack from "@/components/general/snack/snack";
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
+import type { GroupType } from "@/types/groupType";
+import type { RoleType } from "@/types/roleType";
+import type { SnackProps } from "@/types/generalType";
 
 export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boolean, onTransfer?: (root: string) => void }): React.JSX.Element {
 
@@ -32,7 +33,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
   const [anchorGroup, setAnchorGroup] = useState<null | HTMLElement>(null);
   const [anchorFolder, setAnchorFolder] = useState<null | HTMLElement>(null);
   const [anchorEdit, setAnchorEdit] = useState<null | HTMLElement>(null);
-  const [snackProps, setSnackProps] = useState<SnackProps>();
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
   const [isOpenTransferModal, setIsOpenTransferModal] = useState<boolean>(false);
 
@@ -323,8 +324,8 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         </List>
       </Box>
       <Snack {...snackProps} />
-      <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleGroupMembersAction} omit selectRole />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />
-      <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<GroupTree isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />
+      {openRolesModal.isOpen && <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleGroupMembersAction} omit selectRole />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />}
+      {isOpenTransferModal && <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<GroupTree isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />}
     </>
   )
 }

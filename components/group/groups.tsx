@@ -1,15 +1,16 @@
 "use client"
 
 import { useState, useEffect, ChangeEvent } from "react";
+import dynamic from "next/dynamic";
 import {
   ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, Typography, Box
 } from "@mui/material";
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import GroupIcon from '@mui/icons-material/Group';
-
 import SearchIcon from '@mui/icons-material/Search';
+
+const Modal = dynamic(() => import("../general/modal/modal"));
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
-import Modal from "../general/modal/modal";
 import type { GroupType } from "@/types/groupType";
 
 export default function Groups({ groups, onAction, add, edit, omit, selectGroup }:
@@ -93,7 +94,7 @@ export default function Groups({ groups, onAction, add, edit, omit, selectGroup 
           ))
         }
       </List>
-      <Modal isOpen={isOpenSelectGroupModal} title="انتخاب یک گروه" body={<Groups add groups={allGroups} onAction={handleSelectGroupAction} />} onCloseModal={() => setIsOpenSelectGroupModal(false)} />
+      {isOpenSelectGroupModal && <Modal isOpen={isOpenSelectGroupModal} title="انتخاب یک گروه" body={<Groups add groups={allGroups} onAction={handleSelectGroupAction} />} onCloseModal={() => setIsOpenSelectGroupModal(false)} />}
     </>
   )
 }

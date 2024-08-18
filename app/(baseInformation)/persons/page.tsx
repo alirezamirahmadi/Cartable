@@ -1,22 +1,21 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import PersonModify from "@/components/person/personModify";
 import { Divider, useTheme } from "@mui/material";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import { PersonType } from "@/types/personType";
 
+const Modal = dynamic(() => import("@/components/general/modal/modal"));
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
-import Modal from "@/components/general/modal/modal";
 import Snack from "@/components/general/snack/snack";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
-import Loading from "@/components/general/loading/loading";
 import type { SnackProps } from "@/types/generalType";
 
 export default function Persons(): React.JSX.Element {
 
   const theme = useTheme();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [personData, setPersonData] = useState<PersonType[]>([]);
   const [rowData, setRowData] = useState<PersonType>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
@@ -31,7 +30,7 @@ export default function Persons(): React.JSX.Element {
     { field: { title: "account.username" }, label: "نام کاربری" },
     {
       field: { title: "ویرایش" }, label: "ویرایش", kind: "component", options: {
-        component: (value, onChange, rowData) => (<ModifyButtons rowData={rowData} onAction={handleAction} edit omit omitMessage={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`}/>)
+        component: (value, onChange, rowData) => (<ModifyButtons rowData={rowData} onAction={handleAction} edit omit omitMessage={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`} />)
       }
     },
   ]
@@ -41,15 +40,9 @@ export default function Persons(): React.JSX.Element {
   }, [])
 
   const loadPersonData = async () => {
-    setIsLoading(true);
-
     await fetch("api/v1/persons")
       .then(res => res.status === 200 && res.json())
-      .then(data => {
-        setPersonData(data);
-        setIsLoading(false);
-      })
-      .catch(() => setIsLoading(false))
+      .then(data => setPersonData(data));
   }
 
   const handleAction = (data: PersonType, action: string) => {
@@ -97,21 +90,13 @@ export default function Persons(): React.JSX.Element {
       })
   }
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="mt-20">
-  //       <Loading />
-  //     </div>
-  //   )
-  // }
-
   return (
     <>
       <PersonModify onModify={handleModify} />
       <Divider sx={{ mx: "Auto", width: "90%", my: 2 }} />
       <ReactDataTable direction="rtl" rows={personData} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
       <Snack {...snackProps} />
-      <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify onModify={handleModify} person={rowData} />} />
+      {isOpenEditModal && <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify onModify={handleModify} person={rowData} />} />}
     </>
   )
 }

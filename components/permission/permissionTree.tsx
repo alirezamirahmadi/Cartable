@@ -15,7 +15,7 @@ import GroupIcon from '@mui/icons-material/Group';
 
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
 import Snack from "../general/snack/snack";
-import { SnackProps } from "@/types/generalType";
+import type { SnackProps } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
 import type { RoleGroupType } from "@/types/generalType";
 
@@ -30,7 +30,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
   const [roleInGroupsPermissions, setRoleInGroupsPermissions] = useState<string[]>([]);
   const [selectedPermission, setSelectedPermission] = useState<PermissionType>();
   const [openPermissionItems, setopenPermissionItems] = useState<string>("");
-  const [snackProps, setSnackProps] = useState<SnackProps>();
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   useEffect(() => {
     loadPermissionByRoot();

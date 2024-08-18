@@ -5,7 +5,7 @@ import { Box, Autocomplete, TextField, Typography } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import GroupIcon from '@mui/icons-material/Group';
 
-import type { RoleType } from "@/types/RoleType";
+import type { RoleType } from "@/types/roleType";
 import type { RoleGroupType } from "@/types/generalType";
 import { GroupType } from "@/types/groupType";
 

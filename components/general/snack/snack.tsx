@@ -39,6 +39,8 @@ const Snack = memo(({ context, severity, isOpen, onCloseSnack }: SnackProps): Re
       </Stack>
     </div>
   );
-})
+},
+  (prevProps, nextProps) => prevProps.context === nextProps.context && prevProps.severity === nextProps.severity
+)
 
 export default Snack;

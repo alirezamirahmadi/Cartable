@@ -1,14 +1,17 @@
 "use client"
 
 import { useState, useEffect, ChangeEvent } from "react";
+import dynamic from "next/dynamic";
 import {
   ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar,
   Avatar, Typography, Box
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
+
+
+const Modal = dynamic(() => import("../general/modal/modal"));
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
-import Modal from "../general/modal/modal";
-import type { RoleType } from "@/types/RoleType";
+import type { RoleType } from "@/types/roleType";
 
 export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
   { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, selectRole?: boolean }): React.JSX.Element {
@@ -93,7 +96,7 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
           ))
         }
       </List>
-      <Modal isOpen={isOpenSelectRoleModal} title="انتخاب عضو جدید" body={<Roles roles={allRoles} onAction={handleSelectRoleAction} add />} onCloseModal={() => setIsOpenSelectRoleModal(false)} />
+      {isOpenSelectRoleModal && <Modal isOpen={isOpenSelectRoleModal} title="انتخاب عضو جدید" body={<Roles roles={allRoles} onAction={handleSelectRoleAction} add />} onCloseModal={() => setIsOpenSelectRoleModal(false)} />}
     </>
   )
 }

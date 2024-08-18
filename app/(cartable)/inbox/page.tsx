@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { IconButton, useTheme, ListItemText, Typography } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
@@ -8,13 +9,13 @@ import MailIcon from '@mui/icons-material/Mail';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import * as shamsi from "shamsi-date-converter";
 
+const Modal = dynamic(() => import("@/components/general/modal/modal"));
 import { useAppSelector } from "@/lib/hooks";
 import TopBar from "@/components/cartable/inbox/topbar";
 import SideBar from "@/components/cartable/sidebar";
 import { Box } from "@mui/material";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Buttons from "@/components/cartable/buttons";
-import Modal from "@/components/general/modal/modal";
 import Send from "@/components/cartable/send/send";
 import Circulation from "@/components/cartable/details/circulation/circulation";
 
@@ -128,12 +129,12 @@ export default function Inbox(): React.JSX.Element {
           <SideBar place="inbox" />
         </Box>
         <Box sx={{ width: "100%", mx: 1 }}>
-          <TopBar  place="inbox"/>
+          <TopBar place="inbox" />
           <ReactDataTable rows={documents} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
         </Box>
       </Box>
-      <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={selectedDocument?.send?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />
-      <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={selectedDocument?.send?.refDocument} place="inbox" onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />
+      {isOpenSendModal && <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={selectedDocument?.send?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />}
+      {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={selectedDocument?.send?.refDocument} place="inbox" onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />}
     </>
   )
 }

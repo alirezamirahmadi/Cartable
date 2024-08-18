@@ -1,24 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { ListItemText, Typography, useTheme, IconButton } from "@mui/material";
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import * as shamsi from "shamsi-date-converter";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 
+const Modal = dynamic(() => import("@/components/general/modal/modal"));
 import { useAppSelector } from "@/lib/hooks";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Snack from "@/components/general/snack/snack";
-import { SnackProps } from "@/types/generalType";
 import Delete from "@/components/general/delete/delete";
-import Modal from "@/components/general/modal/modal";
+import type { SnackProps } from "@/types/generalType";
 
 export default function Circulation({ refCollection, refDocument, place, onClose }: { refCollection: string, refDocument: string, place: "inbox" | "outbox", onClose: () => void }): React.JSX.Element {
 
   const me = useAppSelector(state => state.me);
   const theme = useTheme();
   const [circulations, setCirculations] = useState<any>();
-  const [snackProps, setSnackProps] = useState<SnackProps>();
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [selectedCirculation, setSelectedCirculation] = useState<any>();
 
@@ -105,7 +106,7 @@ export default function Circulation({ refCollection, refDocument, place, onClose
     <>
       <ReactDataTable rows={circulations ?? []} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
       <Snack {...snackProps} />
-      <Modal isOpen={isOpenDeleteModal} title="فراخوانی ارسال" body={<Delete message={`آیا از حذف ارسال مطمئن هستید؟`} onDelete={handleDeleteSend} />} onCloseModal={() => setIsOpenDeleteModal(false)} />
+      {isOpenDeleteModal && <Modal isOpen={isOpenDeleteModal} title="فراخوانی ارسال" body={<Delete message={`آیا از حذف ارسال مطمئن هستید؟`} onDelete={handleDeleteSend} />} onCloseModal={() => setIsOpenDeleteModal(false)} />}
     </>
   )
 }

@@ -14,7 +14,7 @@ import Urgency from "../urgency/urgency";
 import Snack from "@/components/general/snack/snack";
 import type { ReceiverType, UrgencyType, ReceiveType } from "@/types/cartableType";
 import type { SnackProps } from "@/types/generalType";
-import { RoleType } from "@/types/RoleType";
+import type { RoleType } from "@/types/roleType";
 
 export default function Send({ refCollection, refDocument, parentReceive, onClose }: { refCollection: string, refDocument: string, parentReceive: string, onClose: () => void }): React.JSX.Element {
 

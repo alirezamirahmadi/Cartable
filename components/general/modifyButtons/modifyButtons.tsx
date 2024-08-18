@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { IconButton, Box } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 
-import Modal from "../modal/modal";
+const Modal = dynamic(() => import("../modal/modal"));
 import Delete from "../delete/delete";
 
 export default function ModifyButtons({ rowData, onAction, add, save, edit, omit, omitMessage }: { rowData?: any, onAction: (data: any, action: string) => void, add?: boolean, save?: boolean, edit?: boolean, omit?: boolean, omitMessage?: string }): React.JSX.Element {
@@ -55,7 +56,7 @@ export default function ModifyButtons({ rowData, onAction, add, save, edit, omit
           </IconButton>
         }
       </Box>
-      <Modal title="حذف" isOpen={isOpenDeleteModal} body={<Delete message={omitMessage ?? ""} onDelete={handleDelete} />} onCloseModal={() => setIsOpenDeleteModal(false)} />
+      {isOpenDeleteModal && <Modal title="حذف" isOpen={isOpenDeleteModal} body={<Delete message={omitMessage ?? ""} onDelete={handleDelete} />} onCloseModal={() => setIsOpenDeleteModal(false)} />}
     </>
   )
 }
