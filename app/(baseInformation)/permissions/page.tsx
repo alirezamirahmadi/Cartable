@@ -91,17 +91,43 @@ export default function Permission(): React.JSX.Element {
   }
 
   const handleGroupsAction = async (group: GroupType, action: string) => {
-    selectedPermission && group && action === "Delete" &&
-      await fetch(`api/v1/groupPermissions`, {
-        method: "DELETE",
-        body: JSON.stringify({ groupId: group._id, permissionIds: [selectedPermission._id] })
+    switch (action) {
+      case "Delete":
+        selectedPermission && group && deleteGroupPermission(group._id);
+        break;
+      case "SelectGroup":
+        selectedPermission && group && addGroupPermission(group._id);
+        break;
+    }
+  }
+
+  const deleteGroupPermission = async (groupId: string) => {
+    await fetch(`api/v1/groupPermissions`, {
+      method: "DELETE",
+      body: JSON.stringify({ groupId: groupId, permissionIds: [selectedPermission?._id] })
+    })
+      .then(res => {
+        if (res.status === 200) {
+          loadGroupsPermission();
+          setSnackProps({ context: `مجوز مورد نظر گرفته شد`, isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+        }
       })
-        .then(res => {
-          if (res.status === 200) {
-            loadGroupsPermission();
-            setSnackProps({ context: `مجوز مورد نظر گرفته شد`, isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
-          }
-        })
+  }
+
+  const addGroupPermission = async (groupId: string) => {
+    await fetch(`api/v1/groupPermissions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "Application/json"
+      },
+      body: JSON.stringify({ groupId, permissionIds: [selectedPermission?._id] })
+    })
+      .then(res => {
+        if (res.status === 201) {
+          loadGroupsPermission();
+          setSnackProps({ context: `مجوز مورد نظر داده شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+        }
+      })
   }
 
   return (
@@ -117,12 +143,12 @@ export default function Permission(): React.JSX.Element {
             <Box sx={{ px: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
               <Typography variant="body1" sx={{ mt: 1 }}>سمت های دارای مجوز انتخاب شده</Typography>
               <Divider variant="middle" sx={{ my: 1, mx: "auto" }} />
-              <Roles roles={rolesPermission} omit selectRole={selectedPermission && selectedPermission?.kind !== 1 ? true : false} onAction={handleRolesAction} />
+              <Roles roles={rolesPermission} omit selectRole={selectedPermission && selectedPermission.kind !== 1 ? true : false} onAction={handleRolesAction} />
             </Box>
             <Box sx={{ px: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
               <Typography variant="body1" sx={{ mt: 1 }}>گروه های دارای مجوز انتخاب شده</Typography>
               <Divider variant="middle" sx={{ my: 1, mx: "auto" }} />
-              <Groups groups={groupsPermission} omit onAction={handleGroupsAction} />
+              <Groups groups={groupsPermission} omit selectGroup={selectedPermission && selectedPermission.kind !== 1 ? true : false} onAction={handleGroupsAction} />
             </Box>
           </Box>
         </Box>
