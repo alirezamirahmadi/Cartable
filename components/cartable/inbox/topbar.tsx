@@ -1,15 +1,16 @@
 "use client"
 
-import React, { useState, memo } from 'react';
-import { Box, AppBar, Toolbar, IconButton, Menu, Container, MenuItem, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
-import CollectionsIcon from '@mui/icons-material/Collections';
+import React, { useState, memo, useRef } from "react";
+import { Box, AppBar, Toolbar, IconButton, Menu, Container, MenuItem, FormControl, InputLabel, Select, SelectChangeEvent } from "@mui/material";
+import CollectionsIcon from "@mui/icons-material/Collections";
 
-import SideBar from '../sidebar';
+import SideBar from "../sidebar";
 
 const TopBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Element => {
 
   const [showType, setShowType] = useState<string>("1");
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const sidebarBox = useRef();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -27,18 +28,18 @@ const TopBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Elemen
     <AppBar position="static" color="transparent" sx={{ mb: 2 }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+          <Box ref={sidebarBox} sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton size="large" onClick={handleOpenNavMenu} color="inherit" >
               <CollectionsIcon />
             </IconButton>
-            <Menu id="menu-appbar" anchorEl={anchorElNav} anchorOrigin={{ vertical: 'bottom', horizontal: 'left', }}
+            <Menu id="menu-appbar" anchorEl={anchorElNav} anchorOrigin={{ vertical: "bottom", horizontal: "left", }}
               keepMounted
-              transformOrigin={{ vertical: 'top', horizontal: 'left', }}
+              transformOrigin={{ vertical: "top", horizontal: "left", }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' }, }}
+              sx={{ display: { xs: "block", md: "none" }, }}
             >
-              <SideBar place={place} />
+              {sidebarBox.current && <SideBar place={place} />}
             </Menu>
           </Box>
           {place === "inbox" && <FormControl>

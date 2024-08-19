@@ -26,7 +26,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
 
   useEffect(() => {
     loadPersonData();
-  }, [])
+  }, []);
 
   const loadPersonData = async () => {
     await fetch(`api/v1/persons?limited=true`)

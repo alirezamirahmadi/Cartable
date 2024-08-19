@@ -27,7 +27,7 @@ const MyAccount = memo((): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
   const router = useRouter();
-console.log(resolvedTheme)
+
   useEffect(() => {
     dispatch(changeMode(cookies["dark-mode"] ?? false));
   }, [])

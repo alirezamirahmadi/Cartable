@@ -17,22 +17,18 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
   { roles: RoleType[], onAction: (role: RoleType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, selectRole?: boolean }): React.JSX.Element {
 
   const [search, setSearch] = useState<string>("");
-  const [listRoles, setListRoles] = useState<RoleType[]>([]);
+  const [listRoles, setListRoles] = useState<RoleType[]>(roles);
   const [filteredRoles, setFilteredRoles] = useState<RoleType[]>([]);
   const [isOpenSelectRoleModal, setIsOpenSelectRoleModal] = useState<boolean>(false);
   const [allRoles, setAllRoles] = useState<RoleType[]>([]);
 
   useEffect(() => {
-    setListRoles(roles);
+    (roles.length > 0 || listRoles.length > 0) && setListRoles(roles);
   }, [roles])
 
   useEffect(() => {
     setFilteredRoles(listRoles);
   }, [listRoles])
-
-  useEffect(() => {
-    loadRoleData()
-  }, [])
 
   const loadRoleData = async () => {
     await fetch("api/v1/roles")
@@ -56,12 +52,17 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
     onAction(role, "SelectRole");
   }
 
+  const handleOpenSelectRole = () => {
+    loadRoleData()
+      .then(() => setIsOpenSelectRoleModal(true));
+  }
+
   return (
     <>
       <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', py: 0 }}>
         {selectRole &&
           <Box sx={{ display: "flex" }}>
-            <ModifyButtons add onAction={() => setIsOpenSelectRoleModal(true)} />
+            <ModifyButtons add onAction={handleOpenSelectRole} />
           </Box>
         }
         <ListItem component="div" disablePadding>
@@ -78,7 +79,7 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
             />
           </ListItemButton>
         </ListItem>
-        <Divider variant="middle" component="li" />
+        <Divider variant="middle" />
         {
           filteredRoles?.map((role: any) => (
             <Box key={role._id}>
@@ -91,12 +92,12 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
                 </ListItem>
                 <ModifyButtons add={add} edit={edit} omit={omit} rowData={role} onAction={handleAction} omitMessage={`آیا از حذف "${role.title}" اطمینان دارید؟`} />
               </ListItem>
-              <Divider variant="middle" component="li" />
+              <Divider variant="middle" />
             </Box>
           ))
         }
       </List>
-      
+
       {isOpenSelectRoleModal && <Modal isOpen={isOpenSelectRoleModal} title="انتخاب عضو جدید" body={<Roles roles={allRoles} onAction={handleSelectRoleAction} add />} onCloseModal={() => setIsOpenSelectRoleModal(false)} />}
     </>
   )

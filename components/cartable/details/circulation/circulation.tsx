@@ -70,10 +70,14 @@ export default function Circulation({ refCollection, refDocument, place, onClose
   ]
 
   useEffect(() => {
-    fetch(`api/v1/receives?refCollection=${refCollection}&refDocument=${refDocument}`)
+    loadReceiceData();
+  }, [])
+
+  const loadReceiceData = async () => {
+    await fetch(`api/v1/receives?refCollection=${refCollection}&refDocument=${refDocument}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setCirculations(data))
-  }, [])
+  }
 
   const handleUndoSend = (data: any) => {
     setSelectedCirculation(data);

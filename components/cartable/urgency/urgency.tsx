@@ -12,11 +12,7 @@ const Urgency = memo(({ defaultValue, onChange }:
   const [urgency, setUrgency] = useState<UrgencyType>({ _id: "", title: "" });
 
   useEffect(() => {
-    fetch("api/v1/urgencies")
-      .then(res => res.status === 200 && res.json())
-      .then(data => {
-        setUrgencies(data);
-      });
+    loadUrgencyData();
   }, [])
 
   useEffect(() => {
@@ -24,7 +20,13 @@ const Urgency = memo(({ defaultValue, onChange }:
       setUrgency(defaultValue._id ? defaultValue : urgencies[0]);
       !defaultValue._id && onChange(urgencies[0]);
     }
-  }, [urgencies])
+  }, [urgencies]);
+
+  const loadUrgencyData = async () => {
+    await fetch("api/v1/urgencies")
+      .then(res => res.status === 200 && res.json())
+      .then(data => setUrgencies(data));
+  }
 
   const handleChange = (event: SelectChangeEvent) => {
     const value = { _id: event.target.value, title: event.target.name };

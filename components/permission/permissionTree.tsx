@@ -38,7 +38,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
   }, []);
 
   useEffect(() => {
-    loadPermissionByRoot();
+    roots.length > 1 && loadPermissionByRoot();
   }, [roots]);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
   }, [oldPermissions]);
 
   useEffect(() => {
-    Promise.all([
+    roleGroup !== undefined && Promise.all([
       loadRoleGroupPermission(),
       loadRoleInGroupPermission(),
     ])

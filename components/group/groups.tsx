@@ -17,17 +17,13 @@ export default function Groups({ groups, onAction, add, edit, omit, selectGroup 
   { groups: GroupType[], onAction: (group: GroupType, action: string) => void, add?: boolean, edit?: boolean, omit?: boolean, selectGroup?: boolean }): React.JSX.Element {
 
   const [search, setSearch] = useState<string>("");
-  const [listGroups, setListGroups] = useState<GroupType[]>([]);
+  const [listGroups, setListGroups] = useState<GroupType[]>(groups);
   const [filteredGroups, setFilteredGroups] = useState<GroupType[]>([]);
   const [isOpenSelectGroupModal, setIsOpenSelectGroupModal] = useState<boolean>(false);
   const [allGroups, setAllGroups] = useState<GroupType[]>([]);
 
   useEffect(() => {
-    loadGroupData();
-  }, []);
-
-  useEffect(() => {
-    setListGroups(groups);
+    (groups.length > 0 || listGroups.length > 0) && setListGroups(groups);
   }, [groups]);
 
   useEffect(() => {
@@ -37,7 +33,7 @@ export default function Groups({ groups, onAction, add, edit, omit, selectGroup 
   const loadGroupData = async () => {
     await fetch(`api/v1/groups?kind=2`)
       .then(res => res.status === 200 && res.json())
-      .then(data => setAllGroups(data))
+      .then(data => setAllGroups(data));
   }
 
   const handleSelectGroupAction = (group: GroupType, action: string) => {
@@ -56,12 +52,17 @@ export default function Groups({ groups, onAction, add, edit, omit, selectGroup 
     onAction(group, action);
   }
 
+  const handleOpenselectGroup = () => {
+    loadGroupData()
+      .then(() => setIsOpenSelectGroupModal(true));
+  }
+
   return (
     <>
       <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', py: 0 }}>
         {selectGroup &&
           <Box sx={{ display: "flex" }}>
-            <ModifyButtons add onAction={() => setIsOpenSelectGroupModal(true)} />
+            <ModifyButtons add onAction={handleOpenselectGroup} />
           </Box>
         }
         <ListItem component="div" disablePadding>
@@ -94,7 +95,7 @@ export default function Groups({ groups, onAction, add, edit, omit, selectGroup 
           ))
         }
       </List>
-      
+
       {isOpenSelectGroupModal && <Modal isOpen={isOpenSelectGroupModal} title="انتخاب یک گروه" body={<Groups add groups={allGroups} onAction={handleSelectGroupAction} />} onCloseModal={() => setIsOpenSelectGroupModal(false)} />}
     </>
   )

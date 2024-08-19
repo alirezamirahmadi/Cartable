@@ -43,11 +43,11 @@ const SideBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Eleme
   }, [])
 
   useEffect(() => {
-    setFilteredCollections(collections);
+    (collections.length > 0 || filteredCollections.length > 0) && setFilteredCollections(collections);
   }, [collections])
 
   const loadCollectionData = async () => {
-    place && me && await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/${place}?roleId=${me.defaultRole._id}`, {
+    place && me && await fetch(`api/v1/cartable/${place}?roleId=${me.defaultRole._id}`, {
       method: "GET",
       headers: {
         "Get-Type": "all"
@@ -58,7 +58,7 @@ const SideBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Eleme
   }
 
   const loadNonObserved = async (inboxList: InboxListType[]) => {
-    await fetch(search ? `api/v1/collections?showtitle=${search}` : `api/v1/cartable/inbox?roleId=${me.defaultRole._id}`, {
+    await fetch(`api/v1/cartable/inbox?roleId=${me.defaultRole._id}`, {
       method: "GET",
       headers: {
         "Get-Type": "nonObserved"
@@ -164,6 +164,8 @@ const SideBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Eleme
       </Paper>
     </Box>
   );
-})
+},
+  (prevProps, nextProps) => prevProps.place === nextProps.place
+)
 
 export default SideBar;

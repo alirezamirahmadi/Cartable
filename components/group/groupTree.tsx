@@ -42,7 +42,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
   }, []);
 
   useEffect(() => {
-    loadGroupByRoot();
+    roots.length > 1 && loadGroupByRoot();
   }, [roots]);
 
   const loadGroupByRoot = async () => {

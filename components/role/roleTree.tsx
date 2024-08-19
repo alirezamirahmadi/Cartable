@@ -39,36 +39,36 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
 
   useEffect(() => {
     loadRoleByRoot();
-  }, [])
+  }, []);
 
   useEffect(() => {
     isUpdate && loadRoleByRoot();
-  }, [isUpdate])
-
+  }, [isUpdate]);
+  
   useEffect(() => {
-    loadRoleByRoot();
-  }, [roots])
-
+    roots.length > 1 && loadRoleByRoot();
+  }, [roots]);
+  
   useEffect(() => {
-    onSelectRole && onSelectRole(selectedRole);
-  }, [selectedRole])
+    selectedRole && onSelectRole && onSelectRole(selectedRole);
+  }, [selectedRole]);
 
   const loadRoleByRoot = async () => {
     await fetch(`api/v1/roles?root=${roots[roots.length - 1]._id}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setTreeData(data));
+    .then(res => res.status === 200 && res.json())
+    .then(data => setTreeData(data));
   }
-
+  
   const loadRoleByTitle = async () => {
     await fetch(`api/v1/roles?title=${search}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setTreeData(data));
+    .then(res => res.status === 200 && res.json())
+    .then(data => setTreeData(data));
   }
-
+  
   const loadMemberGroups = async () => {
     selectedRole && await fetch(`api/v1/groupMembers?refRole=${selectedRole?._id}`)
       .then(res => res.status === 200 && res.json())
-      .then(data => setMemberGroups(data))
+      .then(data => setMemberGroups(data));
   }
 
   const handleBreadcrumbs = (root: RoleType) => {
