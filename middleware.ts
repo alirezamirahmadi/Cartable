@@ -1,19 +1,31 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Add a new header x-current-path which passes the path to downstream components
-  const headers = new Headers(request.headers);
-  headers.set("x-current-path", request.nextUrl.pathname);
-  console.log(request.nextUrl.pathname);
-  return NextResponse.next({ headers });
+  const requestHeaders = new Headers(request.headers);
 
-  
+  const currentPath = request.nextUrl.pathname;
+  requestHeaders.set("x-current-path", currentPath);
+
+  const secret = new TextEncoder().encode(process.env.privateKey);
+  const token = cookies().get("token")?.value;
+  const isLoggedin = token ? await jwtVerify(token, secret) : null
+
+  if (!isLoggedin && currentPath !== "/login") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+  else if (isLoggedin && currentPath === "/login") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+  return NextResponse.next({ headers: requestHeaders });
 }
 
 export const config = {
   matcher: [
     // match all routes except static files and APIs
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|svg).*)",
   ],
 };
