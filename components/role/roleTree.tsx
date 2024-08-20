@@ -1,15 +1,9 @@
 "use client"
 
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import {
-  Box, IconButton, ListItem, ListItemText, ListItemButton, Breadcrumbs, Button, List, TextField, Checkbox,
-  Typography
-} from '@mui/material';
+import { Box, IconButton, ListItem, ListItemText, ListItemButton, Breadcrumbs, Button, List, Checkbox } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import SearchIcon from '@mui/icons-material/Search';
-import ReplyIcon from '@mui/icons-material/Reply';
-import CachedIcon from '@mui/icons-material/Cached';
 import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 import GroupIcon from '@mui/icons-material/Group';
@@ -22,6 +16,7 @@ import Groups from '../group/groups';
 import type { RoleType } from '@/types/roleType';
 import type { SnackProps } from '@/types/generalType';
 import type { GroupType } from '@/types/groupType';
+import TreeActions from '../general/treeActions/treeActions';
 
 export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfer }:
   { isUpdate?: boolean, isTransfer?: boolean, onSelectRole?: (role: RoleType | undefined) => void, onTransfer?: (root: string) => void }): React.JSX.Element {
@@ -44,27 +39,27 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
   useEffect(() => {
     isUpdate && loadRoleByRoot();
   }, [isUpdate]);
-  
+
   useEffect(() => {
-    roots.length > 1 && loadRoleByRoot();
+    loadRoleByRoot();
   }, [roots]);
-  
+
   useEffect(() => {
     selectedRole && onSelectRole && onSelectRole(selectedRole);
   }, [selectedRole]);
 
   const loadRoleByRoot = async () => {
     await fetch(`api/v1/roles?root=${roots[roots.length - 1]._id}`)
-    .then(res => res.status === 200 && res.json())
-    .then(data => setTreeData(data));
+      .then(res => res.status === 200 && res.json())
+      .then(data => setTreeData(data));
   }
-  
-  const loadRoleByTitle = async () => {
-    await fetch(`api/v1/roles?title=${search}`)
-    .then(res => res.status === 200 && res.json())
-    .then(data => setTreeData(data));
+
+  const loadRoleByTitle = async (searchContent: string) => {
+    await fetch(`api/v1/roles?title=${searchContent}`)
+      .then(res => res.status === 200 && res.json())
+      .then(data => setTreeData(data));
   }
-  
+
   const loadMemberGroups = async () => {
     selectedRole && await fetch(`api/v1/groupMembers?refRole=${selectedRole?._id}`)
       .then(res => res.status === 200 && res.json())
@@ -80,14 +75,6 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
     }
     while (tempRoots[tempRoots.length - 1]._id !== root._id);
 
-    setRoots(tempRoots);
-  }
-
-  const handleBackward = () => {
-    setSelectedRole(undefined);
-
-    const tempRoots: RoleType[] = [...roots];
-    tempRoots.pop();
     setRoots(tempRoots);
   }
 
@@ -121,7 +108,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
     })
       .then(res => {
         if (res.status === 201) {
-          search ? loadRoleByTitle() : loadRoleByRoot();
+          search ? loadRoleByTitle(search) : loadRoleByRoot();
           setChecked([]);
         }
       })
@@ -173,20 +160,6 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
       .then(res => { res.status === 200 && loadMemberGroups() });
   }
 
-  const handleChangeSearch = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const searchText = event.target.value;
-    setSearch(searchText);
-  }
-
-  const handleSearchRole = () => {
-    loadRoleByTitle();
-  }
-
-  const handleResetRole = () => {
-    setRoots([[...roots][0]]);
-    setSearch("");
-  }
-
   const handleModifyRoleAction = (data: any, action: string) => {
     switch (action) {
       case "Add":
@@ -221,9 +194,24 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
       })
   }
 
+  const handleTreeAction = (root: any[], action: string, searchContent: string | undefined) => {
+    switch (action) {
+      case "Search":
+        setSearch(searchContent ?? "");
+        loadRoleByTitle(searchContent ?? "");
+        break;
+      case "Reset":
+        setRoots(root);
+        break;
+      case "Backward":
+        setRoots(root);
+        break;
+    }
+  }
+
   return (
     <>
-      <Box sx={{ minHeight: 352, minWidth: 250, mx: 2, mb: 2, py: 2, border: 1, borderRadius: 2 }}>
+      <Box sx={{ minHeight: 352, width: '100%', maxWidth: 356, minWidth: 250, mx: 2, mb: 2, py: 2, border: 1, borderRadius: 2 }} className="lg:col-span-2 md:col-span-1">
         <Breadcrumbs>
           {roots.length > 1 && roots.map((root: RoleType, index) => (
             <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.title}</Button>
@@ -241,17 +229,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
         </Box>
         <List>
           <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
-            <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
-              value={search} onChange={handleChangeSearch} sx={{ m: 0 }} />
-            <IconButton disabled={search.length === 0} onClick={handleSearchRole} title="جستجو">
-              <SearchIcon />
-            </IconButton>
-            <IconButton onClick={handleResetRole} title="ریست">
-              <CachedIcon />
-            </IconButton>
-            <IconButton onClick={handleBackward} disabled={roots.length === 1} title="بازگشت">
-              <ReplyIcon />
-            </IconButton>
+            <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />
           </ListItem>
           {
             treeData.map(role => (
@@ -267,7 +245,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
             ))
           }
         </List>
-        
+
         {snackProps.isOpen && <Snack {...snackProps} />}
         {isOpenNewModal && <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />}
         {isOpenTransferModal && <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree isTransfer={true} onTransfer={handleTransferTo} />} />}

@@ -41,11 +41,11 @@ export default function RolesPage(): React.JSX.Element {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
         <RoleTree onSelectRole={handleSelectRole} isUpdate={isRolesUpdate} />
         {!isLoading ? <RoleModify root={root} role={role} onModify={handleModify} /> : <Loading />}
-        {snackProps.isOpen && <Snack {...snackProps} />}
       </div>
+      {snackProps.isOpen && <Snack {...snackProps} />}
     </>
   )
 }

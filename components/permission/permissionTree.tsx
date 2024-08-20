@@ -7,9 +7,6 @@ import {
   Breadcrumbs, Button, Collapse, Tooltip
 } from "@mui/material";
 import RuleFolderIcon from '@mui/icons-material/RuleFolder';
-import SearchIcon from '@mui/icons-material/Search';
-import ReplyIcon from '@mui/icons-material/Reply';
-import CachedIcon from "@mui/icons-material/Cached";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import GroupIcon from '@mui/icons-material/Group';
@@ -19,13 +16,13 @@ import ModifyButtons from "../general/modifyButtons/modifyButtons";
 import type { SnackProps } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
 import type { RoleGroupType } from "@/types/generalType";
+import TreeActions from "../general/treeActions/treeActions";
 
 export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: RoleGroupType | null, onSelect: (permission: PermissionType | undefined) => void }): React.JSX.Element {
 
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
   const [roots, setRoots] = useState<PermissionType[]>([{ _id: "null", title: "", showTitle: "خانه", root: "-1", kind: 1 }])
-  const [search, setSearch] = useState<string>("");
   const [newPermissions, setNewPermissions] = useState<string[]>([]);
   const [oldPermissions, setOldPermissions] = useState<string[]>([]);
   const [roleInGroupsPermissions, setRoleInGroupsPermissions] = useState<string[]>([]);
@@ -38,7 +35,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
   }, []);
 
   useEffect(() => {
-    roots.length > 1 && loadPermissionByRoot();
+    loadPermissionByRoot();
   }, [roots]);
 
   useEffect(() => {
@@ -86,8 +83,8 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
       .then(data => setPermissions(data));
   }
 
-  const loadPermissionByShowTitle = async () => {
-    await fetch(`api/v1/permissions?showTitle=${search}`)
+  const loadPermissionByShowTitle = async (searchContent: string) => {
+    await fetch(`api/v1/permissions?showTitle=${searchContent}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setPermissions(data));
   }
@@ -96,23 +93,6 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
     await fetch(`api/v1/permissions/${permissionId}?item=true`)
       .then(res => res.status === 200 && res.json())
       .then(data => setPermissionItems(data));
-  }
-
-  const handleSearchPermission = () => {
-    loadPermissionByShowTitle();
-  }
-
-  const handleResetPermission = () => {
-    setRoots([[...roots][0]]);
-    setSearch("");
-  }
-
-  const handleBackward = () => {
-    setSelectedPermission(undefined);
-
-    const tempRoots: PermissionType[] = [...roots];
-    tempRoots.pop();
-    setRoots(tempRoots);
   }
 
   const handleToggle = (permissionId: string) => {
@@ -192,6 +172,20 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
     })
   }
 
+  const handleTreeAction = (root: any[], action: string, searchContent: string | undefined) => {
+    switch (action) {
+      case "Search":
+        loadPermissionByShowTitle(searchContent ?? "");
+        break;
+      case "Reset":
+        setRoots(root);
+        break;
+      case "Backward":
+        setRoots(root);
+        break;
+    }
+  }
+
   return (
     <>
       <Box sx={{ width: '100%', maxWidth: 356, bgcolor: 'background.paper' }}>
@@ -206,17 +200,7 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
 
         <List component="nav" sx={{ py: 0 }}>
           <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
-            <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
-              value={search} onChange={event => setSearch(event.target.value)} sx={{ m: 0 }} />
-            <IconButton onClick={handleSearchPermission} disabled={search.length === 0} title="جستجو">
-              <SearchIcon />
-            </IconButton>
-            <IconButton onClick={handleResetPermission} title="ریست">
-              <CachedIcon />
-            </IconButton>
-            <IconButton onClick={handleBackward} disabled={roots.length === 1} title="بازگشت">
-              <ReplyIcon />
-            </IconButton>
+            <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />
           </ListItem>
           {permissions.map((permission: PermissionType) => (
             <Box key={permission._id}>

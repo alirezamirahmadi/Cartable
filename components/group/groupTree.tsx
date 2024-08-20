@@ -1,15 +1,12 @@
 "use client"
 
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Box, List, ListItemButton, TextField, ListItemText, ListItem, IconButton, Typography, Checkbox, Breadcrumbs, Button } from "@mui/material"
+import { Box, List, ListItemButton, ListItemText, ListItem, IconButton, Checkbox, Breadcrumbs, Button } from "@mui/material"
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import GroupIcon from '@mui/icons-material/Group';
-import SearchIcon from '@mui/icons-material/Search';
-import ReplyIcon from '@mui/icons-material/Reply';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
-import CachedIcon from '@mui/icons-material/Cached';
 import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 
@@ -18,6 +15,7 @@ const Snack = dynamic(() => import("@/components/general/snack/snack"));
 const ModifyButtons = dynamic(() => import("@/components/general/modifyButtons/modifyButtons"));
 const TextSave = dynamic(() => import("@/components/general/textSave/textSave"));
 import Roles from "@/components/role/roles";
+import TreeActions from "../general/treeActions/treeActions";
 import type { GroupType } from "@/types/groupType";
 import type { RoleType } from "@/types/roleType";
 import type { SnackProps } from "@/types/generalType";
@@ -42,7 +40,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
   }, []);
 
   useEffect(() => {
-    roots.length > 1 && loadGroupByRoot();
+    loadGroupByRoot();
   }, [roots]);
 
   const loadGroupByRoot = async () => {
@@ -51,8 +49,8 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       .then(data => setGroups(data))
   }
 
-  const loadGroupByTitle = async () => {
-    await fetch(`api/v1/groups?title=${search}`)
+  const loadGroupByTitle = async (searchContent: string) => {
+    await fetch(`api/v1/groups?title=${searchContent}`)
       .then(res => res.status === 200 && res.json())
       .then(data => setGroups(data))
   }
@@ -84,23 +82,6 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
     }
     while (tempRoots[tempRoots.length - 1]._id !== root._id);
 
-    setRoots(tempRoots);
-  }
-
-  const handleSearchGroup = () => {
-    loadGroupByTitle();
-  }
-
-  const handleResetGroup = () => {
-    setRoots([[...roots][0]]);
-    setSearch("");
-  }
-
-  const handleBackward = () => {
-    setSelectedGroup(undefined);
-
-    const tempRoots: GroupType[] = [...roots];
-    tempRoots.pop();
     setRoots(tempRoots);
   }
 
@@ -137,7 +118,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       body: JSON.stringify({ groupIds: checkedGroups, root })
     }).then(res => {
       if (res.status === 201) {
-        search ? loadGroupByTitle() : loadGroupByRoot();
+        search ? loadGroupByTitle(search) : loadGroupByRoot();
         setCheckedGroups([]);
       }
     })
@@ -271,6 +252,21 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       .then(res => { res.status === 200 && loadGroupMembers(openRolesModal.refGroup) })
   }
 
+  const handleTreeAction = (root: any[], action: string, searchContent: string | undefined) => {
+    switch (action) {
+      case "Search":
+        setSearch(searchContent ?? "");
+        loadGroupByTitle(searchContent ?? "");
+        break;
+      case "Reset":
+        setRoots(root);
+        break;
+      case "Backward":
+        setRoots(root);
+        break;
+    }
+  }
+
   return (
     <>
       <Box sx={{ width: '100%', maxWidth: 356, bgcolor: 'background.paper' }}>
@@ -298,17 +294,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
 
         <List component="nav" sx={{ py: 0 }}>
           <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
-            <TextField size="small" label={<Typography variant="body2">جستجو</Typography>} variant="outlined"
-              value={search} onChange={event => setSearch(event.target.value)} sx={{ m: 0 }} />
-            <IconButton onClick={handleSearchGroup} disabled={search.length === 0} title="جستجو">
-              <SearchIcon />
-            </IconButton>
-            <IconButton onClick={handleResetGroup} title="ریست">
-              <CachedIcon />
-            </IconButton>
-            <IconButton onClick={handleBackward} disabled={roots.length === 1} title="بازگشت">
-              <ReplyIcon />
-            </IconButton>
+            <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />
           </ListItem>
           {groups.map((group: GroupType) => (
             <ListItem key={group._id} sx={{ py: 0, minHeight: 24 }}>
