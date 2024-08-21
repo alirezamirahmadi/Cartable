@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import dynamic from "next/dynamic";
 import PersonModify from "@/components/person/personModify";
 import { Divider, useTheme } from "@mui/material";
@@ -20,6 +20,7 @@ export default function Persons(): React.JSX.Element {
   const [rowData, setRowData] = useState<PersonType>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
+  const [isPending, startTransition] = useTransition();
 
   const columns: ColumnType[] = [
     { field: { title: "id" }, label: "ID", options: { display: false } },
@@ -42,7 +43,7 @@ export default function Persons(): React.JSX.Element {
   const loadPersonData = async () => {
     await fetch("api/v1/persons")
       .then(res => res.status === 200 && res.json())
-      .then(data => setPersonData(data));
+      .then(data => startTransition(() => setPersonData(data)));
   }
 
   const handleAction = (data: PersonType, action: string) => {
@@ -95,7 +96,7 @@ export default function Persons(): React.JSX.Element {
       <PersonModify onModify={handleModify} />
       <Divider sx={{ mx: "Auto", width: "90%", my: 2 }} />
       <ReactDataTable direction="rtl" rows={personData} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
-      
+
       {snackProps.isOpen && <Snack {...snackProps} />}
       {isOpenEditModal && <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify onModify={handleModify} person={rowData} />} />}
     </>

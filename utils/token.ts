@@ -14,7 +14,7 @@ const verifyToken = (token: string) => {
     return tokenPayload;
   }
   catch (error) {
-    return error;
+    return "";
   }
 }
 

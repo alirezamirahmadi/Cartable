@@ -14,12 +14,16 @@ export async function middleware(request: NextRequest) {
   const token = cookies().get("token")?.value;
   const isLoggedin = token ? await jwtVerify(token, secret) : null
 
+  // checkPermission("");
+  // is logged in
   if (!isLoggedin && currentPath !== "/login") {
     return NextResponse.redirect(new URL("/login", request.url));
   }
   else if (isLoggedin && currentPath === "/login") {
     return NextResponse.redirect(new URL("/", request.url));
   }
+  // have route permission
+
   return NextResponse.next({ headers: requestHeaders });
 }
 
@@ -29,3 +33,7 @@ export const config = {
     "/((?!api|_next/static|_next/image|favicon.ico|svg).*)",
   ],
 };
+
+// const checkPermission = async (route: string) => {
+//   await fetch (`api/v1/auth/permission`)
+// }

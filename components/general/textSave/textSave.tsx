@@ -1,13 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, TextField, IconButton } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
 
 export default function TextSave({ defaultValue, anchor, label, onAction }: { defaultValue?: string, anchor: null | HTMLElement, label?: string, onAction: (value: string) => void }): React.JSX.Element {
 
   const [value, setValue] = useState<string>(defaultValue ?? "");
-  const open = Boolean(anchor);
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [])
 
   useEffect(() => {
     setValue(defaultValue ?? "");
@@ -26,12 +30,10 @@ export default function TextSave({ defaultValue, anchor, label, onAction }: { de
 
   return (
     <>
-      <Menu anchorEl={anchor} open={open} onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-        }}
+      <Menu anchorEl={anchor} open={anchor ? true : false} onClose={handleClose}
+        MenuListProps={{ 'aria-labelledby': 'basic-button', }}
       >
-        <TextField value={value} onChange={event => setValue(event.target.value)} size="small" label={label} />
+        <TextField ref={inputRef} value={value} onChange={event => setValue(event.target.value)} size="small" label={label} />
         <IconButton onClick={handleAction}>
           <SaveIcon />
         </IconButton>
