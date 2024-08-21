@@ -14,7 +14,6 @@ export async function middleware(request: NextRequest) {
   const token = cookies().get("token")?.value;
   const isLoggedin = token ? await jwtVerify(token, secret) : null
 
-  // checkPermission("");
   // is logged in
   if (!isLoggedin && currentPath !== "/login") {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -22,9 +21,17 @@ export async function middleware(request: NextRequest) {
   else if (isLoggedin && currentPath === "/login") {
     return NextResponse.redirect(new URL("/", request.url));
   }
-  // have route permission
 
-  return NextResponse.next({ headers: requestHeaders });
+  if (currentPath === "/") {
+    return NextResponse.next({ headers: requestHeaders })
+  }
+  
+  // has route permission
+  return await checkPermission(currentPath, isLoggedin?.payload?.username).then(res => res)
+    ?
+    NextResponse.next({ headers: requestHeaders })
+    :
+    NextResponse.redirect(new URL("/", request.url))
 }
 
 export const config = {
@@ -34,6 +41,9 @@ export const config = {
   ],
 };
 
-// const checkPermission = async (route: string) => {
-//   await fetch (`api/v1/auth/permission`)
-// }
+const checkPermission = async (route: string, username: any) => {
+  let isPermission = false;
+  await fetch(`http:/localhost:3000/api/v1/auth/permission?title=${route}&username=${username}`)
+    .then(res => isPermission = res.status === 200)
+  return isPermission;
+}

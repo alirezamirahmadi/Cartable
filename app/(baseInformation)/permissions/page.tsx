@@ -22,7 +22,14 @@ export default function Permission(): React.JSX.Element {
   const [rolesPermission, setRolesPermission] = useState<RoleType[]>([]);
   const [groupsPermission, setGroupsPermission] = useState<GroupType[]>([]);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
+  // useEffect(() => {
 
+  //   const checkPermission = async (route: string) => {
+  //     await fetch(`api/v1/auth/permission?title=/roles`)
+  //     .then(res => res.json()).then(data => console.log(data))
+  //   }
+  //   checkPermission("");
+  // }, [])
   useEffect(() => {
     Promise.all([
       loadGroupsPermission(),
