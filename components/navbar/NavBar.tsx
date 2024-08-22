@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Button, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -10,6 +10,7 @@ import { MainMenuData } from "@/utils/data";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getMe } from "@/lib/features/me/meSlice";
 import MyAccount from "../general/myAccount/myAccount";
+import { MenuType } from "@/types/NavBarType";
 
 export default function NavBar(): React.JSX.Element {
 
@@ -19,11 +20,16 @@ export default function NavBar(): React.JSX.Element {
   const pathName = usePathname();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [menuItemSelected, setMenuItemSelected] = useState<string>("");
+  const [menuData, setMenuData] = useState<MenuType[]>([]);
 
   useEffect(() => {
     setMenuItemSelected(pathName);
     dispatch(getMe());
   }, []);
+
+  useMemo(() => {
+    setMenuData([...MainMenuData].filter((menu: MenuType) => me.permissions.includes(menu.href)))
+  }, [me.permissions])
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -61,7 +67,7 @@ export default function NavBar(): React.JSX.Element {
               transformOrigin={{ vertical: "top", horizontal: "left" }} open={Boolean(anchorElNav)}
               onClose={() => setAnchorElNav(null)} sx={{ display: { xs: "block", md: "none" } }}
             >
-              {MainMenuData.map((page) => (
+              {menuData.map((page) => (
                 <MenuItem key={page.id} onClick={() => handleCloseNavMenu(page.href)}>
                   <Typography textAlign="center"
                     sx={[(theme) => ({ my: 2, color: "white", display: "block", bgcolor: menuItemSelected === page.href ? theme.palette.secondary.main : "" })]}>
@@ -81,7 +87,7 @@ export default function NavBar(): React.JSX.Element {
             LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {MainMenuData.map((page) => (
+            {menuData.map((page) => (
               <Button key={page.id} onClick={() => handleCloseNavMenu(page.href)}
                 sx={[(theme) => ({ my: 2, color: "white", display: "block", bgcolor: menuItemSelected === page.href ? theme.palette.secondary.main : "" })]}>
                 {page.title}

@@ -11,8 +11,8 @@ import EditIcon from '@mui/icons-material/Edit';
 const Modal = dynamic(() => import("../modal/modal"));
 import Delete from "../delete/delete";
 
-const ModifyButtons = memo(({ rowData, onAction, add, save, edit, omit, omitMessage }:
-  { rowData?: any, onAction: (data: any, action: string) => void, add?: boolean, save?: boolean, edit?: boolean, omit?: boolean, omitMessage?: string }): React.JSX.Element => {
+export default function ModifyButtons ({ rowData, onAction, add, save, edit, omit, omitMessage }:
+  { rowData?: any, onAction: (data: any, action: string) => void, add?: boolean, save?: boolean, edit?: boolean, omit?: boolean, omitMessage?: string }): React.JSX.Element {
 
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
 
@@ -60,10 +60,4 @@ const ModifyButtons = memo(({ rowData, onAction, add, save, edit, omit, omitMess
       {isOpenDeleteModal && <Modal title="حذف" isOpen={isOpenDeleteModal} body={<Delete message={omitMessage ?? ""} onDelete={handleDelete} />} onCloseModal={() => setIsOpenDeleteModal(false)} />}
     </>
   )
-},
-  (prevProps, nextProps) => prevProps.rowData === undefined && nextProps.rowData === undefined &&
-    prevProps.add === nextProps.add && prevProps.edit === nextProps.edit && prevProps.omit === nextProps.omit &&
-    prevProps.omitMessage === nextProps.omitMessage && prevProps.save === nextProps.save
-)
-
-export default ModifyButtons;
+}

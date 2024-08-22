@@ -20,7 +20,7 @@ export default function Persons(): React.JSX.Element {
   const [rowData, setRowData] = useState<PersonType>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const columns: ColumnType[] = [
     { field: { title: "id" }, label: "ID", options: { display: false } },
