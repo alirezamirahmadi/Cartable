@@ -9,6 +9,7 @@ import StoreProvider from "@/lib/StoreProvider";
 export const metadata: Metadata = {
   title: "Cartable",
   description: "Software to view, handle and track current affairs",
+  icons:{icon:"image/app/favicon.png"}
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {

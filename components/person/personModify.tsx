@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { TextField, Typography, Checkbox, FormGroup, FormControlLabel, Divider, Button, Select, MenuItem } from "@mui/material";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import { useForm } from "react-hook-form";
@@ -8,13 +9,19 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import type { Value as DatePickerType } from "react-multi-date-picker";
+import { useRouter } from "next/navigation";
 
 import regex from "@/utils/regex";
+const Snack = dynamic(() => import("../general/snack/snack"));
+import type { SnackProps } from "@/types/generalType";
 import type { PersonType } from "@/types/personType";
 
-export default function PersonModify({ person, onModify }: { person?: PersonType, onModify: (isModify: boolean) => void }): React.JSX.Element {
+export default function PersonModify({ person, onModify }: { person?: PersonType, onModify?: (isModify: boolean) => void }): React.JSX.Element {
 
+  const router = useRouter();
   const [birthday, setBirthday] = useState<DatePickerType>("");
+  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
+
   const { register, handleSubmit, reset, formState: { errors }, getValues } = useForm({
     defaultValues: {
       code: person?.code ?? "",
@@ -36,10 +43,10 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
   });
 
   const submitPerson = (data: any) => {
-    person ? putPerson(data) : postPerson(data);
+    person ? editPerson(data) : addPerson(data);
   }
 
-  const postPerson = async (data: any) => {
+  const addPerson = async (data: any) => {
     await fetch("api/v1/persons", {
       method: "POST",
       headers: {
@@ -47,12 +54,18 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
       },
       body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
     })
-    .then(res => { onModify(res.status === 201 ? true : false) })
+      .then(res => {
+        res.status === 201 ?
+          setSnackProps({ context: "شخص جدید با موفقیت ایجاد شد", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+          :
+          setSnackProps({ context: "عملیات مورد نظر با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+      })
+      .then(() => router.refresh())
 
     reset();
   }
 
-  const putPerson = async (data: any) => {
+  const editPerson = async (data: any) => {
     await fetch(`api/v1/persons/${person?._id}`, {
       method: "PUT",
       headers: {
@@ -60,7 +73,7 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
       },
       body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
     })
-      .then(res => { onModify(res.status === 201 ? true : false) })
+      .then(res => { onModify && onModify(res.status === 201 ? true : false) })
   }
 
   return (
@@ -100,6 +113,8 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
           <Button variant="contained" color="secondary" onClick={handleSubmit(submitPerson)} startIcon={<KeyboardArrowUpOutlinedIcon />}>ذخیره</Button>
         </div>
       </form>
+      
+      {snackProps.isOpen && <Snack {...snackProps} />}
     </>
   )
 }
