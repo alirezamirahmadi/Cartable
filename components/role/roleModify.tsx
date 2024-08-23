@@ -12,7 +12,7 @@ import type { PersonType } from "@/types/personType";
 import type { SnackProps } from "@/types/generalType";
 
 export default function RoleModify({ role, root, onModify }: { role?: any, root: string | null, onModify?: (isModify: boolean) => void }): React.JSX.Element {
-  console.log(27)
+
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [persons, setPersons] = useState<PersonType[]>([]);
   const [refPerson, setRefPerson] = useState<string | null>(null);
@@ -35,10 +35,10 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
   }
 
   const submitRole = (data: any) => {
-    role ? putRole(data) : postRole(data);
+    role ? editRole(data) : addRole(data);
   }
 
-  const postRole = async (data: any) => {
+  const addRole = async (data: any) => {
     await fetch("api/v1/roles", {
       method: "POST",
       headers: {
@@ -56,13 +56,13 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
       })
   }
 
-  const putRole = async (data: any) => {
+  const editRole = async (data: any) => {
     await fetch(`api/v1/roles/${role._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ title: data.title, refPerson, root: data.root, isActive: data.isActive })
+      body: JSON.stringify({ title: data.title, refPerson, isActive: data.isActive })
     })
       .then(res => {
         if (res.status === 201) {
@@ -82,7 +82,7 @@ export default function RoleModify({ role, root, onModify }: { role?: any, root:
 
   return (
     <>
-      <div className="lg:col-span-3 md:col-span-2">
+      <div>
         <div className="flex flex-wrap gap-4 justify-center">
           <TextField {...register("title")} required error={errors.title ? true : false} helperText={errors.title ? "لطفا عنوان را وارد کنید" : ""} size="small" label={<Typography variant="body1" sx={{ display: "inline" }}>عنوان</Typography>} />
           <AutoComplete options={persons} defaultValueId={role?.person?._id ?? null} getSelectedId={handleSelectedPerson} inputProps={{ label: "شخص", size: "small", width: 300 }} key={JSON.stringify(persons)} />

@@ -24,7 +24,7 @@ const PUT = async (request: Request, { params }: { params: { roleId: string } })
   else {
     const tempRole = await roleModel.findById(params.roleId);
     const personRoles = tempRole && await roleModel.find({ _id: { $ne: params.roleId }, refPerson: tempRole.refPerson });
-    personRoles && await roleModel.findByIdAndUpdate(personRoles[0]._id, { $set: { isDefault: true } })
+    personRoles?.length > 0 && await roleModel.findByIdAndUpdate(personRoles[0]._id, { $set: { isDefault: true } })
   }
 
   const role = await roleModel.findByIdAndUpdate(params.roleId, { $set: { title, refPerson, isDefault: refPerson ? true : false, isActive } });

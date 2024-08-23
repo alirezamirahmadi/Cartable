@@ -19,10 +19,7 @@ export default async function RolesPage() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
-        <RoleTree roles={roles} />
-        {/* {!isLoading ? <RoleModify root={root} role={role} onModify={handleModify} /> : <Loading />} */}
-      </div>
+      <RoleTree roles={roles} />
     </>
   )
 }
