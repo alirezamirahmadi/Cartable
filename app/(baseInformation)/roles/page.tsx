@@ -1,51 +1,28 @@
-"use client"
-
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-
-const Snack = dynamic(() => import("@/components/general/snack/snack"));
-import RoleModify from "@/components/role/roleModify";
 import RoleTree from "@/components/role/roleTree";
-import { RoleType } from "@/types/roleType";
-import Loading from "@/components/general/loading/loading";
-import type { SnackProps } from "@/types/generalType";
+import connectToDB from "@/utils/db";
+import roleModel from "@/models/role";
 
-export default function RolesPage(): React.JSX.Element {
+async function loadRoleData() {
+  connectToDB();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isRolesUpdate, setIsRolesUpdate] = useState<boolean>(false);
-  const [root, setRoot] = useState<string | null>(null);
-  const [role, setRole] = useState<RoleType | undefined>({ _id: "", title: "", refPerson: "", root: null, isDefault: false, isActive: false });
-  const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
+  const roles = await roleModel.aggregate()
+    .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+    .project({ "title": 1, "root": 1, "isActive": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1 })
+    .unwind({ path: "$person", preserveNullAndEmptyArrays: true })
 
-  useEffect(() => {
-    isRolesUpdate && setIsRolesUpdate(false);
-  }, [isRolesUpdate])
+  return roles;
+}
 
-  useEffect(() => {
-    setIsLoading(false);
-  }, [role])
+export default async function RolesPage() {
 
-  const handleSelectRole = (selectedRole: RoleType | undefined) => {
-    setIsLoading(true);
-    setRoot(selectedRole?._id ?? null);
-    setRole(selectedRole);
-  }
-
-  const handleModify = (isModify: boolean) => {
-    if (isModify) {
-      setIsRolesUpdate(true);
-      setSnackProps({ context: "سمت مورد نظر با موفقیت ویرایش گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
-    }
-  }
+  const roles = await loadRoleData();
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
-        <RoleTree onSelectRole={handleSelectRole} isUpdate={isRolesUpdate} />
-        {!isLoading ? <RoleModify root={root} role={role} onModify={handleModify} /> : <Loading />}
+        <RoleTree roles={roles} />
+        {/* {!isLoading ? <RoleModify root={root} role={role} onModify={handleModify} /> : <Loading />} */}
       </div>
-      {snackProps.isOpen && <Snack {...snackProps} />}
     </>
   )
 }

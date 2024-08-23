@@ -201,7 +201,7 @@ export default function GroupTree({ groups, isTransfer, onTransfer }: { groups: 
           switch (res.status) {
             case 200:
               router.refresh();
-              setSnackProps({ context: "حذف پوشه/گروه با موفقیت انجام شد", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+              setSnackProps({ context: "حذف پوشه/گروه با موفقیت انجام شد", isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
               break;
             case 403:
               setSnackProps({ context: "امکان حذف پوشه/گروه به دلیل داشتن زیر مجموعه وجود ندارد", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
@@ -223,7 +223,7 @@ export default function GroupTree({ groups, isTransfer, onTransfer }: { groups: 
         addGroupMember(role);
         break;
       case "Delete":
-        deleteGroupMember(role._id);
+        deleteGroupMember(role._id ?? "");
         break;
     }
   }

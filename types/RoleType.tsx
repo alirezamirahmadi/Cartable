@@ -1,7 +1,7 @@
 import { PersonType } from "./personType"
 
 type RoleType = {
-  _id: string,
+  _id: string | null,
   title: string,
   refPerson: string,
   person?: PersonType,

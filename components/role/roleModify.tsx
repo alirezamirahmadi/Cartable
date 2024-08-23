@@ -12,7 +12,7 @@ import type { PersonType } from "@/types/personType";
 import type { SnackProps } from "@/types/generalType";
 
 export default function RoleModify({ role, root, onModify }: { role?: any, root: string | null, onModify?: (isModify: boolean) => void }): React.JSX.Element {
-
+  console.log(27)
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [persons, setPersons] = useState<PersonType[]>([]);
   const [refPerson, setRefPerson] = useState<string | null>(null);

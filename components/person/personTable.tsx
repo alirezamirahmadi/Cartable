@@ -69,7 +69,7 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
     })
       .then(res => {
         res.status === 200 &&
-          setSnackProps({ context: "شخص مورد نظر با موفقیت حذف گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+          setSnackProps({ context: "شخص مورد نظر با موفقیت حذف گردید.", isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
       .then(() => router.refresh())
       .catch(() => {

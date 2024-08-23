@@ -1,64 +1,46 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { Box, IconButton, ListItem, ListItemText, ListItemButton, Breadcrumbs, Button, List, Checkbox } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import MoveUpIcon from '@mui/icons-material/MoveUp';
-import MoveDownIcon from '@mui/icons-material/MoveDown';
-import GroupIcon from '@mui/icons-material/Group';
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import { Box, IconButton, ListItem, ListItemText, ListItemButton, Breadcrumbs, Button, List, Checkbox } from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
+import MoveUpIcon from "@mui/icons-material/MoveUp";
+import MoveDownIcon from "@mui/icons-material/MoveDown";
+import GroupIcon from "@mui/icons-material/Group";
 
-const Modal = dynamic(() => import('../general/modal/modal'));
-const Snack = dynamic(() => import('../general/snack/snack'));
-import RoleModify from './roleModify';
-import ModifyButtons from '../general/modifyButtons/modifyButtons';
-import Groups from '../group/groups';
-import type { RoleType } from '@/types/roleType';
-import type { SnackProps } from '@/types/generalType';
-import type { GroupType } from '@/types/groupType';
-import TreeActions from '../general/treeActions/treeActions';
+const Modal = dynamic(() => import("../general/modal/modal"));
+const Snack = dynamic(() => import("../general/snack/snack"));
+import RoleModify from "./roleModify";
+import ModifyButtons from "../general/modifyButtons/modifyButtons";
+import Groups from "../group/groups";
+import TreeActions from "../general/treeActions/treeActions";
+import type { RoleType } from "@/types/roleType";
+import type { SnackProps } from "@/types/generalType";
+import type { GroupType } from "@/types/groupType";
 
-export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfer }:
-  { isUpdate?: boolean, isTransfer?: boolean, onSelectRole?: (role: RoleType | undefined) => void, onTransfer?: (root: string) => void }): React.JSX.Element {
+export default function RoleTree({ roles, isTransfer, onTransfer }:
+  { roles: RoleType[], isTransfer?: boolean, onTransfer?: (root: string) => void }): React.JSX.Element {
 
-  const [roots, setRoots] = useState<RoleType[]>([{ _id: "-1", title: "خانه", root: null, refPerson: "", isDefault: false, isActive: true }]);
+  const router = useRouter();
+  const [roots, setRoots] = useState<RoleType[]>([{ _id: null, title: "خانه", root: null, refPerson: "", isDefault: false, isActive: true }]);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [isOpenNewModal, setIsOpenNewModal] = useState(false);
   const [isOpenTransferModal, setIsOpenTransferModal] = useState<boolean>(false);
   const [isOpenMemberGroupsModal, setIsOpenMemberGroupsModal] = useState<boolean>(false);
   const [selectedRole, setSelectedRole] = useState<RoleType>();
-  const [treeData, setTreeData] = useState<RoleType[]>([]);
+  const [rolesList, setRolesList] = useState<RoleType[]>([]);
   const [search, setSearch] = useState<string>("");
   const [checked, setChecked] = useState<string[]>([]);
   const [memberGroups, setMemberGroups] = useState<GroupType[]>([]);
 
-  useEffect(() => {
-    loadRoleByRoot();
-  }, []);
-
-  useEffect(() => {
-    isUpdate && loadRoleByRoot();
-  }, [isUpdate]);
-
-  useEffect(() => {
-    loadRoleByRoot();
-  }, [roots]);
-
-  useEffect(() => {
-    selectedRole && onSelectRole && onSelectRole(selectedRole);
-  }, [selectedRole]);
-
-  const loadRoleByRoot = async () => {
-    await fetch(`api/v1/roles?root=${roots[roots.length - 1]._id}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setTreeData(data));
+  const loadRolesList = (searchContent?: string) => {
+    setRolesList([...roles].filter((role: RoleType) => !searchContent ? role.root === roots[roots.length - 1]._id : role.title.includes(searchContent ?? "")))
   }
 
-  const loadRoleByTitle = async (searchContent: string) => {
-    await fetch(`api/v1/roles?title=${searchContent}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setTreeData(data));
-  }
+  useMemo(() => {
+    loadRolesList();
+  }, [roots, roles])
 
   const loadMemberGroups = async () => {
     selectedRole && await fetch(`api/v1/groupMembers?refRole=${selectedRole?._id}`)
@@ -108,7 +90,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
     })
       .then(res => {
         if (res.status === 201) {
-          search ? loadRoleByTitle(search) : loadRoleByRoot();
+          router.refresh();
           setChecked([]);
         }
       })
@@ -134,10 +116,10 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
   const handleMemberGroupsAction = (group: GroupType, action: string) => {
     switch (action) {
       case "SelectGroup":
-        addMemberGroup(group._id);
+        addMemberGroup(group._id ?? "");
         break;
       case "Delete":
-        deleteMemberGroup(group._id);
+        deleteMemberGroup(group._id ?? "");
         break;
     }
   }
@@ -173,7 +155,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
   const handleModify = (isModify: boolean) => {
     if (isModify) {
       setIsOpenNewModal(false);
-      loadRoleByRoot();
+      router.refresh();
       setSnackProps({ context: "سمت مورد نظر با موفقیت ایجاد گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
     }
   }
@@ -184,7 +166,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
     })
       .then(res => {
         if (res.status === 200) {
-          loadRoleByRoot();
+          router.refresh();
           setSelectedRole(undefined);
           setSnackProps({ context: "سمت مورد نظر با موفقیت حذف گردید.", isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
         }
@@ -198,7 +180,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
     switch (action) {
       case "Search":
         setSearch(searchContent ?? "");
-        loadRoleByTitle(searchContent ?? "");
+        loadRolesList(searchContent);
         break;
       case "Reset":
         setRoots(root);
@@ -211,7 +193,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
 
   return (
     <>
-      <Box sx={{ minHeight: 352, width: '100%', maxWidth: 356, minWidth: 250, mx: 2, mb: 2, py: 2, border: 1, borderRadius: 2 }} className="lg:col-span-2 md:col-span-1">
+      <Box sx={{ minHeight: 352, width: "100%", maxWidth: 356, minWidth: 250, mx: 2, mb: 2, py: 2, border: 1, borderRadius: 2 }} className="lg:col-span-2 md:col-span-1">
         <Breadcrumbs>
           {roots.length > 1 && roots.map((root: RoleType, index) => (
             <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.title}</Button>
@@ -232,7 +214,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
             <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />
           </ListItem>
           {
-            treeData.map(role => (
+            rolesList.map(role => (
               <ListItem key={role._id} sx={{ py: 0, minHeight: 24 }}>
                 <Checkbox value={checked.includes(role._id ?? "")} onChange={() => handleToggle(role._id ?? "")} />
                 <IconButton onClick={() => handleSubRole(role)}>
@@ -248,7 +230,7 @@ export default function RoleTree({ isUpdate, isTransfer, onSelectRole, onTransfe
 
         {snackProps.isOpen && <Snack {...snackProps} />}
         {isOpenNewModal && <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleModify} />} />}
-        {isOpenTransferModal && <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree isTransfer={true} onTransfer={handleTransferTo} />} />}
+        {isOpenTransferModal && <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree roles={roles} isTransfer={true} onTransfer={handleTransferTo} />} />}
         {isOpenMemberGroupsModal && <Modal title="گروه های عضو" isOpen={isOpenMemberGroupsModal} onCloseModal={() => setIsOpenMemberGroupsModal(false)} body={<Groups groups={memberGroups} selectGroup omit onAction={handleMemberGroupsAction} />} />}
       </Box>
     </>
