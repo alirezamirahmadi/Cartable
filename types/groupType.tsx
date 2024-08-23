@@ -1,5 +1,5 @@
 type GroupType = {
-  _id: string,
+  _id: string | null,
   title: string,
   root: string,
   kind: number,

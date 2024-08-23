@@ -1,12 +1,21 @@
-"use client"
-
 import GroupTree from "@/components/group/groupTree";
+import groupModel from "@/models/group";
+import connectToDB from "@/utils/db";
 
-export default function GroupsPage(): React.JSX.Element {
+async function loadGroupData() {
+  connectToDB();
+
+  const groups = await groupModel.find();
+  return groups ?? [];
+}
+
+export default async function GroupsPage() {
+
+  const groups = await loadGroupData();
 
   return (
     <>
-      <GroupTree />
+      <GroupTree groups={groups} />
     </>
   )
 }

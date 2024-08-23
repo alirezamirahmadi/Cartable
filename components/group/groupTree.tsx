@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Box, List, ListItemButton, ListItemText, ListItem, IconButton, Checkbox, Breadcrumbs, Button } from "@mui/material"
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
@@ -20,14 +21,14 @@ import type { GroupType } from "@/types/groupType";
 import type { RoleType } from "@/types/roleType";
 import type { SnackProps } from "@/types/generalType";
 
-export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boolean, onTransfer?: (root: string) => void }): React.JSX.Element {
+export default function GroupTree({ groups, isTransfer, onTransfer }: { groups: GroupType[], isTransfer?: boolean, onTransfer?: (root: string) => void }): React.JSX.Element {
 
+  const router = useRouter();
   const [roles, setRoles] = useState<RoleType[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<GroupType>();
-  const [roots, setRoots] = useState<GroupType[]>([{ _id: "-1", title: "خانه", root: "-1", kind: 1 }]);
-  const [search, setSearch] = useState<string>("");
-  const [groups, setGroups] = useState<GroupType[]>([]);
-  const [openRolesModal, setOpenRolesModal] = useState<{ isOpen: boolean, refGroup: string }>({ isOpen: false, refGroup: "" });
+  const [roots, setRoots] = useState<GroupType[]>([{ _id: null, title: "خانه", root: "-1", kind: 1 }]);
+  const [groupsList, setGroupsList] = useState<GroupType[]>([]);
+  const [openRolesModal, setOpenRolesModal] = useState<{ isOpen: boolean, refGroup: string | null }>({ isOpen: false, refGroup: "" });
   const [anchorGroup, setAnchorGroup] = useState<null | HTMLElement>(null);
   const [anchorFolder, setAnchorFolder] = useState<null | HTMLElement>(null);
   const [anchorEdit, setAnchorEdit] = useState<null | HTMLElement>(null);
@@ -35,25 +36,13 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
   const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
   const [isOpenTransferModal, setIsOpenTransferModal] = useState<boolean>(false);
 
-  useEffect(() => {
-    loadGroupByRoot();
-  }, []);
-
-  useEffect(() => {
-    loadGroupByRoot();
-  }, [roots]);
-
-  const loadGroupByRoot = async () => {
-    await fetch(`api/v1/groups/${roots[roots.length - 1]._id}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setGroups(data))
+  const loadGroupList = (searchContent?: string) => {
+    setGroupsList([...groups].filter((group: GroupType) => !searchContent ? group.root === roots[roots.length - 1]._id : group.title.includes(searchContent ?? "")))
   }
 
-  const loadGroupByTitle = async (searchContent: string) => {
-    await fetch(`api/v1/groups?title=${searchContent}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setGroups(data))
-  }
+  useMemo(() => {
+    loadGroupList();
+  }, [roots, groups])
 
   const loadGroupMembers = async (refGroup: string) => {
     await fetch(`api/v1/groupMembers?refGroup=${refGroup}`)
@@ -68,7 +57,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         setRoots([...roots, group]);
         break;
       case 2:
-        loadGroupMembers(group._id).then(() => setOpenRolesModal({ isOpen: true, refGroup: group._id }))
+        loadGroupMembers(group._id ?? "").then(() => setOpenRolesModal({ isOpen: true, refGroup: group._id }))
         break;
     }
   }
@@ -118,7 +107,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       body: JSON.stringify({ groupIds: checkedGroups, root })
     }).then(res => {
       if (res.status === 201) {
-        search ? loadGroupByTitle(search) : loadGroupByRoot();
+        router.refresh();
         setCheckedGroups([]);
       }
     })
@@ -135,8 +124,10 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       body: JSON.stringify({ title: value, root: roots[roots.length - 1]._id !== "-1" ? roots[roots.length - 1]._id : null, kind: 2 })
     })
       .then(res => {
-        res.status === 201 ? loadGroupByRoot() :
-          setSnackProps({ context: "ایجاد گروه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+        res.status === 201 ?
+        router.refresh()
+        :
+        setSnackProps({ context: "ایجاد گروه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
       .catch(() => {
         setSnackProps({ context: "ایجاد گروه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
@@ -154,7 +145,9 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       body: JSON.stringify({ title: value, root: roots[roots.length - 1]._id !== "-1" ? roots[roots.length - 1]._id : null, kind: 1 })
     })
       .then(res => {
-        res.status === 201 ? loadGroupByRoot() :
+        res.status === 201 ?
+          router.refresh()
+          :
           setSnackProps({ context: "ایجاد پوشه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
       .catch(() => {
@@ -186,8 +179,8 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       .then(res => {
         switch (res.status) {
           case 201:
+            router.refresh();
             setSnackProps({ context: "ویرایش نام پوشه/گروه با موفقیت انجام شد", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
-            loadGroupByRoot();
             break;
           default:
             setSnackProps({ context: "ویرایش نام پوشه/گروه با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
@@ -207,8 +200,8 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
         .then(res => {
           switch (res.status) {
             case 200:
+              router.refresh();
               setSnackProps({ context: "حذف پوشه/گروه با موفقیت انجام شد", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
-              loadGroupByRoot();
               break;
             case 403:
               setSnackProps({ context: "امکان حذف پوشه/گروه به دلیل داشتن زیر مجموعه وجود ندارد", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
@@ -218,6 +211,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
               break;
           }
         })
+        .then(() => setSelectedGroup(undefined))
         .catch(() => {
           setSnackProps({ context: "حذف پوشه/گروه با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
         })
@@ -242,21 +236,21 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
       },
       body: JSON.stringify({ refGroup: openRolesModal.refGroup, refRole: role._id })
     })
-      .then(res => { res.status === 201 && loadGroupMembers(openRolesModal.refGroup) })
+      .then(res => { res.status === 201 && loadGroupMembers(openRolesModal.refGroup ?? "") })
   }
 
   const deleteGroupMember = async (refRole: string) => {
     openRolesModal && await fetch(`api/v1/groupMembers?refGroup=${openRolesModal.refGroup}&refRole=${refRole}`, {
       method: "DELETE",
     })
-      .then(res => { res.status === 200 && loadGroupMembers(openRolesModal.refGroup) })
+      .then(res => { res.status === 200 && loadGroupMembers(openRolesModal.refGroup ?? "") })
   }
 
   const handleTreeAction = (root: any[], action: string, searchContent: string | undefined) => {
     switch (action) {
       case "Search":
-        setSearch(searchContent ?? "");
-        loadGroupByTitle(searchContent ?? "");
+        setSelectedGroup(undefined);
+        loadGroupList(searchContent);
         break;
       case "Reset":
         setRoots(root);
@@ -296,9 +290,9 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
           <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
             <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />
           </ListItem>
-          {groups.map((group: GroupType) => (
+          {groupsList.map((group: GroupType) => (
             <ListItem key={group._id} sx={{ py: 0, minHeight: 24 }}>
-              <Checkbox disabled={(isTransfer && group.kind === 2)} checked={checkedGroups.includes(group._id)} onChange={() => handleToggle(group._id)} />
+              <Checkbox disabled={(isTransfer && group.kind === 2)} checked={checkedGroups.includes(group._id ?? "")} onChange={() => handleToggle(group._id ?? "")} />
               <IconButton onClick={() => handleSubGroup(group)}>
                 {group.kind === 1 ? <FolderSharedIcon /> : <GroupIcon />}
               </IconButton>
@@ -312,7 +306,7 @@ export default function GroupTree({ isTransfer, onTransfer }: { isTransfer?: boo
 
       {snackProps.isOpen && <Snack {...snackProps} />}
       {openRolesModal.isOpen && <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleGroupMembersAction} omit selectRole />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />}
-      {isOpenTransferModal && <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<GroupTree isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />}
+      {isOpenTransferModal && <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<GroupTree groups={groups} isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />}
     </>
   )
 }

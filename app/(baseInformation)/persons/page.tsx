@@ -1,13 +1,14 @@
-import PersonModify from "@/components/person/personModify";
 import { Divider } from "@mui/material";
 
+import PersonModify from "@/components/person/personModify";
 import PersonTable from "@/components/person/personTable";
+import connectToDB from "@/utils/db";
+import personModel from "@/models/person";
 
 async function loadPersonData() {
-  const persons = await fetch("http://localhost:3000/api/v1/persons", { cache: "no-store" })
-    .then(res => res.status === 200 && res.json())
-    .then(data => data);
+  connectToDB();
 
+  const persons = await personModel.find();
   return persons;
 }
 
