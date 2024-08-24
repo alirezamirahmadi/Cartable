@@ -9,9 +9,9 @@ import { useSearchParams } from "next/navigation";
 
 const Modal = dynamic(() => import("@/components/general/modal/modal"));
 import { useAppSelector } from "@/lib/hooks";
-import SideBar from "@/components/cartable/sidebar"
+import SideBar from "@/components/cartable/sidebar/sidebar"
 import defaultDataTableOptions from "@/utils/defaultDataTable";
-import Buttons from "@/components/cartable/buttons";
+import Buttons from "@/components/cartable/buttons/buttons";
 import Send from "@/components/cartable/send/send";
 import Circulation from "@/components/cartable/details/circulation/circulation";
 import TopBar from "@/components/cartable/inbox/topbar";

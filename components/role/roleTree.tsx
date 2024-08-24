@@ -204,7 +204,7 @@ export default function RoleTree({ roles, isTransfer, onTransfer }:
 
   return (
     <>
-      <Box sx={{ minHeight: 352, width: "100%", maxWidth: 356, minWidth: 250, mx: 2, mb: 2, py: 2, border: 1, borderRadius: 2 }}>
+      <Box sx={{ minHeight: 352, width: "100%", maxWidth: 356, minWidth: 250, mx: 2, mb: 2, py: 2 }}>
         <Breadcrumbs>
           {roots.length > 1 && roots.map((root: RoleType, index) => (
             <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.title}</Button>

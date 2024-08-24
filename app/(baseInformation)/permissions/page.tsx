@@ -53,10 +53,10 @@ export default function Permission(): React.JSX.Element {
   const handleRolesAction = async (role: RoleType, action: string) => {
     switch (action) {
       case "Delete":
-        selectedPermission && role && deleteRolePermission(role._id);
+        selectedPermission && role && deleteRolePermission(role._id ?? "");
         break;
       case "SelectRole":
-        selectedPermission && role && addRolePermission(role._id);
+        selectedPermission && role && addRolePermission(role._id ?? "");
         break;
     }
   }
@@ -93,10 +93,10 @@ export default function Permission(): React.JSX.Element {
   const handleGroupsAction = async (group: GroupType, action: string) => {
     switch (action) {
       case "Delete":
-        selectedPermission && group && deleteGroupPermission(group._id);
+        selectedPermission && group && deleteGroupPermission(group._id ?? "");
         break;
       case "SelectGroup":
-        selectedPermission && group && addGroupPermission(group._id);
+        selectedPermission && group && addGroupPermission(group._id ?? "");
         break;
     }
   }

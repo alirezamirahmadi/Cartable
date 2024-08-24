@@ -6,7 +6,7 @@ async function loadGroupData() {
   connectToDB();
 
   const groups = await groupModel.find();
-  return groups ?? [];
+  return JSON.parse(JSON.stringify(groups)) ?? [];
 }
 
 export default async function GroupsPage() {

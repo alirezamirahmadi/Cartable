@@ -4,7 +4,7 @@ import React, { useState, memo, useRef } from "react";
 import { Box, AppBar, Toolbar, IconButton, Menu, Container, MenuItem, FormControl, InputLabel, Select, SelectChangeEvent } from "@mui/material";
 import CollectionsIcon from "@mui/icons-material/Collections";
 
-import SideBar from "../sidebar";
+import SideBar from "../sidebar/sidebar";
 
 const TopBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Element => {
 

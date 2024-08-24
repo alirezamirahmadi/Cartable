@@ -24,7 +24,7 @@ const SelectRoleGroup = memo(({ onSelect }: { onSelect: (roleGroup: RoleGroupTyp
       .then(data => {
         const tempRoles: RoleGroupType[] = [];
         data.map((role: RoleType) => {
-          tempRoles.push({ _id: role._id, kind: 1, title: `${role.person?.firstName} ${role.person?.lastName} [ ${role.title} ]` })
+          tempRoles.push({ _id: role._id ?? "", kind: 1, title: `${role.person?.firstName} ${role.person?.lastName} [ ${role.title} ]` })
         })
         setRolesAndGroups([...tempGroup, ...tempRoles])
       })
@@ -36,7 +36,7 @@ const SelectRoleGroup = memo(({ onSelect }: { onSelect: (roleGroup: RoleGroupTyp
       .then(res => res.status === 200 && res.json())
       .then(data => {
         data.map((group: GroupType) => {
-          tempGroups.push({ _id: group._id, kind: 2, title: group.title })
+          tempGroups.push({ _id: group._id ?? "", kind: 2, title: group.title })
         })
       })
     return tempGroups;

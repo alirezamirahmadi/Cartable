@@ -10,7 +10,7 @@ async function loadRoleData() {
     .project({ "title": 1, "root": 1, "isActive": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1 })
     .unwind({ path: "$person", preserveNullAndEmptyArrays: true })
 
-  return roles;
+  return JSON.parse(JSON.stringify(roles));
 }
 
 export default async function RolesPage() {

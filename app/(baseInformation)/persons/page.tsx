@@ -9,7 +9,7 @@ async function loadPersonData() {
   connectToDB();
 
   const persons = await personModel.find();
-  return persons;
+  return JSON.parse(JSON.stringify(persons));
 }
 
 export default async function Persons() {
