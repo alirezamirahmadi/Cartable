@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { unstable_cache } from "next/cache";
 import { Box } from "@mui/material";
 import mongoose from "mongoose";
+import { JwtPayload } from "jsonwebtoken";
 
 import SideBar from "@/components/cartable/sidebar/sidebar"
 import TopBar from "@/components/cartable/inbox/topbar";
@@ -11,10 +12,7 @@ import sendModel from "@/models/send";
 import { verifyToken } from "@/utils/token";
 import type { CollectionListType } from "@/types/cartableType";
 
-const token = cookies().get("token");
-const tokenPayload = verifyToken(token?.value ?? "");
-
-const loadCollectionsData = unstable_cache(async () => {
+const loadCollectionsData = unstable_cache(async (tokenPayload:string | JwtPayload) => {
   connectToDB();
 
   if (!tokenPayload) {
@@ -38,7 +36,7 @@ const loadCollectionsData = unstable_cache(async () => {
   }
 })
 
-async function loadCollectionData(collectionId: string) {
+async function loadCollectionData(collectionId: string, tokenPayload: string | JwtPayload) {
   connectToDB();
 
   if (!collectionId || !tokenPayload) {
@@ -72,10 +70,12 @@ const handleCollectionData = unstable_cache(async (data: any) => {
 
 export default async function Outbox({ searchParams }: { searchParams?: { [key: string]: string } }) {
 
+  const token = cookies().get("token");
+  const tokenPayload = verifyToken(token?.value ?? "");
   const { collectionId } = searchParams ?? { collectionId: "" };
 
-  const documents = await loadCollectionData(collectionId);
-  const collections = await handleCollectionData(await loadCollectionsData());
+  const documents = await loadCollectionData(collectionId, tokenPayload);
+  const collections = await handleCollectionData(await loadCollectionsData(tokenPayload));
 
   return (
     <>

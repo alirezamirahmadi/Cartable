@@ -39,6 +39,7 @@ export default function NavBar(): React.JSX.Element {
     setAnchorElNav(null);
     setMenuItemSelected(href);
     router?.replace(href);
+    (href === "/inbox" || href === "/outbox") && router.refresh();
   }
 
   if (!me.isLogin) {

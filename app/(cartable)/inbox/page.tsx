@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { Box } from "@mui/material";
 import mongoose from "mongoose";
-
+import { JwtPayload } from "jsonwebtoken";
 import { verifyToken } from "@/utils/token";
 import TopBar from "@/components/cartable/inbox/topbar";
 import SideBar from "@/components/cartable/sidebar/sidebar";
@@ -10,10 +10,7 @@ import connectToDB from "@/utils/db";
 import receiveModel from "@/models/receive";
 import type { CollectionListType } from "@/types/cartableType";
 
-const token = cookies().get("token");
-const tokenPayload = verifyToken(token?.value ?? "");
-
-async function loadCollectionsData() {
+async function loadCollectionsData(tokenPayload: string | JwtPayload) {
   connectToDB();
 
   if (!tokenPayload) {
@@ -38,7 +35,7 @@ async function loadCollectionsData() {
   }
 }
 
-async function loadNonObserved() {
+async function loadNonObserved(tokenPayload: string | JwtPayload) {
   connectToDB();
 
   if (!tokenPayload) {
@@ -65,7 +62,7 @@ async function loadNonObserved() {
 
 }
 
-async function loadCollectionData(collectionId: string) {
+async function loadCollectionData(collectionId: string, tokenPayload: string | JwtPayload) {
   connectToDB();
 
   if (!collectionId || !tokenPayload) {
@@ -125,10 +122,12 @@ const handleNonObserved = (data: any, inboxList: CollectionListType[]) => {
 
 export default async function Inbox({ searchParams }: { searchParams?: { [key: string]: string } }) {
 
+  const token = cookies().get("token");
+  const tokenPayload = verifyToken(token?.value ?? "");
   const { collectionId } = searchParams ?? { collectionId: "" };
 
-  const documents = await loadCollectionData(collectionId);
-  const collections = handleNonObserved(await loadNonObserved(), handleCollectionData(await loadCollectionsData()));
+  const documents = await loadCollectionData(collectionId, tokenPayload);
+  const collections = handleNonObserved(await loadNonObserved(tokenPayload), handleCollectionData(await loadCollectionsData(tokenPayload)));
 
   return (
     <>

@@ -11,9 +11,6 @@ const GET = async (request: Request, { params }: { params: { collectionId: strin
   const token = cookies().get("token");
   const tokenPayload = verifyToken(token?.value ?? "");
 
-  const { searchParams } = new URL(request.url);
-  const roleId = searchParams.get("roleId");
-
   if (!tokenPayload) {
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
@@ -23,7 +20,8 @@ const GET = async (request: Request, { params }: { params: { collectionId: strin
       .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" })
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .match({ "person.account.username": tokenPayload.username })
-      .match({ "refRole": new mongoose.Types.ObjectId(roleId ?? "") })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+      .match({ "role.isDefault": true })
       .match({ "refCollection": new mongoose.Types.ObjectId(params.collectionId) })
       .project({ "collection.showTitle": 1, "sendDate": 1, "refDocument": 1, "parentReceive": 1 })
       .unwind("$collection")
