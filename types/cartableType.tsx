@@ -9,7 +9,7 @@ type CollectionType = {
   isActive: boolean,
 }
 
-type InboxListType = {
+type CollectionListType = {
   _id: string,
   title: string,
   count: number,
@@ -41,5 +41,5 @@ type ReceiveType = {
 }
 
 export type {
-  CollectionType, InboxListType, UrgencyType, ReceiverType, ReceiveType
+  CollectionType, CollectionListType, UrgencyType, ReceiverType, ReceiveType
 }

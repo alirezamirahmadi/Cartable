@@ -13,7 +13,7 @@ import CachedIcon from "@mui/icons-material/Cached";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 
-import type { InboxListType } from "@/types/cartableType";
+import type { CollectionListType } from "@/types/cartableType";
 
 const Collections = styled(List)<{ component?: React.ElementType }>({
   "& .MuiListItemButton-root": {
@@ -29,17 +29,17 @@ const Collections = styled(List)<{ component?: React.ElementType }>({
   },
 });
 
-const SideBar = memo(({ collections, place }: { collections: InboxListType[], place: "inbox" | "outbox" }): React.JSX.Element => {
+const SideBar = ({ collections, place }: { collections: CollectionListType[], place: "inbox" | "outbox" }): React.JSX.Element => {
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const [open, setOpen] = useState(true);
   const [search, setSearch] = useState<string>("");
   const [selectedCollection, setSelectedCollection] = useState<string>(searchParams.get("collectionId") ?? "");
-  const [collectionsList, setCollectionsList] = useState<InboxListType[]>([]);
+  const [collectionsList, setCollectionsList] = useState<CollectionListType[]>([]);
 
   const loadCollectionsList = () => {
-    setCollectionsList([...collections].filter((collection: InboxListType) => !search ? collection : collection.title.includes(search ?? "")))
+    setCollectionsList([...collections].filter((collection: CollectionListType) => !search ? collection : collection.title.includes(search ?? "")))
   }
 
   useMemo(() => {
@@ -111,8 +111,9 @@ const SideBar = memo(({ collections, place }: { collections: InboxListType[], pl
       </Paper>
     </Box>
   );
-},
-  (prevProps, nextProps) => prevProps.place === nextProps.place
-)
+}
+// ,
+//   (prevProps, nextProps) => prevProps.place === nextProps.place
+// )
 
 export default SideBar;

@@ -8,7 +8,7 @@ import SideBar from "@/components/cartable/sidebar/sidebar";
 import DocumentList from "@/components/cartable/documentList/documentList";
 import connectToDB from "@/utils/db";
 import receiveModel from "@/models/receive";
-import type { InboxListType } from "@/types/cartableType";
+import type { CollectionListType } from "@/types/cartableType";
 
 const token = cookies().get("token");
 const tokenPayload = verifyToken(token?.value ?? "");
@@ -100,7 +100,7 @@ async function loadCollectionData(collectionId: string) {
 }
 
 const handleCollectionData = (data: any) => {
-  const myCollections = new Array<InboxListType>();
+  const myCollections = new Array<CollectionListType>();
 
   data && data?.map((collection: any) => {
     myCollections.push({ _id: collection?._id?._id ? collection?._id?._id[0] : "", title: collection?._id?.showTitle ? collection?._id?.showTitle[0] : "", count: 0 });
@@ -108,7 +108,7 @@ const handleCollectionData = (data: any) => {
   return myCollections;
 }
 
-const handleNonObserved = (data: any, inboxList: InboxListType[]) => {
+const handleNonObserved = (data: any, inboxList: CollectionListType[]) => {
   let count = 0;
 
   const myCollections = inboxList.map(collection => {
@@ -123,12 +123,12 @@ const handleNonObserved = (data: any, inboxList: InboxListType[]) => {
   return myCollections;
 }
 
-export default async function Inbox({ searchParams }: { searchParams?: { [key: string]: string }; }) {
+export default async function Inbox({ searchParams }: { searchParams?: { [key: string]: string } }) {
 
   const { collectionId } = searchParams ?? { collectionId: "" };
 
   const documents = await loadCollectionData(collectionId);
-  const collections = handleNonObserved(await loadNonObserved(), handleCollectionData(await loadCollectionsData()))
+  const collections = handleNonObserved(await loadNonObserved(), handleCollectionData(await loadCollectionsData()));
 
   return (
     <>

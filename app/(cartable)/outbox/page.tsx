@@ -1,96 +1,93 @@
-"use client"
+import { cookies } from "next/headers";
+import { unstable_cache } from "next/cache";
+import { Box } from "@mui/material";
+import mongoose from "mongoose";
 
-import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import ReactDataTable, { ColumnType } from "react-datatable-responsive"
-import { Box, useTheme, Typography } from "@mui/material";
-import * as shamsi from "shamsi-date-converter";
-import { useSearchParams } from "next/navigation";
-
-const Modal = dynamic(() => import("@/components/general/modal/modal"));
-import { useAppSelector } from "@/lib/hooks";
 import SideBar from "@/components/cartable/sidebar/sidebar"
-import defaultDataTableOptions from "@/utils/defaultDataTable";
-import Buttons from "@/components/cartable/buttons/buttons";
-import Send from "@/components/cartable/send/send";
-import Circulation from "@/components/cartable/details/circulation/circulation";
 import TopBar from "@/components/cartable/inbox/topbar";
+import DocumentList from "@/components/cartable/documentList/documentList";
+import connectToDB from "@/utils/db";
+import sendModel from "@/models/send";
+import { verifyToken } from "@/utils/token";
+import type { CollectionListType } from "@/types/cartableType";
 
-export default function Outbox(): React.JSX.Element {
+const token = cookies().get("token");
+const tokenPayload = verifyToken(token?.value ?? "");
 
-  const searchParams = useSearchParams();
-  const collectionId = searchParams.get("collid");
+const loadCollectionsData = unstable_cache(async () => {
+  connectToDB();
 
-  const theme = useTheme();
-  const me = useAppSelector(state => state.me);
-  const [documents, setDocuments] = useState([]);
-  const [isOpenSendModal, setIsOpenSendModal] = useState<boolean>(false);
-  const [isOpenDetailsModal, setIsOpenDetailsModal] = useState<boolean>(false);
-  const [selectedDocument, setSelectedDocument] = useState<any>();
-
-  const columns: ColumnType[] = [
-    { field: { title: "_id" }, label: "ID", options: { display: false } },
-    { field: { title: "refDocument" }, label: "شماره مدرک" },
-    { field: { title: "collection.showTitle" }, label: "نوع مدرک" },
-    {
-      field: { title: "sendDate" }, label: "زمان ارسال", kind: "component", options: {
-        component: (value, onChange, rowData) => (<Typography variant="body2" sx={{ direction: "rtl" }}>{shamsi.gregorianToJalali(value).join("/")} {new Date(value).toLocaleTimeString()}</Typography>)
-      }
-    },
-    {
-      field: { title: "Details" }, label: "", kind: "component", options: {
-        component: (value, onChange, rowData) => (<Buttons value={value} onChange={(event: any) => onChange && onChange(event.target.value)} rowData={rowData} onAction={handleAction} />)
-      }
-    },
-  ]
-
-  useEffect(() => {
-    loadCollectionData();
-  }, [])
-
-  useEffect(() => {
-    loadCollectionData();
-  }, [collectionId])
-
-  const loadCollectionData = async () => {
-    collectionId && me && await fetch(`api/v1/cartable/outbox/${collectionId}?roleId=${me.defaultRole._id}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setDocuments(data))
+  if (!tokenPayload) {
+    return [];
   }
 
-  const handleAction = (data: any, action: string) => {
-    setSelectedDocument(data);
+  if (typeof tokenPayload !== "string") {
+    const sends = await sendModel.aggregate()
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" })
+      .match({ "person.account.username": tokenPayload.username })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+      .match({ "role.isDefault": true })
+      .project({ "collection._id": 1, "collection.showTitle": 1 })
+      .group({ _id: { "_id": "$collection._id", "showTitle": "$collection.showTitle" } })
 
-    switch (action) {
-      case "Open":
-        openDocument(data);
-        break;
-      case "Send":
-        setIsOpenSendModal(true);
-        break;
-      case "Details":
-        setIsOpenDetailsModal(true);
-        break;
-    }
+    return JSON.parse(JSON.stringify(sends));
+  }
+  else {
+    return [];
+  }
+})
+
+async function loadCollectionData(collectionId: string) {
+  connectToDB();
+
+  if (!collectionId || !tokenPayload) {
+    return [];
   }
 
-  const openDocument = async (data: any) => {
+  if (typeof tokenPayload !== "string") {
+    const sends = await sendModel.aggregate()
+      .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" })
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .match({ "person.account.username": tokenPayload.username })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+      .match({ "role.isDefault": true })
+      .match({ "refCollection": new mongoose.Types.ObjectId(collectionId) })
+      .project({ "collection.showTitle": 1, "sendDate": 1, "refDocument": 1, "parentReceive": 1 })
+      .unwind("$collection")
 
+    return JSON.parse(JSON.stringify(sends));
   }
+  return [];
+}
+
+const handleCollectionData = unstable_cache(async (data: any) => {
+  const myCollections = new Array<CollectionListType>();
+
+  data && data?.map((collection: any) => {
+    myCollections.push({ _id: collection?._id?._id ? collection?._id?._id[0] : "", title: collection?._id?.showTitle ? collection?._id?.showTitle[0] : "", count: 0 });
+  })
+  return myCollections;
+})
+
+export default async function Outbox({ searchParams }: { searchParams?: { [key: string]: string } }) {
+
+  const { collectionId } = searchParams ?? { collectionId: "" };
+
+  const documents = await loadCollectionData(collectionId);
+  const collections = await handleCollectionData(await loadCollectionsData());
 
   return (
     <>
       <Box sx={{ display: "flex" }}>
         <Box sx={{ display: { xs: "none", md: "block" }, maxWidth: 300 }}>
-          <SideBar place="outbox" />
+          <SideBar collections={collections} place="outbox" />
         </Box>
         <Box sx={{ width: "100%", mx: 1 }}>
           <TopBar place="outbox" />
-          <ReactDataTable rows={documents} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
+          <DocumentList documents={documents} place="outbox" />
         </Box>
       </Box>
-      {isOpenSendModal && <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={selectedDocument?.refDocument} parentReceive={selectedDocument?.parentReceive} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />}
-      {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={selectedDocument?.refDocument} place="outbox" onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />}
     </>
   )
 }
