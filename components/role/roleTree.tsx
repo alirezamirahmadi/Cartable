@@ -15,6 +15,7 @@ const RoleModify = dynamic(() => import("./roleModify"));
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
 import Groups from "../group/groups";
 import TreeActions from "../general/treeActions/treeActions";
+import { useAppSelector } from "@/lib/hooks";
 import type { RoleType } from "@/types/roleType";
 import type { SnackProps } from "@/types/generalType";
 import type { GroupType } from "@/types/groupType";
@@ -22,6 +23,7 @@ import type { GroupType } from "@/types/groupType";
 export default function RoleTree({ roles, isTransfer, onTransfer }:
   { roles: RoleType[], isTransfer?: boolean, onTransfer?: (root: string) => void }): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const router = useRouter();
   const [roots, setRoots] = useState<RoleType[]>([{ _id: null, title: "خانه", root: null, refPerson: "", isDefault: false, isActive: true }]);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
@@ -163,7 +165,7 @@ export default function RoleTree({ roles, isTransfer, onTransfer }:
       setSnackProps({ context: "سمت مورد نظر با موفقیت ایجاد گردید.", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
     }
   }
-  
+
   const handleEditRole = (isModify: boolean) => {
     if (isModify) {
       setIsOpenEditModal(false);
@@ -212,13 +214,15 @@ export default function RoleTree({ roles, isTransfer, onTransfer }:
         </Breadcrumbs>
 
         <Box sx={{ display: "flex" }}>
-          <IconButton onClick={handleTransfer} disabled={checked.length === 0} title={isTransfer ? "انتقال به" : "انتقال"}>
-            {isTransfer ? <MoveDownIcon /> : <MoveUpIcon />}
-          </IconButton>
+          {me.permissions.includes("/roles.edit") &&
+            <IconButton onClick={handleTransfer} disabled={checked.length === 0} title={isTransfer ? "انتقال به" : "انتقال"}>
+              {isTransfer ? <MoveDownIcon /> : <MoveUpIcon />}
+            </IconButton>
+          }
           <IconButton onClick={handleMemberGroups} disabled={selectedRole ? false : true} title="گروه های عضو">
             <GroupIcon />
           </IconButton>
-          <ModifyButtons add edit={selectedRole ? true : false} omit={selectedRole ? true : false} onAction={handleModifyRoleAction} omitMessage={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} />
+          <ModifyButtons add={me.permissions.includes("/roles.new")} edit={selectedRole && me.permissions.includes("/roles.edit") ? true : false} omit={selectedRole && me.permissions.includes("/roles.delete") ? true : false} onAction={handleModifyRoleAction} omitMessage={`آیا از حذف سمت ${selectedRole?.title} مطمئن هستید؟`} />
         </Box>
         <List>
           <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
@@ -243,7 +247,7 @@ export default function RoleTree({ roles, isTransfer, onTransfer }:
         {isOpenNewModal && <Modal title="سمت جدید" isOpen={isOpenNewModal} onCloseModal={() => setIsOpenNewModal(false)} body={<RoleModify root={roots[roots.length - 1]._id ?? null} onModify={handleNewRole} />} />}
         {isOpenEditModal && <Modal title="ویرایش سمت" isOpen={isOpenEditModal} onCloseModal={() => setIsOpenEditModal(false)} body={<RoleModify role={selectedRole} root={roots[roots.length - 1]._id ?? null} onModify={handleEditRole} />} />}
         {isOpenTransferModal && <Modal title="انتقال به" isOpen={isOpenTransferModal} onCloseModal={() => setIsOpenTransferModal(false)} body={<RoleTree roles={roles} isTransfer={true} onTransfer={handleTransferTo} />} />}
-        {isOpenMemberGroupsModal && <Modal title="گروه های عضو" isOpen={isOpenMemberGroupsModal} onCloseModal={() => setIsOpenMemberGroupsModal(false)} body={<Groups groups={memberGroups} selectGroup omit onAction={handleMemberGroupsAction} />} />}
+        {isOpenMemberGroupsModal && <Modal title="گروه های عضو" isOpen={isOpenMemberGroupsModal} onCloseModal={() => setIsOpenMemberGroupsModal(false)} body={<Groups groups={memberGroups} selectGroup={me.permissions.includes("/roles.new")} omit={me.permissions.includes("/roles.delete")} onAction={handleMemberGroupsAction} />} />}
       </Box>
     </>
   )
