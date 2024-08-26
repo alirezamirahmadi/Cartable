@@ -17,12 +17,14 @@ const ModifyButtons = dynamic(() => import("@/components/general/modifyButtons/m
 const TextSave = dynamic(() => import("@/components/general/textSave/textSave"));
 import Roles from "@/components/role/roles";
 import TreeActions from "../general/treeActions/treeActions";
+import { useAppSelector } from "@/lib/hooks";
 import type { GroupType } from "@/types/groupType";
 import type { RoleType } from "@/types/roleType";
 import type { SnackProps } from "@/types/generalType";
 
 export default function GroupTree({ groups, isTransfer, onTransfer }: { groups: GroupType[], isTransfer?: boolean, onTransfer?: (root: string) => void }): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const router = useRouter();
   const [roles, setRoles] = useState<RoleType[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<GroupType>();
@@ -125,9 +127,9 @@ export default function GroupTree({ groups, isTransfer, onTransfer }: { groups: 
     })
       .then(res => {
         res.status === 201 ?
-        router.refresh()
-        :
-        setSnackProps({ context: "ایجاد گروه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+          router.refresh()
+          :
+          setSnackProps({ context: "ایجاد گروه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
       .catch(() => {
         setSnackProps({ context: "ایجاد گروه جدید با مشکل مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
@@ -271,18 +273,25 @@ export default function GroupTree({ groups, isTransfer, onTransfer }: { groups: 
         </Breadcrumbs>
 
         <Box sx={{ display: "flex" }}>
-          <IconButton id="ibtnNewGroup" onClick={event => setAnchorGroup(event.currentTarget)} title="گروه جدید">
-            <GroupAddIcon />
-          </IconButton>
-          <TextSave anchor={anchorGroup} onAction={handleActionNewGroup} label="گروه جدید" />
-          <IconButton onClick={event => setAnchorFolder(event.currentTarget)} title="پوشه جدید">
-            <CreateNewFolderIcon />
-          </IconButton>
-          <IconButton onClick={handleTransfer} disabled={checkedGroups.length === 0} title={isTransfer ? "انتقال به" : "انتقال"}>
-            {isTransfer ? <MoveDownIcon /> : <MoveUpIcon />}
-          </IconButton>
-          <TextSave anchor={anchorFolder} onAction={handleActionNewFolder} label="پوشه جدید" />
-          {selectedGroup && <ModifyButtons edit omit rowData={undefined} onAction={handleModifyAction} omitMessage={`آیا از حذف "${selectedGroup?.title}" اطمینان دارید`} />}
+          {me.permissions.includes("/groups.new") &&
+            <>
+              <IconButton id="ibtnNewGroup" onClick={event => setAnchorGroup(event.currentTarget)} title="گروه جدید">
+                <GroupAddIcon />
+              </IconButton>
+              <TextSave anchor={anchorGroup} onAction={handleActionNewGroup} label="گروه جدید" />
+              <IconButton onClick={event => setAnchorFolder(event.currentTarget)} title="پوشه جدید">
+                <CreateNewFolderIcon />
+              </IconButton>
+              <TextSave anchor={anchorFolder} onAction={handleActionNewFolder} label="پوشه جدید" />
+            </>
+          }
+
+          {me.permissions.includes("/groups.edit") &&
+            <IconButton onClick={handleTransfer} disabled={checkedGroups.length === 0} title={isTransfer ? "انتقال به" : "انتقال"}>
+              {isTransfer ? <MoveDownIcon /> : <MoveUpIcon />}
+            </IconButton>
+          }
+          {selectedGroup && <ModifyButtons edit={me.permissions.includes("/groups.edit")} omit={me.permissions.includes("/groups.delete")} rowData={undefined} onAction={handleModifyAction} omitMessage={`آیا از حذف "${selectedGroup?.title}" اطمینان دارید`} />}
           <TextSave anchor={anchorEdit} onAction={handleActionEdit} defaultValue={selectedGroup?.title} />
         </Box>
 
@@ -305,7 +314,7 @@ export default function GroupTree({ groups, isTransfer, onTransfer }: { groups: 
       </Box>
 
       {snackProps.isOpen && <Snack {...snackProps} />}
-      {openRolesModal.isOpen && <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleGroupMembersAction} omit selectRole />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />}
+      {openRolesModal.isOpen && <Modal isOpen={openRolesModal.isOpen} title="اعضا گروه" body={<Roles roles={roles} onAction={handleGroupMembersAction} omit={me.permissions.includes("/groups.delete")} selectRole={me.permissions.includes("/groups.new")} />} onCloseModal={() => setOpenRolesModal({ isOpen: false, refGroup: "" })} />}
       {isOpenTransferModal && <Modal isOpen={isOpenTransferModal} title="انتقال به" body={<GroupTree groups={groups} isTransfer={true} onTransfer={handleTransferTo} />} onCloseModal={() => setIsOpenTransferModal(false)} />}
     </>
   )

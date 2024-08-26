@@ -12,7 +12,7 @@ import sendModel from "@/models/send";
 import { verifyToken } from "@/utils/token";
 import type { CollectionListType } from "@/types/cartableType";
 
-const loadCollectionsData = unstable_cache(async (tokenPayload:string | JwtPayload) => {
+async function loadCollectionsData (tokenPayload:string | JwtPayload) {
   connectToDB();
 
   if (!tokenPayload) {
@@ -34,7 +34,7 @@ const loadCollectionsData = unstable_cache(async (tokenPayload:string | JwtPaylo
   else {
     return [];
   }
-})
+}
 
 async function loadCollectionData(collectionId: string, tokenPayload: string | JwtPayload) {
   connectToDB();
@@ -59,14 +59,14 @@ async function loadCollectionData(collectionId: string, tokenPayload: string | J
   return [];
 }
 
-const handleCollectionData = unstable_cache(async (data: any) => {
+async function handleCollectionData (data: any) {
   const myCollections = new Array<CollectionListType>();
 
   data && data?.map((collection: any) => {
     myCollections.push({ _id: collection?._id?._id ? collection?._id?._id[0] : "", title: collection?._id?.showTitle ? collection?._id?.showTitle[0] : "", count: 0 });
   })
   return myCollections;
-})
+}
 
 export default async function Outbox({ searchParams }: { searchParams?: { [key: string]: string } }) {
 
