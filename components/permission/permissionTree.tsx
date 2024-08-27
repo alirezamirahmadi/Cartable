@@ -13,13 +13,15 @@ import GroupIcon from '@mui/icons-material/Group';
 
 const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
+import TreeActions from "../general/treeActions/treeActions";
+import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
 import type { RoleGroupType } from "@/types/generalType";
-import TreeActions from "../general/treeActions/treeActions";
 
 export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: RoleGroupType | null, onSelect: (permission: PermissionType | undefined) => void }): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
   const [roots, setRoots] = useState<PermissionType[]>([{ _id: "null", title: "", showTitle: "خانه", root: "-1", kind: 1 }])
@@ -188,16 +190,17 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
 
   return (
     <>
-      <Box sx={{ width: '100%', maxWidth: 356, bgcolor: 'background.paper' }}>
+      <Box sx={{ width: '100%', maxWidth: 356, bgcolor: 'background.paper', py: 1 }}>
         <Breadcrumbs>
           {roots.length > 1 && roots.map((root: PermissionType, index) => (
             <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.showTitle}</Button>
           ))}
         </Breadcrumbs>
-        <Box sx={{ display: "flex" }}>
-          <ModifyButtons save onAction={handleSaveAction} />
-        </Box>
-
+        {me.permissions.includes("/permissions.edit") &&
+          <Box sx={{ display: "flex" }}>
+            <ModifyButtons save onAction={handleSaveAction} />
+          </Box>
+        }
         <List component="nav" sx={{ py: 0 }}>
           <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
             <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />

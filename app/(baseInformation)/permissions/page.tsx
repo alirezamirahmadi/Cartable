@@ -9,6 +9,7 @@ import PermissionTree from "@/components/permission/permissionTree";
 import SelectRoleGroup from "@/components/general/selectRoleGroup/selectRoleGroup";
 import Roles from "@/components/role/roles";
 import Groups from "@/components/group/groups";
+import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
 import type { RoleGroupType } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
@@ -17,6 +18,7 @@ import type { GroupType } from "@/types/groupType";
 
 export default function Permission(): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const [selectedRoleGroup, setSelectedRoleGroup] = useState<RoleGroupType | null>();
   const [selectedPermission, setSelectedPermission] = useState<PermissionType>();
   const [rolesPermission, setRolesPermission] = useState<RoleType[]>([]);
@@ -143,12 +145,12 @@ export default function Permission(): React.JSX.Element {
             <Box sx={{ px: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
               <Typography variant="body1" sx={{ mt: 1 }}>سمت های دارای مجوز انتخاب شده</Typography>
               <Divider variant="middle" sx={{ my: 1, mx: "auto" }} />
-              <Roles roles={rolesPermission} omit selectRole={selectedPermission && selectedPermission.kind !== 1 ? true : false} onAction={handleRolesAction} />
+              <Roles roles={rolesPermission} omit={me.permissions.includes("/permissions.edit")} selectRole={me.permissions.includes("/permissions.edit") && selectedPermission && selectedPermission.kind !== 1 ? true : false} onAction={handleRolesAction} />
             </Box>
             <Box sx={{ px: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
               <Typography variant="body1" sx={{ mt: 1 }}>گروه های دارای مجوز انتخاب شده</Typography>
               <Divider variant="middle" sx={{ my: 1, mx: "auto" }} />
-              <Groups groups={groupsPermission} omit selectGroup={selectedPermission && selectedPermission.kind !== 1 ? true : false} onAction={handleGroupsAction} />
+              <Groups groups={groupsPermission} omit={me.permissions.includes("/permissions.edit")} selectGroup={me.permissions.includes("/permissions.edit") && selectedPermission && selectedPermission.kind !== 1 ? true : false} onAction={handleGroupsAction} />
             </Box>
           </Box>
         </Box>
