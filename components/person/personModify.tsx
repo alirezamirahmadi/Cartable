@@ -8,16 +8,18 @@ import { useForm } from "react-hook-form";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-import type { Value as DatePickerType } from "react-multi-date-picker";
 import { useRouter } from "next/navigation";
+import type { Value as DatePickerType } from "react-multi-date-picker";
 
-import regex from "@/utils/regex";
 const Snack = dynamic(() => import("../general/snack/snack"));
+import regex from "@/utils/regex";
+import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
 import type { PersonType } from "@/types/personType";
 
 export default function PersonModify({ person, onModify }: { person?: PersonType, onModify?: (isModify: boolean) => void }): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const router = useRouter();
   const [birthday, setBirthday] = useState<DatePickerType>("");
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
@@ -109,11 +111,13 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
           <TextField {...register("username", { required: true, pattern: regex.username })} size="small" error={errors.username ? true : false} required helperText={errors.username && "نام کاربری می بایست بین 4 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام کاربری</Typography>} />
           <TextField {...register("password", { required: true, pattern: regex.password })} size="small" error={errors.password ? true : false} required helperText={errors.password && "رمز عبور می بایست بین 8 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>رمز عبور</Typography>} type="password" />
         </div>
-        <div className="flex justify-center mt-4">
-          <Button variant="contained" color="secondary" onClick={handleSubmit(submitPerson)} startIcon={<KeyboardArrowUpOutlinedIcon />}>ذخیره</Button>
-        </div>
+        {(person || me.permissions.includes("/persons.new")) &&
+          <div className="flex justify-center mt-4">
+            <Button variant="contained" color="secondary" onClick={handleSubmit(submitPerson)} startIcon={<KeyboardArrowUpOutlinedIcon />}>ذخیره</Button>
+          </div>
+        }
       </form>
-      
+
       {snackProps.isOpen && <Snack {...snackProps} />}
     </>
   )

@@ -6,16 +6,18 @@ import { useRouter } from "next/navigation";
 import PersonModify from "@/components/person/personModify";
 import { useTheme } from "@mui/material";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
-import { PersonType } from "@/types/personType";
 
 const Modal = dynamic(() => import("@/components/general/modal/modal"));
 const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
+import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
+import type { PersonType } from "@/types/personType";
 
 export default function PersonTable({ persons }: { persons: PersonType[] }): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const theme = useTheme();
   const router = useRouter();
   const [rowData, setRowData] = useState<PersonType>();
@@ -31,7 +33,7 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
     { field: { title: "account.username" }, label: "نام کاربری" },
     {
       field: { title: "ویرایش" }, label: "ویرایش", kind: "component", options: {
-        component: (value, onChange, rowData) => (<ModifyButtons rowData={rowData} onAction={handleAction} edit omit omitMessage={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`} />)
+        component: (value, onChange, rowData) => (<ModifyButtons rowData={rowData} onAction={handleAction} edit={me.permissions.includes("/persons.edit")} omit={me.permissions.includes("/persons.delete")} omitMessage={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`} />)
       }
     },
   ]
