@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 const Modal = dynamic(() => import("../modal/modal"));
 const Snack = dynamic(() => import("../snack/snack"));
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { clearMe } from "@/lib/features/me/meSlice";
+import { getMe, clearMe } from "@/lib/features/me/meSlice";
 import { changeMode } from "@/lib/features/darkMode/darkSlice";
 import ChangePassword from "@/components/changePassword/changePassword";
 import MyRoles from "../myRoles/myRoles";
@@ -61,6 +61,14 @@ const MyAccount = memo((): React.JSX.Element => {
   const handleCloseModal = () => {
     setIsOpenPasswordModal(false);
     setIsOpenRolesModal(false);
+  }
+
+  const handleChangeRole = (isChange: boolean) => {
+    if (isChange) {
+      setIsOpenRolesModal(false);
+      dispatch(getMe())
+        .then(() => router.replace("/"));
+    }
   }
 
   const handleChangePassword = () => {
@@ -118,7 +126,7 @@ const MyAccount = memo((): React.JSX.Element => {
 
       {snackProps.isOpen && <Snack {...snackProps} />}
       {isOpenPasswordModal && <Modal title="تغییر رمزعبور" isOpen={isOpenPasswordModal} body={<ChangePassword onChangePassword={changePasswordSuccess} onError={handleError} />} onCloseModal={handleCloseModal} />}
-      {isOpenRolesModal && <Modal title="سمت های من" isOpen={isOpenRolesModal} body={<MyRoles />} onCloseModal={handleCloseModal} />}
+      {isOpenRolesModal && <Modal title="سمت های من" isOpen={isOpenRolesModal} body={<MyRoles onChangeRole={handleChangeRole} />} onCloseModal={handleCloseModal} />}
     </>
   )
 })

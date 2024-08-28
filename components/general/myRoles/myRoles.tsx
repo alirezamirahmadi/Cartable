@@ -1,16 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { List, ListItem, ListItemButton, ListItemText, ListItemIcon, Box, Divider } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { changeRole } from "@/lib/features/me/meSlice";
 
-export default function MyRoles(): React.JSX.Element {
+export default function MyRoles({ onChangeRole }: { onChangeRole: (isChange: boolean) => void }): React.JSX.Element {
 
-  const router = useRouter();
   const [myRoles, setMyRoles] = useState<{ _id: string, title: string, root: string }[]>([]);
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
@@ -37,7 +35,7 @@ export default function MyRoles(): React.JSX.Element {
         .then(res => {
           if (res.status === 201) {
             dispatch(changeRole({ ...me, defaultRole: role }));
-            router.replace("/");
+            onChangeRole(true);
           }
         })
   }
