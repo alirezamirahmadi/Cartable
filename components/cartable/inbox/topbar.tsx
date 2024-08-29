@@ -1,14 +1,18 @@
 "use client"
 
 import React, { useState, memo, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Box, AppBar, Toolbar, IconButton, Menu, Container, MenuItem, FormControl, InputLabel, Select, SelectChangeEvent } from "@mui/material";
 import CollectionsIcon from "@mui/icons-material/Collections";
 
 import SideBar from "../sidebar/sidebar";
+import type { CollectionListType } from "@/types/cartableType";
 
-const TopBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Element => {
+const TopBar = memo(({ collections, place }: { collections: CollectionListType[], place: "inbox" | "outbox" }): React.JSX.Element => {
 
-  const [showType, setShowType] = useState<string>("1");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [filter, setFilter] = useState<string>(searchParams.get("filter") ?? "all");
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const sidebarBox = useRef();
 
@@ -21,7 +25,11 @@ const TopBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Elemen
   }
 
   const handleChangeShowType = (event: SelectChangeEvent) => {
-    setShowType(event.target.value);
+    const newFilter = event.target.value;
+    const collectionId = searchParams.get("collectionId");
+
+    setFilter(newFilter);
+    collectionId && router.replace(`/inbox?collectionId=${collectionId}${newFilter !== "all" ? `&filter=${newFilter}` : ""}`)
   }
 
   return (
@@ -39,19 +47,19 @@ const TopBar = memo(({ place }: { place: "inbox" | "outbox" }): React.JSX.Elemen
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: "block", md: "none" }, }}
             >
-              {sidebarBox.current && <SideBar place={place} />}
+              {sidebarBox.current && <SideBar collections={collections} place={place} />}
             </Menu>
           </Box>
-          {place === "inbox" && <FormControl>
-            <InputLabel>نمایش</InputLabel>
-            <Select value={showType} label="نمایش" onChange={handleChangeShowType}>
-              <MenuItem value={1}>کلیه مدارک کارتابل</MenuItem>
-              <MenuItem value={2}>مدارک خوانده شده</MenuItem>
-              <MenuItem value={3}>مدارک خوانده نشده</MenuItem>
-              <MenuItem value={4}>مدارک ارجاع شده</MenuItem>
-              <MenuItem value={5}>مدارک ارجاع نشده</MenuItem>
-            </Select>
-          </FormControl>}
+          {place === "inbox" &&
+            <FormControl>
+              <InputLabel>فیلتر</InputLabel>
+              <Select value={filter} label="فیلتر" onChange={handleChangeShowType} disabled={searchParams.get("collectionId") ? false : true}>
+                <MenuItem value={"all"}>کلیه مدارک کارتابل</MenuItem>
+                <MenuItem value={"observed"}>مدارک خوانده شده</MenuItem>
+                <MenuItem value={"nonObserved"}>مدارک خوانده نشده</MenuItem>
+              </Select>
+            </FormControl>
+          }
         </Toolbar>
       </Container>
     </AppBar>

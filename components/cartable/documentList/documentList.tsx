@@ -20,9 +20,11 @@ export default function DocumentList({ documents, place }: { documents: any[], p
 
   const searchParams = useSearchParams();
   const collectionId = searchParams.get("collectionId");
+  const filter = searchParams.get("filter");
   const [isOpenSendModal, setIsOpenSendModal] = useState<boolean>(false);
   const [isOpenDetailsModal, setIsOpenDetailsModal] = useState<boolean>(false);
   const [selectedDocument, setSelectedDocument] = useState<any>();
+  const observed = filter === "observed";
 
   const router = useRouter();
   const theme = useTheme();
@@ -125,7 +127,7 @@ export default function DocumentList({ documents, place }: { documents: any[], p
 
   return (
     <>
-      <ReactDataTable rows={documents} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
+      <ReactDataTable rows={!filter ? documents : [...documents].filter(document => document.observed === observed) } columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
 
       {isOpenSendModal && <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />}
       {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} place="inbox" onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />}

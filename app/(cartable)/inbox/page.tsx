@@ -137,7 +137,7 @@ export default async function Inbox({ searchParams }: { searchParams?: { [key: s
           <SideBar collections={collections} place="inbox" />
         </Box>
         <Box sx={{ width: "100%", mx: 1 }}>
-          <TopBar place="inbox" />
+          <TopBar collections={collections} place="inbox" />
           <DocumentList documents={documents} place="inbox" />
         </Box>
       </Box>

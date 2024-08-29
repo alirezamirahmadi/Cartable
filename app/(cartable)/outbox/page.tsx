@@ -84,7 +84,7 @@ export default async function Outbox({ searchParams }: { searchParams?: { [key: 
           <SideBar collections={collections} place="outbox" />
         </Box>
         <Box sx={{ width: "100%", mx: 1 }}>
-          <TopBar place="outbox" />
+          <TopBar collections={collections} place="outbox" />
           <DocumentList documents={documents} place="outbox" />
         </Box>
       </Box>
