@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { Box } from "@mui/material";
 import mongoose from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
+
 import { verifyToken } from "@/utils/token";
 import TopBar from "@/components/cartable/inbox/topbar";
 import SideBar from "@/components/cartable/sidebar/sidebar";

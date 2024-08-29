@@ -106,6 +106,10 @@ export default function Circulation({ refCollection, refDocument, place, onClose
       })
   }
 
+  if(!me.permissions.includes("/cartable.circulation")){
+    return(<></>)
+  }
+
   return (
     <>
       <ReactDataTable rows={circulations ?? []} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
