@@ -7,7 +7,41 @@ import receiveModel from "@/models/receive";
 import connectToDB from "@/utils/db";
 import type { CollectionListType } from "@/types/cartableType";
 
-async function loadCollectionsData(tokenPayload: string | JwtPayload) {
+async function inboxDocuments(collectionId: string, tokenPayload: string | JwtPayload) {
+  connectToDB();
+
+  if (!collectionId || !tokenPayload) {
+    return [];
+  }
+
+  if (typeof tokenPayload !== "string") {
+    const receives = await receiveModel.aggregate()
+      .lookup({ from: "sends", localField: "refSend", foreignField: "_id", as: "send" })
+      .lookup({ from: "people", localField: "send.refPerson", foreignField: "_id", as: "sender" })
+      .lookup({ from: "collections", localField: "send.refCollection", foreignField: "_id", as: "collection" })
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .lookup({ from: "roles", localField: "send.refRole", foreignField: "_id", as: "senderRole" })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "recieverRole" })
+      .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" })
+      .match({ "person.account.username": tokenPayload.username })
+      .match({ "recieverRole.isDefault": true })
+      .match({ "send.refCollection": new mongoose.Types.ObjectId(collectionId) })
+      .project({
+        "sender.firstName": 1, "sender.lastName": 1, "senderRole.title": 1, "collection.showTitle": 1, "urgency.title": 1, "send.sendDate": 1,
+        "observed": 1, "viewDate": 1, "lastViewedDate": 1, "send.refDocument": 1,
+      })
+      .unwind("$sender")
+      .unwind("$send")
+      .unwind("$collection")
+      .unwind("$senderRole")
+      .unwind("$urgency")
+
+    return JSON.parse(JSON.stringify(receives));
+  }
+  return [];
+}
+
+async function loadInboxCollections(tokenPayload: string | JwtPayload) {
   connectToDB();
 
   if (!tokenPayload) {
@@ -59,41 +93,7 @@ async function loadNonObserved(tokenPayload: string | JwtPayload) {
 
 }
 
-async function loadCollectionData(collectionId: string, tokenPayload: string | JwtPayload) {
-  connectToDB();
-
-  if (!collectionId || !tokenPayload) {
-    return [];
-  }
-
-  if (typeof tokenPayload !== "string") {
-    const receives = await receiveModel.aggregate()
-      .lookup({ from: "sends", localField: "refSend", foreignField: "_id", as: "send" })
-      .lookup({ from: "people", localField: "send.refPerson", foreignField: "_id", as: "sender" })
-      .lookup({ from: "collections", localField: "send.refCollection", foreignField: "_id", as: "collection" })
-      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
-      .lookup({ from: "roles", localField: "send.refRole", foreignField: "_id", as: "senderRole" })
-      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "recieverRole" })
-      .lookup({ from: "urgencies", localField: "refUrgency", foreignField: "_id", as: "urgency" })
-      .match({ "person.account.username": tokenPayload.username })
-      .match({ "recieverRole.isDefault": true })
-      .match({ "send.refCollection": new mongoose.Types.ObjectId(collectionId) })
-      .project({
-        "sender.firstName": 1, "sender.lastName": 1, "senderRole.title": 1, "collection.showTitle": 1, "urgency.title": 1, "send.sendDate": 1,
-        "observed": 1, "viewDate": 1, "lastViewedDate": 1, "send.refDocument": 1,
-      })
-      .unwind("$sender")
-      .unwind("$send")
-      .unwind("$collection")
-      .unwind("$senderRole")
-      .unwind("$urgency")
-
-    return JSON.parse(JSON.stringify(receives));
-  }
-  return [];
-}
-
-const handleCollectionData = (data: any) => {
+const handleInboxCollections = (data: any) => {
   const myCollections = new Array<CollectionListType>();
 
   data && data?.map((collection: any) => {
@@ -118,11 +118,11 @@ const handleNonObserved = (data: any, inboxList: CollectionListType[]) => {
 }
 
 async function inboxCollections (tokenPayload: string | JwtPayload){
-  const collections = await handleNonObserved(await loadNonObserved(tokenPayload), handleCollectionData(await loadCollectionsData(tokenPayload)));
+  const collections = handleNonObserved(await loadNonObserved(tokenPayload), handleInboxCollections(await loadInboxCollections(tokenPayload)));
   return collections;
 }
 
 export {
   inboxCollections,
-  loadCollectionData
+  inboxDocuments
 }
