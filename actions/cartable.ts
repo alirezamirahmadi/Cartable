@@ -4,9 +4,11 @@ import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 
 import receiveModel from "@/models/receive";
+import sendModel from "@/models/send";
 import connectToDB from "@/utils/db";
 import type { CollectionListType } from "@/types/cartableType";
 
+// inbox
 async function inboxDocuments(collectionId: string, tokenPayload: string | JwtPayload) {
   connectToDB();
 
@@ -117,12 +119,78 @@ const handleNonObserved = (data: any, inboxList: CollectionListType[]) => {
   return myCollections;
 }
 
+// outbox
+async function loadOutboxCollections (tokenPayload:string | JwtPayload) {
+  connectToDB();
+
+  if (!tokenPayload) {
+    return [];
+  }
+
+  if (typeof tokenPayload !== "string") {
+    const sends = await sendModel.aggregate()
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" })
+      .match({ "person.account.username": tokenPayload.username })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+      .match({ "role.isDefault": true })
+      .project({ "collection._id": 1, "collection.showTitle": 1 })
+      .group({ _id: { "_id": "$collection._id", "showTitle": "$collection.showTitle" } })
+
+    return JSON.parse(JSON.stringify(sends));
+  }
+  else {
+    return [];
+  }
+}
+
+async function outboxDocument(collectionId: string, tokenPayload: string | JwtPayload) {
+  connectToDB();
+
+  if (!collectionId || !tokenPayload) {
+    return [];
+  }
+
+  if (typeof tokenPayload !== "string") {
+    const sends = await sendModel.aggregate()
+      .lookup({ from: "collections", localField: "refCollection", foreignField: "_id", as: "collection" })
+      .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
+      .match({ "person.account.username": tokenPayload.username })
+      .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" })
+      .match({ "role.isDefault": true })
+      .match({ "refCollection": new mongoose.Types.ObjectId(collectionId) })
+      .project({ "collection.showTitle": 1, "sendDate": 1, "refDocument": 1, "parentReceive": 1 })
+      .unwind("$collection")
+
+    return JSON.parse(JSON.stringify(sends));
+  }
+  return [];
+}
+
+async function handleOutboxCollections (data: any) {
+  const myCollections = new Array<CollectionListType>();
+
+  data && data?.map((collection: any) => {
+    myCollections.push({ _id: collection?._id?._id ? collection?._id?._id[0] : "", title: collection?._id?.showTitle ? collection?._id?.showTitle[0] : "", count: 0 });
+  })
+  return myCollections;
+}
+
+
 async function inboxCollections (tokenPayload: string | JwtPayload){
   const collections = handleNonObserved(await loadNonObserved(tokenPayload), handleInboxCollections(await loadInboxCollections(tokenPayload)));
   return collections;
 }
 
+async function outboxCollections (tokenPayload: string | JwtPayload){
+  const collections = await handleOutboxCollections(await loadOutboxCollections(tokenPayload));
+  return collections;
+}
+
 export {
   inboxCollections,
-  inboxDocuments
+  inboxDocuments,
+
+  outboxCollections,
+  outboxDocument,
 }
