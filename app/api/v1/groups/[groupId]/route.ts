@@ -1,11 +1,20 @@
 import mongoose from "mongoose";
+import { cookies } from "next/headers";
 
+import { verifyToken } from "@/utils/token";
 import groupModel from "@/models/group";
 import groupMemberModel from "@/models/groupMember";
 import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { groupId: string } }) => {
   connectToDB();
+    
+  const token = cookies().get("token");
+  const tokenPayload = verifyToken(token?.value ?? "");
+
+  if (!tokenPayload) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const groups = await groupModel.find({ root: params.groupId !== "-1" ? new mongoose.Types.ObjectId(params.groupId) : null });
 
@@ -17,6 +26,13 @@ const GET = async (request: Request, { params }: { params: { groupId: string } }
 
 const PUT = async (request: Request, { params }: { params: { groupId: string } }) => {
   connectToDB();
+
+  const token = cookies().get("token");
+  const tokenPayload = verifyToken(token?.value ?? "");
+
+  if (!tokenPayload) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { title, root, kind } = await request.json();
 
@@ -30,6 +46,13 @@ const PUT = async (request: Request, { params }: { params: { groupId: string } }
 
 const DELETE = async (request: Request, { params }: { params: { groupId: string } }) => {
   connectToDB();
+
+  const token = cookies().get("token");
+  const tokenPayload = verifyToken(token?.value ?? "");
+
+  if (!tokenPayload) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const groups = await groupModel.find({ root: new mongoose.Types.ObjectId(params.groupId) });
   if (groups.length > 0) {

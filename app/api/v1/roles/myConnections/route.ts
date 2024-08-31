@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
+import { cookies } from "next/headers";
 
+import { verifyToken } from "@/utils/token";
 import roleModel from "@/models/role";
 import connectToDB from "@/utils/db";
 
 const GET = async (request: Request) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { searchParams } = new URL(request.url);
   const roleId = searchParams.get("roleId");

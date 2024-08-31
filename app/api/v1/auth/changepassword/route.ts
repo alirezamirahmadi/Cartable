@@ -5,11 +5,6 @@ import { verifyToken } from "@/utils/token";
 import { hashPassword, verifyPassword } from "@/utils/crypto";
 import connectToDB from "@/utils/db";
 
-
-const GET = () => {
-  return Response.json({ message: "ok" })
-}
-
 const PUT = async (request: Request) => {
   connectToDB();
 
@@ -44,6 +39,5 @@ const PUT = async (request: Request) => {
 }
 
 export {
-  GET,
   PUT
 }

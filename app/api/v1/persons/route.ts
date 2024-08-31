@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+
+import { verifyToken } from "@/utils/token";
 import { hashPassword } from "@/utils/crypto";
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
@@ -5,6 +8,10 @@ import type { PersonType } from "@/types/personType";
 
 const GET = async (request: Request) => {
   connectToDB();
+  
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   let response: { json: any, status: number } = { json: null, status: 501 };
   let person;
@@ -23,9 +30,6 @@ const GET = async (request: Request) => {
   }
   else if (username && password) {
     person = await personModel.find({ account: { username, password, isActive: true } }).exec();
-    // person = await personModel.aggregate()
-    //   .match({ account: { username, password, isActive: true } })
-    //   .lookup({ from: "roles", localField: "refRole", foreignField: "_id", as: "role" });
   }
 
   response = person ? { json: person, status: 200 } : { json: { message: "Persons not found" }, status: 404 };
@@ -33,8 +37,11 @@ const GET = async (request: Request) => {
 }
 
 const POST = async (request: Request) => {
-
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account }: PersonType = await request.json();
 

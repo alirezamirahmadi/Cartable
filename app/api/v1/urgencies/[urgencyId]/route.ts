@@ -1,8 +1,15 @@
+import { cookies } from "next/headers";
+
+import { verifyToken } from "@/utils/token";
 import urgencyModel from "@/models/urgency";
 import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { urgencyId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const urgency = await urgencyModel.findById(params.urgencyId);
 
@@ -14,6 +21,10 @@ const GET = async (request: Request, { params }: { params: { urgencyId: string }
 
 const PUT = async (request: Request, { params }: { params: { urgencyId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { title } = await request.json();
 
@@ -27,6 +38,10 @@ const PUT = async (request: Request, { params }: { params: { urgencyId: string }
 
 const DELETE = async (request: Request, { params }: { params: { urgencyId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const urgency = await urgencyModel.findByIdAndDelete(params.urgencyId);
 

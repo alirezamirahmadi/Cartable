@@ -1,9 +1,16 @@
+import { cookies } from "next/headers";
+import mongoose from "mongoose";
+
+import { verifyToken } from "@/utils/token";
 import loginedModel from "@/models/logined";
 import connectToDB from "@/utils/db";
-import mongoose from "mongoose";
 
 const GET = async (request: Request, { params }: { params: { loginedId: string } }) => {
   connectToDB();
+    
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const logined = await loginedModel.aggregate()
     .match({ _id: { $eq: new mongoose.Types.ObjectId(params.loginedId) } })
@@ -17,6 +24,11 @@ const GET = async (request: Request, { params }: { params: { loginedId: string }
 
 const DELETE = async (request: Request, { params }: { params: { loginedId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
+
   const logined = await loginedModel.findByIdAndDelete(params.loginedId);
 
   if (logined) {

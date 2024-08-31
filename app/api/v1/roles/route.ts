@@ -1,9 +1,16 @@
+import { cookies } from "next/headers";
+import mongoose from "mongoose";
+
+import { verifyToken } from "@/utils/token";
 import roleModel from "@/models/role";
 import connectToDB from "@/utils/db";
-import mongoose from "mongoose";
 
 const GET = async (request: Request) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { searchParams } = new URL(request.url);
   const root = searchParams.get("root");
@@ -39,6 +46,10 @@ const GET = async (request: Request) => {
 const POST = async (request: Request) => {
   connectToDB();
 
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
+
   const { title, refPerson, root, isActive } = await request.json();
 
   refPerson && await roleModel.updateMany({ refPerson }, { isDefault: false });
@@ -51,6 +62,12 @@ const POST = async (request: Request) => {
 }
 
 const PUT = async (request: Request) => {
+  connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
+
   const { roleIds, root } = await request.json();
 
   const role = await roleModel.updateMany({ _id: { $in: roleIds } }, { $set: { root } });

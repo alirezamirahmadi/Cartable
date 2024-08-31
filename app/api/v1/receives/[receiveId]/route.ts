@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+
+import { verifyToken } from "@/utils/token";
 import receiveModel from "@/models/receive";
 import sendModel from "@/models/send";
 import connectToDB from "@/utils/db";
@@ -5,6 +8,10 @@ import mongoose from "mongoose";
 
 const GET = async (request: Request, { params }: { params: { receiveId: string } }) => {
   connectToDB();
+    
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const receive = await receiveModel.aggregate()
     .match({ _id: new mongoose.Types.ObjectId(params.receiveId) })
@@ -22,6 +29,10 @@ const GET = async (request: Request, { params }: { params: { receiveId: string }
 const PUT = async (request: Request, { params }: { params: { receiveId: string } }) => {
   connectToDB();
 
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
+
   const { refSend, refPerson, refRole, refUrgency, viewDate, lastViewedDate, comment, observed } = await request.json();
 
   const receive = await receiveModel.findByIdAndUpdate(params.receiveId,
@@ -35,6 +46,10 @@ const PUT = async (request: Request, { params }: { params: { receiveId: string }
 
 const DELETE = async (request: Request, { params }: { params: { receiveId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { refSend } = await request.json();
   const receives = await receiveModel.find({ refSend });

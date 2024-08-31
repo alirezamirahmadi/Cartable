@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
+import { cookies } from "next/headers";
 
+import { verifyToken } from "@/utils/token";
 import groupMemberModel from "@/models/groupMember";
 import roleModel from "@/models/role";
 import groupModel from "@/models/group";
@@ -7,6 +9,10 @@ import connectToDB from "@/utils/db";
 
 const GET = async (request: Request) => {
   connectToDB();
+    
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { searchParams } = new URL(request.url);
   const refGroup = searchParams.get("refGroup");
@@ -39,6 +45,10 @@ const GET = async (request: Request) => {
 const POST = async (request: Request) => {
   connectToDB();
 
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
+
   const { refGroup, refRole } = await request.json();
 
   const duplicate = await groupMemberModel.find({ refGroup, refRole });
@@ -55,6 +65,10 @@ const POST = async (request: Request) => {
 
 const DELETE = async (request: Request) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { searchParams } = new URL(request.url);
   const refGroup = searchParams.get("refGroup");

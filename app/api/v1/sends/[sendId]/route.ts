@@ -1,9 +1,16 @@
+import { cookies } from "next/headers";
+import mongoose from "mongoose";
+
+import { verifyToken } from "@/utils/token";
 import sendModel from "@/models/send";
 import connectToDB from "@/utils/db";
-import mongoose from "mongoose";
 
 const GET = async (request: Request, { params }: { params: { sendId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const send = await sendModel.aggregate()
     .match({ _id: new mongoose.Types.ObjectId(params.sendId) })
@@ -20,6 +27,10 @@ const GET = async (request: Request, { params }: { params: { sendId: string } })
 const PUT = async (request: Request, { params }: { params: { sendId: string } }) => {
   connectToDB();
 
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
+
   const { refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, parentReceive } = await request.json();
 
   const send = await sendModel.findByIdAndUpdate(params.sendId, { refPerson, refRole, refCollection, refDocument, ipAddress, sendDate, parentReceive });
@@ -32,6 +43,10 @@ const PUT = async (request: Request, { params }: { params: { sendId: string } })
 
 const DELETE = async (request: Request, { params }: { params: { sendId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const send = await sendModel.findByIdAndDelete(params.sendId);
 

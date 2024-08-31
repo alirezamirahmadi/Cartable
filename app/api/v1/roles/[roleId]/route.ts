@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
+import { cookies } from "next/headers";
 
+import { verifyToken } from "@/utils/token";
 import roleModel from "@/models/role";
 import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { roleId: string } }) => {
   connectToDB();
+  
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const role = await roleModel.findById(params.roleId);
 
@@ -16,6 +22,10 @@ const GET = async (request: Request, { params }: { params: { roleId: string } })
 
 const PUT = async (request: Request, { params }: { params: { roleId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { title, refPerson, isActive } = await request.json();
   if (refPerson) {
@@ -37,6 +47,10 @@ const PUT = async (request: Request, { params }: { params: { roleId: string } })
 
 const DELETE = async (request: Request, { params }: { params: { roleId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const roleUsed = await roleModel.aggregate()
     .match({ _id: new mongoose.Types.ObjectId(params.roleId) })

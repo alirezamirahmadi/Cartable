@@ -1,9 +1,16 @@
+import { cookies } from "next/headers";
+import mongoose from "mongoose";
+
+import { verifyToken } from "@/utils/token";
 import sendModel from "@/models/send";
 import connectToDB from "@/utils/db";
-import mongoose from "mongoose";
 
 const GET = async (request: Request) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   let response: { json: any, status: number } = { json: null, status: 501 };
   const { searchParams } = new URL(request.url);
@@ -40,6 +47,10 @@ const GET = async (request: Request) => {
 
 const POST = async (request: Request) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { refPerson, refRole, refCollection, refDocument, sendDate, parentReceive } = await request.json();
 

@@ -1,8 +1,15 @@
+import { cookies } from "next/headers";
+
+import { verifyToken } from "@/utils/token";
 import urgencyModel from "@/models/urgency";
 import connectToDB from "@/utils/db";
 
 const GET = async () => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const urgencies = await urgencyModel.find();
 
@@ -14,6 +21,10 @@ const GET = async () => {
 
 const POST = async (request: Request) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { title } = await request.json();
 

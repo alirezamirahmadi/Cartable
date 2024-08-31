@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+
+import { verifyToken } from "@/utils/token";
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
 import mongoose from "mongoose";
@@ -6,6 +9,10 @@ import { hashPassword } from "@/utils/crypto";
 
 const GET = async (request: Request, { params }: { params: { personId: string } }) => {
   connectToDB();
+    
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const person = await personModel.aggregate()
     .match({ _id: { $eq: new mongoose.Types.ObjectId(params.personId) } })
@@ -19,6 +26,10 @@ const GET = async (request: Request, { params }: { params: { personId: string } 
 
 const PUT = async (request: Request, { params }: { params: { personId: string } }) => {
   connectToDB();
+
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account } = await request.json();
 
@@ -40,6 +51,10 @@ const PUT = async (request: Request, { params }: { params: { personId: string } 
 
 const DELETE = async (request: Request, { params }: { params: { personId: string } }) => {
   connectToDB();
+  
+  if (!verifyToken(cookies().get("token")?.value ?? "")) {
+    return Response.json({ message: "Person is not login" }, { status: 401 });
+  }
 
   const person = await personModel.findByIdAndDelete(params.personId);
 
