@@ -2,8 +2,16 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { TextField, Typography, Checkbox, FormGroup, FormControlLabel, Divider, Button, Select, MenuItem } from "@mui/material";
+import {
+  TextField, Typography, Checkbox, FormGroup, FormControlLabel, Divider, Button, Select, MenuItem,
+  Badge, Avatar, Box
+} from "@mui/material";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
+import EditIcon from '@mui/icons-material/Edit';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import DrawIcon from '@mui/icons-material/Draw';
+import PriceCheckIcon from '@mui/icons-material/PriceCheck';
 import { useForm } from "react-hook-form";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
@@ -14,6 +22,7 @@ import type { Value as DatePickerType } from "react-multi-date-picker";
 const Snack = dynamic(() => import("../general/snack/snack"));
 import regex from "@/utils/regex";
 import { useAppSelector } from "@/lib/hooks";
+import VisuallyHiddenInput from "../general/visuallyHiddenInput/visuallyHiddenInput";
 import type { SnackProps } from "@/types/generalType";
 import type { PersonType } from "@/types/personType";
 
@@ -21,8 +30,10 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
 
   const me = useAppSelector(state => state.me);
   const router = useRouter();
-  const [birthday, setBirthday] = useState<DatePickerType>("");
+  const [birthday, setBirthday] = useState<DatePickerType>();
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
+  const [image, setImage] = useState<Blob>();
+  const [sign, setSign] = useState<Blob>();
 
   const { register, handleSubmit, reset, formState: { errors }, getValues } = useForm({
     defaultValues: {
@@ -38,23 +49,40 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
       address: person?.address ?? "",
       description: person?.description ?? "",
       isActive: person?.isActive ?? false,
-
+      image: null,
+      sign: null,
       username: person?.account?.username ?? "",
       password: "",
     }
   });
 
   const submitPerson = (data: any) => {
-    person ? editPerson(data) : addPerson(data);
+    const formData = new FormData();
+    formData.append("code", data.code);
+    formData.append("firstName", data.firstName);
+    formData.append("lastName", data.lastName);
+    formData.append("nationalCode", data.nationalCode);
+    formData.append("birthday", birthday?.valueOf().toString() ?? "");
+    formData.append("gender", data.gender);
+    formData.append("maritalStatus", data.maritalStatus);
+    formData.append("education", data.education);
+    formData.append("phone", data.phone);
+    formData.append("email", data.email);
+    formData.append("address", data.address);
+    formData.append("description", data.description);
+    formData.append("isActive", data.isActive);
+    formData.append("image", image ?? "");
+    formData.append("sign", sign ?? "");
+    formData.append("username", data.username);
+    formData.append("password", data.password);
+
+    person ? editPerson(formData) : addPerson(formData);
   }
 
-  const addPerson = async (data: any) => {
+  const addPerson = async (formData: FormData) => {
     await fetch("api/v1/persons", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
+      body: formData,
     })
       .then(res => {
         res.status === 201 ?
@@ -63,17 +91,14 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
           setSnackProps({ context: "عملیات مورد نظر با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
       .then(() => router.refresh())
-
     reset();
   }
 
-  const editPerson = async (data: any) => {
+  const editPerson = async (formData: FormData) => {
     await fetch(`api/v1/persons/${person?._id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
+      body: formData,
+      // body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
     })
       .then(res => { onModify && onModify(res.status === 201 ? true : false) })
   }
@@ -82,6 +107,18 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
     <>
       <form>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-2 place-items-center">
+          <Badge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            badgeContent={
+              <Box component="label" sx={{ cursor: "pointer" }}>
+                <EditIcon fontSize="small" />
+                <VisuallyHiddenInput type="file" onChange={event => setImage(event.target.files ? event.target.files[0] : undefined)} />
+              </Box>
+            }
+          >
+            <Avatar alt={person?.firstName ?? ""} src={person?.image ?? ""} sx={{ width: 52, height: 52 }}>
+              {image && <HowToRegIcon fontSize="large" />}
+            </Avatar>
+          </Badge>
           <TextField {...register("code")} size="small" error={errors.code ? true : false} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>کد</Typography>} />
           <TextField {...register("firstName", { required: true, pattern: regex.flName })} size="small" error={errors.firstName ? true : false} required helperText={errors.firstName && "نام می بایست بین 3 تا 50 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام</Typography>} />
           <TextField {...register("lastName", { required: true, pattern: regex.flName })} size="small" error={errors.lastName ? true : false} required helperText={errors.lastName && "نام خانوادگی می بایست بین 3 تا 50 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام خانوادگی</Typography>} />
@@ -107,15 +144,26 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
 
         <Divider sx={{ width: "75%", mx: "auto", my: "1rem" }} />
 
-        <div className="flex flex-wrap justify-center gap-y-2 gap-x-8">
-          <TextField {...register("username", { required: true, pattern: regex.username })} size="small" error={errors.username ? true : false} required helperText={errors.username && "نام کاربری می بایست بین 4 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام کاربری</Typography>} />
-          <TextField {...register("password", { required: true, pattern: regex.password })} size="small" error={errors.password ? true : false} required helperText={errors.password && "رمز عبور می بایست بین 8 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>رمز عبور</Typography>} type="password" />
-        </div>
-        {(person || me.permissions.includes("/persons.new")) &&
-          <div className="flex justify-center mt-4">
-            <Button variant="contained" color="secondary" onClick={handleSubmit(submitPerson)} startIcon={<KeyboardArrowUpOutlinedIcon />}>ذخیره</Button>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-y-4 sm:gap-x-8 justify-items-center place-items-center">
+          <div className="grid grid-rows-2 justify-items-center gap-y-2 col-span-3">
+            <div className="flex flex-wrap justify-center gap-y-2 gap-x-4">
+              <TextField {...register("username", { required: true, pattern: regex.username })} size="small" error={errors.username ? true : false} required helperText={errors.username && "نام کاربری می بایست بین 4 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام کاربری</Typography>} />
+              <TextField {...register("password", { required: true, pattern: regex.password })} size="small" error={errors.password ? true : false} required helperText={errors.password && "رمز عبور می بایست بین 8 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>رمز عبور</Typography>} type="password" />
+            </div>
+            {(person || me.permissions.includes("/persons.new")) &&
+              <Button variant="contained" color="primary" onClick={handleSubmit(submitPerson)} startIcon={<KeyboardArrowUpOutlinedIcon />}>ذخیره</Button>
+            }
           </div>
-        }
+          <div className="">
+            <Avatar variant="rounded" alt={person?.firstName ?? ""} src={person?.sign ?? ""} sx={{ width: 80, height: 80 }}>
+              {sign ? <PriceCheckIcon fontSize="large"/> : <DrawIcon fontSize="large"/>}
+            </Avatar>
+            <Button component="label" role={undefined} color="secondary" variant="contained" tabIndex={-1} startIcon={<AttachFileIcon />} sx={{ width: 80 }}>
+              امضا
+              <VisuallyHiddenInput type="file" onChange={event => setSign(event.target.files ? event.target.files[0] : undefined)} />
+            </Button>
+          </div>
+        </div>
       </form>
 
       {snackProps.isOpen && <Snack {...snackProps} />}

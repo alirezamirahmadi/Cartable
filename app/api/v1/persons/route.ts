@@ -6,7 +6,6 @@ import { verifyToken } from "@/utils/token";
 import { hashPassword } from "@/utils/crypto";
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
-import type { PersonType } from "@/types/personType";
 
 const GET = async (request: Request) => {
   connectToDB();
@@ -45,7 +44,6 @@ const POST = async (request: Request) => {
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
 
-  // const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, account }: PersonType = await request.json();
   const formData = await request.formData();
   const code = formData.get("code");
   const firstName = formData.get("firstName");
@@ -62,32 +60,41 @@ const POST = async (request: Request) => {
   const isActive = formData.get("isActive");
   const image = formData.get("image");
   const sign = formData.get("sign");
-  const account = formData.get("account");
+  const username = formData.get("username");
+  const password = formData.get("password");
 
   // data check
-  if (firstName?.trim().length < 2 || lastName?.trim().length < 2 || account?.username?.trim().length < 4 || account?.password?.trim().length < 8) {
+  if ((typeof firstName === "string" && firstName?.trim().length < 2) ||
+    (typeof lastName === "string" && lastName?.trim().length < 2) ||
+    (typeof username === "string" && username?.trim().length < 4) ||
+    (typeof password === "string" && password?.trim().length < 8)) {
+
     return Response.json({ message: "Data is invalid" }, { status: 422 });
   }
 
   // username exist
-  const personExist = await personModel.findOne({ "account.username": account?.username });
+  const personExist = await personModel.findOne({ "account.username": username });
   if (personExist) {
     return Response.json({ message: "Username already exists" }, { status: 422 });
   }
 
   // hash password
-  const hashedPassword = await hashPassword(account.password);
+  const hashedPassword = typeof password === "string" ? await hashPassword(password) : "";
 
-  const imageBuffer = Buffer.from(await image.arrayBuffer());
-  const signBuffer = Buffer.from(await sign.arrayBuffer());
-  const imageFileName = new Date() + image.name;
-  const signFileName = new Date() + sign.name;
+  const imagePath = (typeof image !== "string" && image !== null) ? "/persons/images/" + Date.now() + image.name : ""
+  const signPath = (typeof sign !== "string" && sign !== null) ? "/persons/signs/" + Date.now() + sign.name : "";
 
-  const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, image: imageFileName, sign: signFileName, account: { ...account, password: hashedPassword } });
+  const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, image: imagePath, sign: signPath, account: { username, password: hashedPassword } });
 
   if (person) {
-    await writeFile(path.join(process.cwd(), "/public/persons/images/" + imageFileName), imageBuffer);
-    await writeFile(path.join(process.cwd(), "/public/persons/signs/" + signFileName), signBuffer);
+    if (typeof image !== "string" && image !== null) {
+      const imageBuffer = Buffer.from(await image.arrayBuffer());
+      image && await writeFile(path.join(process.cwd(), "/public" + imagePath), imageBuffer);
+    }
+    if (typeof sign !== "string" && sign !== null) {
+      const signBuffer = Buffer.from(await sign.arrayBuffer());
+      sign && await writeFile(path.join(process.cwd(), "/public" + signPath), signBuffer);
+    }
 
     return Response.json({ message: "Person created successfully" }, { status: 201 });
   }
