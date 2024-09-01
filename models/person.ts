@@ -48,6 +48,12 @@ const schema = new mongoose.Schema({
     type: Boolean,
     require: true,
   },
+  image:{
+    type:String,
+  },
+  sign:{
+    type:String,
+  },
   account: {
     username: { type: String, require: true, minLength: 4 },
     password: { type: String, require: true, minLength: 8 },
