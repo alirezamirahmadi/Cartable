@@ -70,8 +70,14 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
       method: "DELETE"
     })
       .then(res => {
-        res.status === 200 &&
-          setSnackProps({ context: "شخص مورد نظر با موفقیت حذف گردید.", isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+        switch (res.status) {
+          case 200:
+            setSnackProps({ context: "شخص مورد نظر با موفقیت حذف گردید.", isOpen: true, severity: "info", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+            break;
+          case 403:
+            setSnackProps({ context: "شخض مورد نظر به دلیل استفاده شدن در سمت ها، ارسال و یا دریافت قابل حذف نیست", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+            break;
+        }
       })
       .then(() => router.refresh())
       .catch(() => {
