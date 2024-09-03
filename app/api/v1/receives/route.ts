@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 const GET = async (request: Request) => {
   connectToDB();
-    
+
   if (!verifyToken(cookies().get("token")?.value ?? "")) {
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
@@ -35,8 +35,8 @@ const GET = async (request: Request) => {
       .lookup({ from: "roles", localField: "send.refRole", foreignField: "_id", as: "senderRole" })
       .match({ "send.refCollection": new mongoose.Types.ObjectId(refCollection ?? ''), "send.refDocument": new mongoose.Types.ObjectId(refDocument ?? '') })
       .project({
-        "refSend": 1, "sender._id": 1, "sender.firstName": 1, "sender.lastName": 1, "senderRole.title": 1, "send.sendDate": 1,
-        "receiver.firstName": 1, "receiver.lastName": 1, "receiverRole.title": 1, "urgency.title": 1, "comment": 1, "viewDate": 1, "lastViewedDate": 1
+        "refSend": 1, "sender._id": 1, "sender.firstName": 1, "sender.lastName": 1, "sender.image": 1, "senderRole.title": 1, "send.sendDate": 1,
+        "receiver.firstName": 1, "receiver.lastName": 1, "receiver.image": 1, "receiverRole.title": 1, "urgency.title": 1, "comment": 1, "viewDate": 1, "lastViewedDate": 1
       })
       .unwind("send")
       .unwind("sender")
@@ -53,7 +53,7 @@ const GET = async (request: Request) => {
 
 const POST = async (request: Request) => {
   connectToDB();
-  
+
   if (!verifyToken(cookies().get("token")?.value ?? "")) {
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }

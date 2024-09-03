@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { IconButton, useTheme, ListItemText, Typography } from "@mui/material";
+import { IconButton, useTheme, ListItemText, Typography, Avatar, ListItem, ListItemAvatar } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import MailIcon from '@mui/icons-material/Mail';
@@ -46,7 +46,12 @@ export default function DocumentList({ documents, place }: { documents: any[], p
         {
           field: { title: "sender" }, label: "فرستنده", kind: "component", options: {
             component: (value, onChange, rowData) => (
-              <ListItemText primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} />
+              <ListItem>
+                <ListItemAvatar>
+                  <Avatar alt={rowData.sender.firstName} src={rowData.sender.image} />
+                </ListItemAvatar>
+                <ListItemText primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} />
+              </ListItem>
             )
           }
         },
@@ -127,7 +132,7 @@ export default function DocumentList({ documents, place }: { documents: any[], p
 
   return (
     <>
-      <ReactDataTable rows={!filter ? documents : [...documents].filter(document => document.observed === observed) } columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
+      <ReactDataTable rows={!filter ? documents : [...documents].filter(document => document.observed === observed)} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
 
       {isOpenSendModal && <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />}
       {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} place="inbox" onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { ListItemText, Typography, useTheme, IconButton } from "@mui/material";
+import { ListItemText, Typography, useTheme, IconButton, ListItem, ListItemAvatar, Avatar } from "@mui/material";
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import * as shamsi from "shamsi-date-converter";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
@@ -28,14 +28,24 @@ export default function Circulation({ refCollection, refDocument, place, onClose
     {
       field: { title: "sender" }, label: "فرستنده", kind: "component", options: {
         component: (value, onChange, rowData) => (
-          <ListItemText primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} />
+          <ListItem>
+            <ListItemAvatar>
+              <Avatar alt={rowData.sender.firstName} src={rowData.sender.image} />
+            </ListItemAvatar>
+            <ListItemText primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} />
+          </ListItem>
         )
       }
     },
     {
       field: { title: "receiver" }, label: "گیرنده", kind: "component", options: {
         component: (value, onChange, rowData) => (
-          <ListItemText primary={`${rowData.receiver.firstName} ${rowData.receiver.lastName}`} secondary={rowData.receiverRole.title} />
+          <ListItem>
+            <ListItemAvatar>
+              <Avatar alt={rowData.receiver.firstName} src={rowData.receiver.image} />
+            </ListItemAvatar>
+            <ListItemText primary={`${rowData.receiver.firstName} ${rowData.receiver.lastName}`} secondary={rowData.receiverRole.title} />
+          </ListItem>
         )
       }
     },
@@ -106,8 +116,8 @@ export default function Circulation({ refCollection, refDocument, place, onClose
       })
   }
 
-  if(!me.permissions.includes("/cartable.circulation")){
-    return(<></>)
+  if (!me.permissions.includes("/cartable.circulation")) {
+    return (<></>)
   }
 
   return (

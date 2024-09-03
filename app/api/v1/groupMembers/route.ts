@@ -9,7 +9,7 @@ import connectToDB from "@/utils/db";
 
 const GET = async (request: Request) => {
   connectToDB();
-    
+
   if (!verifyToken(cookies().get("token")?.value ?? "")) {
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
@@ -24,7 +24,7 @@ const GET = async (request: Request) => {
     .match({ "groupmember.refGroup": new mongoose.Types.ObjectId(refGroup ?? "") })
     .project({
       "title": 1, "root": 1, "isActive": 1,
-      "person._id": 1, "person.firstName": 1, "person.lastName": 1
+      "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.image": 1
     })
     .unwind("person")
 

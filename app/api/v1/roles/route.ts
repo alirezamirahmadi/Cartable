@@ -21,14 +21,14 @@ const GET = async (request: Request) => {
     roles = await roleModel.aggregate()
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .match({ isActive: true })
-      .project({ "title": 1, "root": 1, "isActive": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1 })
+      .project({ "title": 1, "root": 1, "isActive": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.image": 1 })
       .unwind("person")
   }
   else if (root || title) {
     roles = await roleModel.aggregate()
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
       .match(title ? { title: { $regex: `.*${title}.*` } } : { root: root !== "-1" ? new mongoose.Types.ObjectId(root ?? "") : null })
-      .project({ "title": 1, "root": 1, "isActive": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1 })
+      .project({ "title": 1, "root": 1, "isActive": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.image": 1 })
       .unwind({ path: "$person", preserveNullAndEmptyArrays: true })
   }
   else if (refPerson) {
@@ -53,7 +53,7 @@ const POST = async (request: Request) => {
   const { title, refPerson, root, isActive } = await request.json();
 
   refPerson && await roleModel.updateMany({ refPerson }, { isDefault: false });
-  const role = await roleModel.create({ title, refPerson, root, isDefault: true, isActive, permissions:[] });
+  const role = await roleModel.create({ title, refPerson, root, isDefault: true, isActive, permissions: [] });
 
   if (role) {
     return Response.json({ message: "Role created successfully" }, { status: 201 });

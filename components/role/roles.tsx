@@ -86,7 +86,7 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
               <ListItem alignItems="center">
                 <ListItem alignItems="flex-start" sx={{ p: 0 }}>
                   <ListItemAvatar>
-                    <Avatar alt={role.person.firstName} src="" sx={{ width: 35, height: 35, mx: "auto" }} />
+                    <Avatar alt={role.person.firstName} src={role.person.image} sx={{ width: 45, height: 45, mx: "auto" }} />
                   </ListItemAvatar>
                   <ListItemText primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} sx={{ cursor: "pointer" }} />
                 </ListItem>

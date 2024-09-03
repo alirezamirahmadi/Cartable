@@ -29,7 +29,7 @@ async function inboxDocuments(collectionId: string, tokenPayload: string | JwtPa
       .match({ "recieverRole.isDefault": true })
       .match({ "send.refCollection": new mongoose.Types.ObjectId(collectionId) })
       .project({
-        "sender.firstName": 1, "sender.lastName": 1, "senderRole.title": 1, "collection.showTitle": 1, "urgency.title": 1, "send.sendDate": 1,
+        "sender.firstName": 1, "sender.lastName": 1, "sender.image": 1, "senderRole.title": 1, "collection.showTitle": 1, "urgency.title": 1, "send.sendDate": 1,
         "observed": 1, "viewDate": 1, "lastViewedDate": 1, "send.refDocument": 1,
       })
       .unwind("$sender")
@@ -120,7 +120,7 @@ const handleNonObserved = (data: any, inboxList: CollectionListType[]) => {
 }
 
 // outbox
-async function loadOutboxCollections (tokenPayload:string | JwtPayload) {
+async function loadOutboxCollections(tokenPayload: string | JwtPayload) {
   connectToDB();
 
   if (!tokenPayload) {
@@ -167,7 +167,7 @@ async function outboxDocument(collectionId: string, tokenPayload: string | JwtPa
   return [];
 }
 
-async function handleOutboxCollections (data: any) {
+async function handleOutboxCollections(data: any) {
   const myCollections = new Array<CollectionListType>();
 
   data && data?.map((collection: any) => {
@@ -177,12 +177,12 @@ async function handleOutboxCollections (data: any) {
 }
 
 
-async function inboxCollections (tokenPayload: string | JwtPayload){
+async function inboxCollections(tokenPayload: string | JwtPayload) {
   const collections = handleNonObserved(await loadNonObserved(tokenPayload), handleInboxCollections(await loadInboxCollections(tokenPayload)));
   return collections;
 }
 
-async function outboxCollections (tokenPayload: string | JwtPayload){
+async function outboxCollections(tokenPayload: string | JwtPayload) {
   const collections = await handleOutboxCollections(await loadOutboxCollections(tokenPayload));
   return collections;
 }

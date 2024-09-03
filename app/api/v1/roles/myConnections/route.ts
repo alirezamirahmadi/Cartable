@@ -29,7 +29,7 @@ const GET = async (request: Request) => {
         { _id: root !== "null" ? new mongoose.Types.ObjectId(root) : "" }
       ]
     })
-    .project({ "title": 1, "root": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1 })
+    .project({ "title": 1, "root": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.image": 1 })
     .unwind("person")
 
   if (roles) {

@@ -15,7 +15,10 @@ const GET = async (request: Request, { params }: { params: { permissionId: strin
   const roles = await roleModel.aggregate()
     .match({ permissions: new mongoose.Types.ObjectId(params.permissionId) })
     .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
-    .project({ "title": 1, "root": 1, "isActive": 1, "person._id": 1, "person.firstName": 1, "person.lastName": 1 })
+    .project({
+      "title": 1, "root": 1, "isActive": 1,
+      "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.image": 1
+    })
     .unwind("person")
 
   if (roles) {

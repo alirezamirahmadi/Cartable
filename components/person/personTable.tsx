@@ -4,7 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import PersonModify from "@/components/person/personModify";
-import { useTheme } from "@mui/material";
+import { useTheme, Avatar } from "@mui/material";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 
 const Modal = dynamic(() => import("@/components/general/modal/modal"));
@@ -22,10 +22,16 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
   const router = useRouter();
   const [rowData, setRowData] = useState<PersonType>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
+  const [isOpenRolesModal, setIsOpenRolesModal] = useState<boolean>(false);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   const columns: ColumnType[] = [
     { field: { title: "id" }, label: "ID", options: { display: false } },
+    {
+      field: { title: "image" }, label: "تصویر", kind: "component", options: {
+        component: (value, onChange, rowData) => (<Avatar sx={{mx:"auto"}} alt={rowData.firstName} src={value} />)
+      }
+    },
     { field: { title: "firstName" }, label: "نام" },
     { field: { title: "lastName" }, label: "نام خانوادگی" },
     { field: { title: "code" }, label: "کد" },
@@ -48,10 +54,6 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
         handleDelete(data._id);
         break;
     }
-  }
-
-  const handleCloseModal = () => {
-    setIsOpenEditModal(false);
   }
 
   const handleModify = (isModify: boolean) => {
@@ -90,7 +92,7 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
       <ReactDataTable direction="rtl" rows={persons} columns={columns} options={defaultDataTableOptions(theme.palette.mode)} />
 
       {snackProps.isOpen && <Snack {...snackProps} />}
-      {isOpenEditModal && <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={handleCloseModal} body={<PersonModify person={rowData} onModify={handleModify} />} />}
+      {isOpenEditModal && <Modal title="ویرایش شخص" isOpen={isOpenEditModal} fullWidth onCloseModal={() => setIsOpenEditModal(false)} body={<PersonModify person={rowData} onModify={handleModify} />} />}
     </>
   )
 }
