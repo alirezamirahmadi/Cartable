@@ -7,7 +7,8 @@ import PersonModify from "@/components/person/personModify";
 import { useTheme, Avatar } from "@mui/material";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 
-const Modal = dynamic(() => import("@/components/general/modal/modal"));
+import Loading from "../general/loading/loading";
+const Modal = dynamic(() => import("@/components/general/modal/modal"), {loading:() => <Loading />});
 const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import defaultDataTableOptions from "@/utils/defaultDataTable";

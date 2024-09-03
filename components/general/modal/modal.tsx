@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, Suspense } from 'react';
 import { Box, Typography, Modal as MUIModal, IconButton, Divider } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
+import Loading from '../loading/loading';
 
 const Modal = memo(({ title, isOpen, body, fullWidth, onCloseModal }:
   { title: string, isOpen: boolean, body: React.ReactNode, fullWidth?: boolean, onCloseModal: () => void }): React.JSX.Element => {
@@ -45,7 +46,9 @@ const Modal = memo(({ title, isOpen, body, fullWidth, onCloseModal }:
             </IconButton>
           </div>
           <Divider sx={{ my: 2 }} />
-          {body}
+          <Suspense fallback={<Loading />}>
+            {body}
+          </Suspense>
         </Box>
       </MUIModal>
     </div>

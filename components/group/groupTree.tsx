@@ -11,7 +11,8 @@ import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import MoveUpIcon from '@mui/icons-material/MoveUp';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 
-const Modal = dynamic(() => import("@/components/general/modal/modal"));
+import Loading from "../general/loading/loading";
+const Modal = dynamic(() => import("@/components/general/modal/modal"), {loading:() => <Loading />});
 const Snack = dynamic(() => import("@/components/general/snack/snack"));
 const ModifyButtons = dynamic(() => import("@/components/general/modifyButtons/modifyButtons"));
 const TextSave = dynamic(() => import("@/components/general/textSave/textSave"));

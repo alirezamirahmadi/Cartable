@@ -9,8 +9,9 @@ import MoveUpIcon from "@mui/icons-material/MoveUp";
 import MoveDownIcon from "@mui/icons-material/MoveDown";
 import GroupIcon from "@mui/icons-material/Group";
 
-const Modal = dynamic(() => import("../general/modal/modal"));
-const Snack = dynamic(() => import("../general/snack/snack"));
+import Loading from "../general/loading/loading";
+const Modal = dynamic(() => import("../general/modal/modal"), {loading:() => <Loading />});
+const Snack = dynamic(() => import("../general/snack/snack"), {loading:() => <Loading />});
 const RoleModify = dynamic(() => import("./roleModify"));
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
 import Groups from "../group/groups";

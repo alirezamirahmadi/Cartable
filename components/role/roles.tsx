@@ -8,8 +8,8 @@ import {
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 
-
-const Modal = dynamic(() => import("../general/modal/modal"));
+import Loading from "../general/loading/loading";
+const Modal = dynamic(() => import("../general/modal/modal"), {loading:() => <Loading />});
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import type { RoleType } from "@/types/roleType";
 

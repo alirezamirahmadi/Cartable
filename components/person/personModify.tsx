@@ -33,7 +33,7 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
 
   const me = useAppSelector(state => state.me);
   const router = useRouter();
-  const [birthday, setBirthday] = useState<DatePickerType>();
+  const [birthday, setBirthday] = useState<DatePickerType>(person?.birthday ?? "");
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [image, setImage] = useState<Blob | string>();
   const [sign, setSign] = useState<Blob | string>();

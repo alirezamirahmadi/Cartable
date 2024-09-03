@@ -8,9 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import CloseIcon from '@mui/icons-material/Close';
 
+import Loading from "@/components/general/loading/loading";
 const Snack = dynamic(() => import("@/components/general/snack/snack"));
+const Roles = dynamic(() => import("../../role/roles"), { loading: () => <Loading /> });
 import { useAppSelector } from "@/lib/hooks";
-import Roles from "../../role/roles";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Urgency from "../urgency/urgency";
 import type { ReceiverType, UrgencyType, ReceiveType } from "@/types/cartableType";
@@ -152,7 +153,7 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
         <Button variant="outlined" color="primary" onClick={() => onClose()} startIcon={<CloseIcon />}>انصراف</Button>
         <Button variant="contained" color="primary" disabled={receivers && receivers.length > 0 ? false : true} onClick={handleSubmit} startIcon={<KeyboardArrowUpOutlinedIcon />}>ارسال</Button>
       </div>
-      
+
       {snackProps.isOpen && <Snack {...snackProps} />}
     </>
   )

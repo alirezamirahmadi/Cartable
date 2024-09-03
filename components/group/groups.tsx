@@ -9,7 +9,8 @@ import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import GroupIcon from '@mui/icons-material/Group';
 import SearchIcon from '@mui/icons-material/Search';
 
-const Modal = dynamic(() => import("../general/modal/modal"));
+import Loading from "../general/loading/loading";
+const Modal = dynamic(() => import("../general/modal/modal"), {loading:() => <Loading />});
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import type { GroupType } from "@/types/groupType";
 

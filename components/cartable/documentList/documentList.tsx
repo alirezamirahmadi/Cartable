@@ -10,7 +10,8 @@ import MailIcon from '@mui/icons-material/Mail';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import * as shamsi from "shamsi-date-converter";
 
-const Modal = dynamic(() => import("@/components/general/modal/modal"));
+import Loading from "@/components/general/loading/loading";
+const Modal = dynamic(() => import("@/components/general/modal/modal"), {loading:() => <Loading />});
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Buttons from "@/components/cartable/buttons/buttons";
 import Send from "@/components/cartable/send/send";
