@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 require("./person");
 require("./collection");
-require("./document");
 
 const schema = new mongoose.Schema({
   title: {
@@ -14,6 +13,11 @@ const schema = new mongoose.Schema({
   path: {
     type: String,
     required: true,
+  },
+  createDate: {
+    type: Date,
+    default: () => Date.now(),
+    immutable: false,
   },
   refPerson: {
     type: mongoose.Types.ObjectId,
@@ -28,7 +32,6 @@ const schema = new mongoose.Schema({
   refDocument: {
     type: mongoose.Types.ObjectId,
     required: true,
-    ref: "document",
   },
 })
 
