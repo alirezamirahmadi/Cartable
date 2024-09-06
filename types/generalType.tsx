@@ -11,7 +11,19 @@ type RoleGroupType = {
   title: string,
 }
 
+type AttachmentType = {
+  _id: string,
+  title: string,
+  description: string,
+  path: string,
+  createDate: string,
+  refPerson: string,
+  refCollection: string,
+  refDocument: string,
+}
+
 export type {
   SnackProps,
-  RoleGroupType
+  RoleGroupType,
+  AttachmentType
 }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import {
   TextField, Typography, Checkbox, FormGroup, FormControlLabel, Divider, Button, Select, MenuItem,
-  Badge, Avatar, Box
+  Badge, Avatar, Box, IconButton
 } from "@mui/material";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import EditIcon from '@mui/icons-material/Edit';
@@ -101,7 +101,6 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
     await fetch(`api/v1/persons/${person?._id}`, {
       method: "PUT",
       body: formData,
-      // body: JSON.stringify({ ...data, birthday, account: { username: data.username, password: data.password } })
     })
       .then(res => { onModify && onModify(res.status === 201 ? true : false) })
   }
@@ -110,14 +109,14 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
     <>
       <form>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-2 place-items-center">
-          <Box sx={{ display: "flex" }}>
+          <Box sx={{ display: "flex", alignItems: "end" }}>
             <Badge overlap="circular" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               badgeContent={
                 <>
-                  <Box component="label" sx={{ cursor: "pointer" }}>
+                  <IconButton component="label">
                     <EditIcon fontSize="small" />
                     <VisuallyHiddenInput type="file" onChange={event => setImage(event.target.files ? event.target.files[0] : undefined)} />
-                  </Box>
+                  </IconButton>
                 </>
               }
             >
@@ -164,17 +163,17 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
               <Button variant="contained" color="primary" onClick={handleSubmit(submitPerson)} startIcon={<KeyboardArrowUpOutlinedIcon />}>ذخیره</Button>
             }
           </div>
-          <Box>
+          <Box sx={{ display: "flex", alignItems: "end" }}>
             <Avatar variant="rounded" alt={person?.firstName ?? ""} src={person?.sign ?? ""} sx={{ width: 80, height: 80 }}>
               {!sign && sign !== "Delete" && <DrawIcon fontSize="large" />}
               {sign && sign !== "Delete" && <PriceCheckIcon fontSize="large" />}
               {sign === "Delete" && <DeleteForeverIcon fontSize="large" />}
             </Avatar>
-            <Box sx={{ display: "flex" }}>
-              <Button component="label" role={undefined} color="secondary" variant="contained" tabIndex={-1} startIcon={<AttachFileIcon />} sx={{ width: 80 }}>
-                امضا
+            <Box>
+              <IconButton component="label">
+                <AttachFileIcon />
                 <VisuallyHiddenInput type="file" onChange={event => setSign(event.target.files ? event.target.files[0] : undefined)} />
-              </Button>
+              </IconButton>
               {person?.sign && <ModifyButtons onAction={(data: any, action: string) => setSign(action)} omit omitMessage={`آیا از حذف امضا ${person?.firstName} مطمئن هستید؟`} />}
             </Box>
           </Box>

@@ -20,13 +20,13 @@ const GET = async (request: Request) => {
       refDocument: new mongoose.Types.ObjectId(refDocument ?? "")
     })
     .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
-    .project({ "title": 1, "description": 1, "path": 1, "person.firstName": 1, "person.lastName": 1 })
+    .project({ "title": 1, "description": 1, "path": 1, "createDate": 1, "person.firstName": 1, "person.lastName": 1 })
     .unwind("person")
 
   if (attachment) {
-    Response.json(attachment, { status: 200 });
+    return Response.json(attachment, { status: 200 });
   }
-  Response.json({ message: "not found" }, { status: 404 });
+  return Response.json({ message: "not found" }, { status: 404 });
 }
 
 const POST = async (request: Request) => {
