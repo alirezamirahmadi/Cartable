@@ -8,7 +8,7 @@ import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { groupId: string } }) => {
   connectToDB();
-    
+
   const token = cookies().get("token");
   const tokenPayload = verifyToken(token?.value ?? "");
 
@@ -34,9 +34,9 @@ const PUT = async (request: Request, { params }: { params: { groupId: string } }
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
 
-  const { title, root, kind } = await request.json();
+  const { title, root } = await request.json();
 
-  const group = await groupModel.findByIdAndUpdate(params.groupId, { title, root, kind });
+  const group = await groupModel.findByIdAndUpdate(params.groupId, { $set: { title, root } });
 
   if (group) {
     return Response.json({ message: "Group updated successfully" }, { status: 201 });
@@ -58,7 +58,7 @@ const DELETE = async (request: Request, { params }: { params: { groupId: string 
   if (groups.length > 0) {
     return Response.json({ message: "Group was not deleted because of its children" }, { status: 403 })
   }
-  
+
   const groupMembers = await groupMemberModel.find({ refGroup: new mongoose.Types.ObjectId(params.groupId) });
   if (groupMembers.length > 0) {
     return Response.json({ message: "Group was not deleted because of its children" }, { status: 403 })
