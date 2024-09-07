@@ -15,8 +15,7 @@ const Modal = dynamic(() => import("@/components/general/modal/modal"), { loadin
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Buttons from "@/components/cartable/buttons/buttons";
 import Send from "@/components/cartable/send/send";
-import Circulation from "@/components/cartable/details/circulation/circulation";
-import Attachment from "@/components/general/attachment/attachment";
+import Details from "../details/details";
 
 export default function DocumentList({ documents, place }: { documents: any[], place: "inbox" | "outbox" }): React.JSX.Element {
 
@@ -137,8 +136,7 @@ export default function DocumentList({ documents, place }: { documents: any[], p
       <ReactDataTable rows={!filter ? documents : [...documents].filter(document => document.observed === observed)} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
 
       {isOpenSendModal && <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />}
-      {/* {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} place="inbox" onClose={() => setIsOpenDetailsModal(false)} />} onCloseModal={() => setIsOpenDetailsModal(false)} />} */}
-      {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="گردش مدرک" fullWidth body={<Attachment refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} />} onCloseModal={() => setIsOpenDetailsModal(false)} />}
+      {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="جزئیات" fullWidth body={<Details refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} place={place} />} onCloseModal={() => setIsOpenDetailsModal(false)} />}
     </>
   )
 }

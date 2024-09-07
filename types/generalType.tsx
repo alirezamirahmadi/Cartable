@@ -22,8 +22,15 @@ type AttachmentType = {
   refDocument: string,
 }
 
+type TabPanelProps = {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
 export type {
   SnackProps,
   RoleGroupType,
-  AttachmentType
+  AttachmentType,
+  TabPanelProps
 }

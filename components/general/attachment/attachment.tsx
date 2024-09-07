@@ -13,12 +13,14 @@ import * as shamsi from "shamsi-date-converter";
 const Snack = dynamic(() => import("../snack/snack"));
 import ModifyButtons from "../modifyButtons/modifyButtons";
 import VisuallyHiddenInput from "../visuallyHiddenInput/visuallyHiddenInput";
+import defaultDataTableOptions from "@/utils/defaultDataTable";
+import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
 import type { AttachmentType } from "@/types/generalType";
-import defaultDataTableOptions from "@/utils/defaultDataTable";
 
 export default function Attachment({ refCollection, refDocument }: { refCollection: string, refDocument: string }): React.JSX.Element {
 
+  const me = useAppSelector(state => state.me);
   const theme = useTheme();
   const [file, setFile] = useState<File>();
   const [attachments, setattachments] = useState<AttachmentType[]>([]);
@@ -53,7 +55,7 @@ export default function Attachment({ refCollection, refDocument }: { refCollecti
       },
       {
         field: { title: "modify" }, label: "حذف", kind: "component", options: {
-          component: (value, onChange, rowData) => (<ModifyButtons omit omitMessage={`آیا از حذف ${rowData?.title} مطمئن هستید؟`} rowData={rowData} onAction={handleAction} />)
+          component: (value, onChange, rowData) => (<ModifyButtons omit={me.permissions.includes("/attachment.delete")} omitMessage={`آیا از حذف ${rowData?.title} مطمئن هستید؟`} rowData={rowData} onAction={handleAction} />)
         }
       },
     ];
@@ -105,23 +107,27 @@ export default function Attachment({ refCollection, refDocument }: { refCollecti
   return (
     <>
       <Box>
-        <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", mb: 2 }}>
-          <IconButton component="label" >
-            <AttachFileIcon />
-            <VisuallyHiddenInput type="file" onChange={event => setFile(event.target.files ? event.target.files[0] : undefined)} />
-          </IconButton>
-          {file &&
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <TextField value={description} onChange={event => setDescription(event.target.value)} sx={{ width: { xs: 150, md: 500, lg: 700 } }} multiline variant="outlined" size="small" label="توضیحات" />
-              <IconButton onClick={handleUploadFile}>
-                <CloudUploadIcon />
+        {me.permissions.includes("/attachment.new") &&
+          <>
+            <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", mb: 2 }}>
+              <IconButton component="label" >
+                <AttachFileIcon />
+                <VisuallyHiddenInput type="file" onChange={event => setFile(event.target.files ? event.target.files[0] : undefined)} />
               </IconButton>
+              {file &&
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <TextField value={description} onChange={event => setDescription(event.target.value)} sx={{ width: { xs: 150, md: 500, lg: 700 } }} multiline variant="outlined" size="small" label="توضیحات" />
+                  <IconButton onClick={handleUploadFile}>
+                    <CloudUploadIcon />
+                  </IconButton>
+                </Box>
+              }
             </Box>
-          }
-        </Box>
-        {file && <Typography variant="body2" sx={{ mx: 5, mb: 1 }}>{`عنوان فایل: ${file?.name}`}</Typography>}
-        <Divider variant="middle" />
-        <ReactDataTable rows={attachments} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
+            {file && <Typography variant="body2" sx={{ mx: 5, mb: 1 }}>{`عنوان فایل: ${file?.name}`}</Typography>}
+            <Divider variant="middle" />
+          </>
+        }
+        {me.permissions.includes("/attachment") && <ReactDataTable rows={attachments} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />}
       </Box>
 
       <Snack {...snackProps} />
