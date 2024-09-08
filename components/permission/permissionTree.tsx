@@ -14,12 +14,13 @@ import GroupIcon from '@mui/icons-material/Group';
 const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
 import TreeActions from "../general/treeActions/treeActions";
+import RolesGroups from "./rolesGroups";
 import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
 import type { RoleGroupType } from "@/types/generalType";
 
-export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: RoleGroupType | null, onSelect: (permission: PermissionType | undefined) => void }): React.JSX.Element {
+export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupType | null }): React.JSX.Element {
 
   const me = useAppSelector(state => state.me);
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
@@ -50,10 +51,6 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
       loadRoleInGroupPermission(),
     ])
   }, [roleGroup]);
-
-  useEffect(() => {
-    onSelect(selectedPermission);
-  }, [selectedPermission]);
 
   const loadRoleInGroupPermission = async () => {
     roleGroup?.kind === 1 ?
@@ -190,54 +187,57 @@ export default function PermissionTree({ roleGroup, onSelect }: { roleGroup?: Ro
 
   return (
     <>
-      <Box sx={{ width: '100%', maxWidth: 356, bgcolor: 'background.paper', py: 1 }}>
-        <Breadcrumbs>
-          {roots.length > 1 && roots.map((root: PermissionType, index) => (
-            <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.showTitle}</Button>
-          ))}
-        </Breadcrumbs>
-        {me.permissions.includes("/permissions.edit") &&
-          <Box sx={{ display: "flex" }}>
-            <ModifyButtons save onAction={handleSaveAction} />
-          </Box>
-        }
-        <List component="nav" sx={{ py: 0 }}>
-          <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
-            <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />
-          </ListItem>
-          {permissions.map((permission: PermissionType) => (
-            <Box key={permission._id}>
-              <ListItem sx={{ py: 0, minHeight: 24 }}>
-                <IconButton sx={{ px: 0 }} onClick={() => handleSubPermission(permission)} disabled={permission.kind === 3}>
-                  {permission.kind === 1 && <RuleFolderIcon />}
-                  {permission.kind === 2 && openPermissionItems === permission._id && <ExpandLess />}
-                  {permission.kind === 2 && openPermissionItems !== permission._id && <ExpandMore />}
-                </IconButton>
-                {permission.kind !== 1 && <Checkbox checked={newPermissions.includes(permission._id)} onChange={() => handleToggle(permission._id)} />}
-                <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permission._id} onClick={() => setSelectedPermission(permission)}>
-                  <ListItemText primary={permission.showTitle} />
-                </ListItemButton>
-                {roleInGroupsPermissions.includes(permission._id) && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
-              </ListItem>
-              {permission.kind === 2 &&
-                <Collapse in={openPermissionItems === permission._id} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    {permissionItems.map((permissionItem: PermissionType) => (
-                      <ListItem key={permissionItem._id} sx={{ py: 0, pl: 7, maxHeight: 28 }}>
-                        <Checkbox checked={newPermissions.includes(permissionItem._id)} onChange={() => handleToggle(permissionItem._id)} />
-                        <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permissionItem._id} onClick={() => setSelectedPermission(permissionItem)}>
-                          <ListItemText secondary={permissionItem.showTitle} />
-                        </ListItemButton>
-                        {roleInGroupsPermissions.includes(permissionItem._id) && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
-              }
+      <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 1, rowGap: 1 }}>
+        <Box sx={{ width: '100%', maxWidth: 356, bgcolor: 'background.paper', py: 1, border: "1px solid lightgray", borderRadius: 1.5 }}>
+          <Breadcrumbs>
+            {roots.length > 1 && roots.map((root: PermissionType, index) => (
+              <Button key={root._id} variant="text" disabled={index === roots.length - 1} color="inherit" size="small" sx={{ cursor: "pointer", px: 0 }} onClick={() => handleBreadcrumbs(root)}>{root.showTitle}</Button>
+            ))}
+          </Breadcrumbs>
+          {me.permissions.includes("/permissions.edit") &&
+            <Box sx={{ display: "flex" }}>
+              <ModifyButtons save onAction={handleSaveAction} />
             </Box>
-          ))}
-        </List>
-      </Box >
+          }
+          <List component="nav" sx={{ py: 0 }}>
+            <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
+              <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />
+            </ListItem>
+            {permissions.map((permission: PermissionType) => (
+              <Box key={permission._id}>
+                <ListItem sx={{ py: 0, minHeight: 24 }}>
+                  <IconButton sx={{ px: 0 }} onClick={() => handleSubPermission(permission)} disabled={permission.kind === 3}>
+                    {permission.kind === 1 && <RuleFolderIcon />}
+                    {permission.kind === 2 && openPermissionItems === permission._id && <ExpandLess />}
+                    {permission.kind === 2 && openPermissionItems !== permission._id && <ExpandMore />}
+                  </IconButton>
+                  {permission.kind !== 1 && <Checkbox checked={newPermissions.includes(permission._id)} onChange={() => handleToggle(permission._id)} />}
+                  <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permission._id} onClick={() => setSelectedPermission(permission)}>
+                    <ListItemText primary={permission.showTitle} />
+                  </ListItemButton>
+                  {roleInGroupsPermissions.includes(permission._id) && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
+                </ListItem>
+                {permission.kind === 2 &&
+                  <Collapse in={openPermissionItems === permission._id} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {permissionItems.map((permissionItem: PermissionType) => (
+                        <ListItem key={permissionItem._id} sx={{ py: 0, pl: 7, maxHeight: 28 }}>
+                          <Checkbox checked={newPermissions.includes(permissionItem._id)} onChange={() => handleToggle(permissionItem._id)} />
+                          <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permissionItem._id} onClick={() => setSelectedPermission(permissionItem)}>
+                            <ListItemText secondary={permissionItem.showTitle} />
+                          </ListItemButton>
+                          {roleInGroupsPermissions.includes(permissionItem._id) && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Collapse>
+                }
+              </Box>
+            ))}
+          </List>
+        </Box >
+        <RolesGroups selectedPermission={selectedPermission} />
+      </Box>
 
       {snackProps.isOpen && <Snack {...snackProps} />}
     </>
