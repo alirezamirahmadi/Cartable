@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import {
   ListItem, ListItemText, ListItemButton, List, Box, IconButton, Checkbox,
   Breadcrumbs, Button, Collapse, Tooltip
@@ -18,11 +19,13 @@ import RolesGroups from "./rolesGroups";
 import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
-import type { RoleGroupType } from "@/types/generalType";
 
-export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupType | null }): React.JSX.Element {
+export default function PermissionTree(): React.JSX.Element {
 
   const me = useAppSelector(state => state.me);
+  const searchParams = useSearchParams();
+  const roleId = searchParams.get("roleId");
+  const groupId = searchParams.get("groupId");
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
   const [roots, setRoots] = useState<PermissionType[]>([{ _id: "null", title: "", showTitle: "خانه", root: "-1", kind: 1 }])
@@ -46,15 +49,15 @@ export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupTyp
   }, [oldPermissions]);
 
   useEffect(() => {
-    roleGroup !== undefined && Promise.all([
+    (roleId || groupId) !== undefined && Promise.all([
       loadRoleGroupPermission(),
       loadRoleInGroupPermission(),
     ])
-  }, [roleGroup]);
+  }, [roleId, groupId]);
 
   const loadRoleInGroupPermission = async () => {
-    roleGroup?.kind === 1 ?
-      await fetch(`api/v1/groupPermissions?roleId=${roleGroup._id}`)
+    roleId ?
+      await fetch(`api/v1/groupPermissions?roleId=${roleId}`)
         .then(res => res.status === 200 && res.json())
         .then(data => {
           const tempPermissions: string[] = [];
@@ -68,8 +71,8 @@ export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupTyp
   }
 
   const loadRoleGroupPermission = async () => {
-    roleGroup ?
-      await fetch(`api/v1/${roleGroup?.kind === 1 ? "rolePermissions?roleId" : "groupPermissions?groupId"}=${roleGroup?._id}`)
+    (roleId || groupId) ?
+      await fetch(`api/v1/${roleId ? "rolePermissions?roleId" : "groupPermissions?groupId"}=${roleId ?? groupId}`)
         .then(res => res.status === 200 && res.json())
         .then(data => setOldPermissions(data[0]?.permissions))
       :
@@ -128,7 +131,7 @@ export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupTyp
   }
 
   const handleSaveAction = (data: any, action: string) => {
-    if (!roleGroup) {
+    if (!roleId && !groupId) {
       setSnackProps({ context: "لطفا گروه و یا سمت مورد نظر را انتخاب کنید", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
       return;
     }
@@ -138,7 +141,7 @@ export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupTyp
         .then(() => deleteTakenPermissons()
           .then(() => {
             loadRoleGroupPermission();
-            setSnackProps({ context: `مجوزهای مورد نظر برای ${roleGroup?.title} اعمال شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+            setSnackProps({ context: `مجوزهای مورد نظر اعمال شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
           })
         )
         .catch(() => {
@@ -150,24 +153,24 @@ export default function PermissionTree({ roleGroup }: { roleGroup?: RoleGroupTyp
   const addNewPermissons = async () => {
     const permissionIds: string[] = [...newPermissions].filter((permission: string) => !oldPermissions?.includes(permission));
 
-    permissionIds.length > 0 && await fetch(`api/v1/${roleGroup?.kind === 1 ? "rolePermissions" : "groupPermissions"}`, {
+    permissionIds.length > 0 && await fetch(`api/v1/${roleId ? "rolePermissions" : "groupPermissions"}`, {
       method: "POST",
       headers: {
         "Content-Type": "Application/json"
       },
-      body: JSON.stringify(roleGroup?.kind === 1 ? { roleId: roleGroup?._id, permissionIds } : { groupId: roleGroup?._id, permissionIds })
+      body: JSON.stringify(roleId ? { roleId, permissionIds } : { groupId, permissionIds })
     })
   }
 
   const deleteTakenPermissons = async () => {
     const permissionIds: string[] = [...oldPermissions ?? []].filter((permission: string) => !newPermissions?.includes(permission));
 
-    permissionIds.length > 0 && await fetch(`api/v1/${roleGroup?.kind === 1 ? "rolePermissions" : "groupPermissions"}`, {
+    permissionIds.length > 0 && await fetch(`api/v1/${roleId ? "rolePermissions" : "groupPermissions"}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "Application/json"
       },
-      body: JSON.stringify(roleGroup?.kind === 1 ? { roleId: roleGroup?._id, permissionIds } : { groupId: roleGroup?._id, permissionIds })
+      body: JSON.stringify(roleId ? { roleId, permissionIds } : { groupId, permissionIds })
     })
   }
 
