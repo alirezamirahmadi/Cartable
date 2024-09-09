@@ -1,5 +1,5 @@
 type PermissionType = {
-  _id: string,
+  _id: string | null,
   title: string,
   showTitle: string,
   root: string,

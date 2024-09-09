@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import {
@@ -20,15 +20,15 @@ import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
 
-export default function PermissionTree(): React.JSX.Element {
+export default function PermissionTree({ permissions }: { permissions: PermissionType[] }): React.JSX.Element {
 
   const me = useAppSelector(state => state.me);
   const searchParams = useSearchParams();
   const roleId = searchParams.get("roleId");
   const groupId = searchParams.get("groupId");
-  const [permissions, setPermissions] = useState<PermissionType[]>([]);
+  const [permissionsList, setPermissionsList] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
-  const [roots, setRoots] = useState<PermissionType[]>([{ _id: "null", title: "", showTitle: "خانه", root: "-1", kind: 1 }])
+  const [roots, setRoots] = useState<PermissionType[]>([{ _id: null, title: "", showTitle: "خانه", root: "-1", kind: 1 }])
   const [newPermissions, setNewPermissions] = useState<string[]>([]);
   const [oldPermissions, setOldPermissions] = useState<string[]>([]);
   const [roleInGroupsPermissions, setRoleInGroupsPermissions] = useState<string[]>([]);
@@ -36,13 +36,13 @@ export default function PermissionTree(): React.JSX.Element {
   const [openPermissionItems, setopenPermissionItems] = useState<string>("");
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
-  useEffect(() => {
-    loadPermissionByRoot();
-  }, []);
+  const loadPermissionList = (searchContent?: string) => {
+    setPermissionsList([...permissions].filter((permission: PermissionType) => !searchContent ? permission.root === roots[roots.length - 1]._id : permission.title.includes(searchContent ?? "")))
+  }
 
-  useEffect(() => {
-    loadPermissionByRoot();
-  }, [roots]);
+  useMemo(() => {
+    loadPermissionList();
+  }, [roots, permissions]);
 
   useEffect(() => {
     setNewPermissions(oldPermissions ?? []);
@@ -79,24 +79,6 @@ export default function PermissionTree(): React.JSX.Element {
       setOldPermissions([]);
   }
 
-  const loadPermissionByRoot = async () => {
-    await fetch(`api/v1/permissions/${roots[roots.length - 1]._id}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setPermissions(data));
-  }
-
-  const loadPermissionByShowTitle = async (searchContent: string) => {
-    await fetch(`api/v1/permissions?showTitle=${searchContent}`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setPermissions(data));
-  }
-
-  const loadPermissionItems = async (permissionId: string) => {
-    await fetch(`api/v1/permissions/${permissionId}?item=true`)
-      .then(res => res.status === 200 && res.json())
-      .then(data => setPermissionItems(data));
-  }
-
   const handleToggle = (permissionId: string) => {
     const index = newPermissions.indexOf(permissionId);
     const tempChecked = [...newPermissions]
@@ -112,8 +94,8 @@ export default function PermissionTree(): React.JSX.Element {
         setRoots([...roots, permission]);
         break;
       case 2:
-        setopenPermissionItems(openPermissionItems === permission._id ? "" : permission._id);
-        loadPermissionItems(permission._id);
+        setopenPermissionItems((openPermissionItems === permission._id || !permission._id) ? "" : permission._id);
+        setPermissionItems([...permissions].filter((permissionItem: PermissionType) => permissionItem.root === permission._id));
         break;
     }
   }
@@ -177,7 +159,7 @@ export default function PermissionTree(): React.JSX.Element {
   const handleTreeAction = (root: any[], action: string, searchContent: string | undefined) => {
     switch (action) {
       case "Search":
-        loadPermissionByShowTitle(searchContent ?? "");
+        setPermissionsList([...permissions].filter((permission: PermissionType) => permission.showTitle.includes(searchContent ?? "")))
         break;
       case "Reset":
         setRoots(root);
@@ -206,7 +188,7 @@ export default function PermissionTree(): React.JSX.Element {
             <ListItem component="div" disablePadding sx={{ px: 1, pb: 1 }}>
               <TreeActions roots={roots} search reset backward onAction={handleTreeAction} />
             </ListItem>
-            {permissions.map((permission: PermissionType) => (
+            {permissionsList.map((permission: PermissionType) => (
               <Box key={permission._id}>
                 <ListItem sx={{ py: 0, minHeight: 24 }}>
                   <IconButton sx={{ px: 0 }} onClick={() => handleSubPermission(permission)} disabled={permission.kind === 3}>
@@ -214,22 +196,22 @@ export default function PermissionTree(): React.JSX.Element {
                     {permission.kind === 2 && openPermissionItems === permission._id && <ExpandLess />}
                     {permission.kind === 2 && openPermissionItems !== permission._id && <ExpandMore />}
                   </IconButton>
-                  {permission.kind !== 1 && <Checkbox checked={newPermissions.includes(permission._id)} onChange={() => handleToggle(permission._id)} />}
+                  {permission.kind !== 1 && <Checkbox checked={newPermissions.includes(permission._id ?? "")} onChange={() => handleToggle(permission._id ?? "")} />}
                   <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permission._id} onClick={() => setSelectedPermission(permission)}>
                     <ListItemText primary={permission.showTitle} />
                   </ListItemButton>
-                  {roleInGroupsPermissions.includes(permission._id) && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
+                  {roleInGroupsPermissions.includes(permission._id ?? "") && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
                 </ListItem>
                 {permission.kind === 2 &&
                   <Collapse in={openPermissionItems === permission._id} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
                       {permissionItems.map((permissionItem: PermissionType) => (
                         <ListItem key={permissionItem._id} sx={{ py: 0, pl: 7, maxHeight: 28 }}>
-                          <Checkbox checked={newPermissions.includes(permissionItem._id)} onChange={() => handleToggle(permissionItem._id)} />
+                          <Checkbox checked={newPermissions.includes(permissionItem._id ?? "")} onChange={() => handleToggle(permissionItem._id ?? "")} />
                           <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permissionItem._id} onClick={() => setSelectedPermission(permissionItem)}>
                             <ListItemText secondary={permissionItem.showTitle} />
                           </ListItemButton>
-                          {roleInGroupsPermissions.includes(permissionItem._id) && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
+                          {roleInGroupsPermissions.includes(permissionItem._id ?? "") && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
                         </ListItem>
                       ))}
                     </List>
