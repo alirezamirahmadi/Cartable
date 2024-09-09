@@ -21,11 +21,11 @@ export default async function Inbox({ searchParams }: { searchParams?: { [key: s
     <>
       <Box sx={{ display: "flex" }}>
         <Box sx={{ display: { xs: "none", md: "block" }, maxWidth: 300 }}>
-          <SideBar collections={collections} place="inbox" />
+          <SideBar collections={collections} />
         </Box>
         <Box sx={{ width: "100%", mx: 1 }}>
-          <TopBar collections={collections} place="inbox" />
-          <DocumentList documents={documents} place="inbox" />
+          <TopBar collections={collections} />
+          <DocumentList documents={documents} />
         </Box>
       </Box>
     </>

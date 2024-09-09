@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, memo, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import {
   TextField, InputAdornment, Typography, Box, Divider, List, ListItem, ListItemButton, ListItemIcon,
@@ -29,10 +29,11 @@ const Collections = styled(List)<{ component?: React.ElementType }>({
   },
 });
 
-const SideBar = ({ collections, place }: { collections: CollectionListType[], place: "inbox" | "outbox" }): React.JSX.Element => {
+const SideBar = ({ collections }: { collections: CollectionListType[] }): React.JSX.Element => {
 
-  const searchParams = useSearchParams();
+  const path = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [open, setOpen] = useState(true);
   const [search, setSearch] = useState<string>("");
   const [selectedCollection, setSelectedCollection] = useState<string>(searchParams.get("collectionId") ?? "");
@@ -52,7 +53,7 @@ const SideBar = ({ collections, place }: { collections: CollectionListType[], pl
 
   const handleOpenCollection = (collectionId: string) => {
     setSelectedCollection(collectionId);
-    router.replace(`/${place}?collectionId=${collectionId}`);
+    router.replace(`${path}?collectionId=${collectionId}`);
   }
 
   return (
@@ -61,7 +62,7 @@ const SideBar = ({ collections, place }: { collections: CollectionListType[], pl
         <Collections component="nav" disablePadding>
           <ListItemButton component="a" href="#customized-list" sx={{ display: { xs: "none", md: "block" } }}>
             <ListItemIcon sx={{ fontSize: 20 }}><CollectionsIcon /></ListItemIcon>
-            <ListItemText sx={{ my: 0 }} primary={place === "inbox" ? "کارتابل جاری" : "کارتابل پیگیری"} primaryTypographyProps={{ fontSize: 20, fontWeight: "medium", letterSpacing: 0, }} />
+            <ListItemText sx={{ my: 0 }} primary={path === "/inbox" ? "کارتابل جاری" : "کارتابل پیگیری"} primaryTypographyProps={{ fontSize: 20, fontWeight: "medium", letterSpacing: 0, }} />
           </ListItemButton>
           <Divider />
           <ListItem component="div" disablePadding>
@@ -112,8 +113,5 @@ const SideBar = ({ collections, place }: { collections: CollectionListType[], pl
     </Box>
   );
 }
-// ,
-//   (prevProps, nextProps) => prevProps.place === nextProps.place
-// )
 
 export default SideBar;

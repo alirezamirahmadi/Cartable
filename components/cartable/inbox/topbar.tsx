@@ -1,15 +1,16 @@
 "use client"
 
 import React, { useState, memo, useRef } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Box, AppBar, Toolbar, IconButton, Menu, Container, MenuItem, FormControl, InputLabel, Select, SelectChangeEvent } from "@mui/material";
 import CollectionsIcon from "@mui/icons-material/Collections";
 
 import SideBar from "../sidebar/sidebar";
 import type { CollectionListType } from "@/types/cartableType";
 
-const TopBar = memo(({ collections, place }: { collections: CollectionListType[], place: "inbox" | "outbox" }): React.JSX.Element => {
+const TopBar = memo(({ collections }: { collections: CollectionListType[] }): React.JSX.Element => {
 
+  const path = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filter, setFilter] = useState<string>(searchParams.get("filter") ?? "all");
@@ -47,10 +48,10 @@ const TopBar = memo(({ collections, place }: { collections: CollectionListType[]
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: "block", md: "none" }, }}
             >
-              {sidebarBox.current && <SideBar collections={collections} place={place} />}
+              {sidebarBox.current && <SideBar collections={collections} />}
             </Menu>
           </Box>
-          {place === "inbox" &&
+          {path === "/inbox" &&
             <FormControl>
               <InputLabel>فیلتر</InputLabel>
               <Select value={filter} label="فیلتر" onChange={handleChangeShowType} disabled={searchParams.get("collectionId") ? false : true}>

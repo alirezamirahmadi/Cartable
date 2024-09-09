@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
-import { IconButton, useTheme, ListItemText, TextField, Button } from "@mui/material";
+import { IconButton, useTheme, ListItemText, TextField, Button, Box } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import CloseIcon from '@mui/icons-material/Close';
@@ -141,18 +141,18 @@ export default function Send({ refCollection, refDocument, parentReceive, onClos
 
   return (
     <>
-      <div className="flex">
+      <Box sx={{ display: "flex" }}>
         <Roles roles={roles} onAction={handleSelectRole} add />
-        <div className="w-full">
+        <Box sx={{ width: "100%" }} className="w-full">
           <ReactDataTable rows={receivers ?? []} columns={columns} direction="rtl"
             options={{ ...defaultDataTableOptions(theme.palette.mode), filter: false, search: false, download: false, viewColumns: false, print: false }}
           />
-        </div>
-      </div>
-      <div className="flex justify-center gap-x-4">
+        </Box>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "center", columnGap: 2 }} className="flex justify-center gap-x-4">
         <Button variant="outlined" color="primary" onClick={() => onClose()} startIcon={<CloseIcon />}>انصراف</Button>
         <Button variant="contained" color="primary" disabled={receivers && receivers.length > 0 ? false : true} onClick={handleSubmit} startIcon={<KeyboardArrowUpOutlinedIcon />}>ارسال</Button>
-      </div>
+      </Box>
 
       {snackProps.isOpen && <Snack {...snackProps} />}
     </>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { ListItemText, Typography, useTheme, IconButton, ListItem, ListItemAvatar, Avatar } from "@mui/material";
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
@@ -14,10 +15,11 @@ import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Delete from "@/components/general/delete/delete";
 import type { SnackProps } from "@/types/generalType";
 
-export default function Circulation({ refCollection, refDocument, place, onClose }: { refCollection: string, refDocument: string, place: "inbox" | "outbox", onClose: () => void }): React.JSX.Element {
+export default function Circulation({ refCollection, refDocument }: { refCollection: string, refDocument: string }): React.JSX.Element {
 
-  const me = useAppSelector(state => state.me);
   const theme = useTheme();
+  const path = usePathname();
+  const me = useAppSelector(state => state.me);
   const [circulations, setCirculations] = useState<any>();
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
@@ -69,7 +71,7 @@ export default function Circulation({ refCollection, refDocument, place, onClose
     {
       field: { title: "observed" }, label: "", kind: "component", options: {
         component: (value, onChange, rowData) => {
-          return !rowData.viewDate && place === "outbox" && rowData.sender._id === me._id ? (
+          return !rowData.viewDate && path === "/outbox" && rowData.sender._id === me._id ? (
             <IconButton onClick={() => handleUndoSend(rowData)} color="primary">
               <LowPriorityIcon titleAccess="فراخوانی ارسال" />
             </IconButton>
@@ -77,11 +79,11 @@ export default function Circulation({ refCollection, refDocument, place, onClose
         }
       }
     },
-  ]
+  ];
 
   useEffect(() => {
     loadReceiceData();
-  }, [])
+  }, []);
 
   const loadReceiceData = async () => {
     await fetch(`api/v1/receives?refCollection=${refCollection}&refDocument=${refDocument}`)

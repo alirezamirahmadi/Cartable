@@ -1,10 +1,9 @@
 "use client"
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { IconButton, useTheme, ListItemText, Typography, Avatar, ListItem, ListItemAvatar } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import MailIcon from '@mui/icons-material/Mail';
 import DraftsIcon from '@mui/icons-material/Drafts';
@@ -15,15 +14,19 @@ const Modal = dynamic(() => import("@/components/general/modal/modal"), { loadin
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Buttons from "@/components/cartable/buttons/buttons";
 import Send from "@/components/cartable/send/send";
-import Details from "../details/details";
+import Circulation from "../details/circulation/circulation";
+import Attachment from "@/components/general/attachment/attachment";
 
-export default function DocumentList({ documents, place }: { documents: any[], place: "inbox" | "outbox" }): React.JSX.Element {
+export default function DocumentList({ documents }: { documents: any[] }): React.JSX.Element {
+
+  const path = usePathname();
 
   const searchParams = useSearchParams();
   const collectionId = searchParams.get("collectionId");
   const filter = searchParams.get("filter");
   const [isOpenSendModal, setIsOpenSendModal] = useState<boolean>(false);
-  const [isOpenDetailsModal, setIsOpenDetailsModal] = useState<boolean>(false);
+  const [isOpenCirculationModal, setIsOpenCirculationModal] = useState<boolean>(false);
+  const [isOpenAttachmentModal, setIsOpenAttachmentModal] = useState<boolean>(false);
   const [selectedDocument, setSelectedDocument] = useState<any>();
   const observed = filter === "observed";
 
@@ -31,7 +34,7 @@ export default function DocumentList({ documents, place }: { documents: any[], p
   const theme = useTheme();
 
   const columns: ColumnType[] =
-    place === "inbox"
+    path === "/inbox"
       ?
       [
         {
@@ -112,8 +115,11 @@ export default function DocumentList({ documents, place }: { documents: any[], p
       case "Send":
         setIsOpenSendModal(true);
         break;
-      case "Details":
-        setIsOpenDetailsModal(true);
+      case "Circulation":
+        setIsOpenCirculationModal(true)
+        break;
+      case "Attachment":
+        setIsOpenAttachmentModal(true);
         break;
     }
   }
@@ -135,8 +141,10 @@ export default function DocumentList({ documents, place }: { documents: any[], p
     <>
       <ReactDataTable rows={!filter ? documents : [...documents].filter(document => document.observed === observed)} columns={columns} direction="rtl" options={defaultDataTableOptions(theme.palette.mode)} />
 
-      {isOpenSendModal && <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />}
-      {isOpenDetailsModal && <Modal isOpen={isOpenDetailsModal} title="جزئیات" fullWidth body={<Details refCollection={collectionId ?? ""} refDocument={place === "inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} place={place} />} onCloseModal={() => setIsOpenDetailsModal(false)} />}
+      {isOpenSendModal && <Modal isOpen={isOpenSendModal} title="ارسال مدرک" fullWidth body={<Send refCollection={collectionId ?? ""} refDocument={path === "/inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} parentReceive={selectedDocument?._id} onClose={() => setIsOpenSendModal(false)} />} onCloseModal={() => setIsOpenSendModal(false)} />}
+
+      {isOpenCirculationModal && <Modal isOpen={isOpenCirculationModal} title="گردش مدرک" fullWidth body={<Circulation refCollection={collectionId ?? ""} refDocument={path === "/inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} />} onCloseModal={() => setIsOpenCirculationModal(false)} />}
+      {isOpenAttachmentModal && <Modal isOpen={isOpenAttachmentModal} title="پیوست" fullWidth body={<Attachment refCollection={collectionId ?? ""} refDocument={path === "/inbox" ? selectedDocument?.send?.refDocument : selectedDocument?.refDocument} />} onCloseModal={() => setIsOpenAttachmentModal(false)} />}
     </>
   )
 }
