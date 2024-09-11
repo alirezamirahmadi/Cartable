@@ -16,6 +16,7 @@ import Buttons from "@/components/cartable/buttons/buttons";
 import Send from "@/components/cartable/send/send";
 import Circulation from "../details/circulation/circulation";
 import Attachment from "@/components/general/attachment/attachment";
+import RoleAvatar from "@/components/general/roleAvatar/roleAvatar";
 
 export default function DocumentList({ documents }: { documents: any[] }): React.JSX.Element {
 
@@ -50,12 +51,7 @@ export default function DocumentList({ documents }: { documents: any[] }): React
         {
           field: { title: "sender" }, label: "فرستنده", kind: "component", options: {
             component: (value, onChange, rowData) => (
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar alt={rowData.sender.firstName} src={rowData.sender.image} />
-                </ListItemAvatar>
-                <ListItemText primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} />
-              </ListItem>
+              <RoleAvatar primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} src={rowData.sender.image} />
             )
           }
         },

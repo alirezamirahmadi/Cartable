@@ -9,8 +9,9 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 
 import Loading from "../general/loading/loading";
-const Modal = dynamic(() => import("../general/modal/modal"), {loading:() => <Loading />});
+const Modal = dynamic(() => import("../general/modal/modal"), { loading: () => <Loading /> });
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
+import RoleAvatar from "../general/roleAvatar/roleAvatar";
 import type { RoleType } from "@/types/roleType";
 
 export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
@@ -84,12 +85,7 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
           filteredRoles?.map((role: any) => (
             <Box key={role._id}>
               <ListItem alignItems="center">
-                <ListItem alignItems="flex-start" sx={{ p: 0 }}>
-                  <ListItemAvatar>
-                    <Avatar alt={role.person.firstName} src={role.person.image} sx={{ width: 45, height: 45, mx: "auto" }} />
-                  </ListItemAvatar>
-                  <ListItemText primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} sx={{ cursor: "pointer" }} />
-                </ListItem>
+                <RoleAvatar primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} src={role.person.image} />
                 <ModifyButtons add={add} edit={edit} omit={omit} rowData={role} onAction={handleAction} omitMessage={`آیا از حذف "${role.title}" اطمینان دارید؟`} />
               </ListItem>
               <Divider variant="middle" />

@@ -13,6 +13,7 @@ const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import { useAppSelector } from "@/lib/hooks";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
 import Delete from "@/components/general/delete/delete";
+import RoleAvatar from "@/components/general/roleAvatar/roleAvatar";
 import type { SnackProps } from "@/types/generalType";
 
 export default function Circulation({ refCollection, refDocument }: { refCollection: string, refDocument: string }): React.JSX.Element {
@@ -30,24 +31,14 @@ export default function Circulation({ refCollection, refDocument }: { refCollect
     {
       field: { title: "sender" }, label: "فرستنده", kind: "component", options: {
         component: (value, onChange, rowData) => (
-          <ListItem>
-            <ListItemAvatar>
-              <Avatar alt={rowData.sender.firstName} src={rowData.sender.image} />
-            </ListItemAvatar>
-            <ListItemText primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} />
-          </ListItem>
+          <RoleAvatar primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} src={rowData.sender.image} />
         )
       }
     },
     {
       field: { title: "receiver" }, label: "گیرنده", kind: "component", options: {
         component: (value, onChange, rowData) => (
-          <ListItem>
-            <ListItemAvatar>
-              <Avatar alt={rowData.receiver.firstName} src={rowData.receiver.image} />
-            </ListItemAvatar>
-            <ListItemText primary={`${rowData.receiver.firstName} ${rowData.receiver.lastName}`} secondary={rowData.receiverRole.title} />
-          </ListItem>
+          <RoleAvatar primary={`${rowData.receiver.firstName} ${rowData.receiver.lastName}`} secondary={rowData.receiverRole.title} src={rowData.receiver.image} />
         )
       }
     },
