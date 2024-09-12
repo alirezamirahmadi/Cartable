@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
-import { ListItemText, Typography, useTheme, IconButton, ListItem, ListItemAvatar, Avatar } from "@mui/material";
+import { Typography, useTheme, IconButton } from "@mui/material";
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import * as shamsi from "shamsi-date-converter";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
@@ -107,10 +107,6 @@ export default function Circulation({ refCollection, refDocument }: { refCollect
       .catch(() => {
         setSnackProps({ context: "مشکلی در فراخوانی ارسال وجود دارد", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
       })
-  }
-
-  if (!me.permissions.includes("/cartable.circulation")) {
-    return (<></>)
   }
 
   return (

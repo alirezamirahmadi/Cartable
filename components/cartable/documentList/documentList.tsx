@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import { IconButton, useTheme, ListItemText, Typography, Avatar, ListItem, ListItemAvatar } from "@mui/material";
+import { IconButton, useTheme, Typography } from "@mui/material";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 import MailIcon from '@mui/icons-material/Mail';
 import DraftsIcon from '@mui/icons-material/Drafts';

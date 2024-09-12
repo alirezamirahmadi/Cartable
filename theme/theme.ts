@@ -8,10 +8,10 @@ import { useAppSelector } from "@/lib/hooks";
 
 const vazir = localFont({ src: "./fonts/Vazir.woff2" });
 
-export default function theme() {
+export default function theme(dark: boolean) {
 
   const darkMode = useAppSelector(state => state.darkMode);
-  const [mode, setMode] = useState<boolean>(darkMode);
+  const [mode, setMode] = useState<boolean>(dark);
 
   useEffect(() => {
     setMode(darkMode);

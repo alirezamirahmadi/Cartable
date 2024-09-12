@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { List, ListItem, ListItemButton, ListItemText, ListItemIcon, Box, Divider } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 
@@ -12,6 +13,7 @@ export default function MyRoles({ onChangeRole }: { onChangeRole: (isChange: boo
   const [myRoles, setMyRoles] = useState<{ _id: string, title: string, root: string }[]>([]);
   const dispatch = useAppDispatch();
   const me = useAppSelector(state => state.me);
+  const router = useRouter();
 
   useEffect(() => {
     loadMyRoles();
@@ -34,9 +36,11 @@ export default function MyRoles({ onChangeRole }: { onChangeRole: (isChange: boo
       })
         .then(res => {
           if (res.status === 201) {
-            dispatch(changeRole({ ...me, defaultRole: role }));
-            onChangeRole(true);
+            router.replace("/");
           }
+        })
+        .then(() => {
+          onChangeRole(true);
         })
   }
 

@@ -27,7 +27,7 @@ const GET = async () => {
       .lookup({ from: "groups", localField: "groupmember.refGroup", foreignField: "_id", as: "groups" })
       .lookup({ from: "permissions", localField: "groups.permissions", foreignField: "_id", as: "grouppermissions" })
       .project({
-        "firstName": 1, "lastName": 1, "roles._id": 1, "roles.root": 1, "roles.title": 1, "roles.isDefault": 1,
+        "firstName": 1, "lastName": 1, "image": 1, "roles._id": 1, "roles.root": 1, "roles.title": 1, "roles.isDefault": 1,
         "rolepermissions": 1, "grouppermissions": 1
       })
       .addFields({ "permissions": [] })

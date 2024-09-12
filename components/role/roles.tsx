@@ -2,10 +2,7 @@
 
 import { useState, useEffect, ChangeEvent } from "react";
 import dynamic from "next/dynamic";
-import {
-  ListItemButton, TextField, InputAdornment, List, ListItem, Divider, ListItemText, ListItemAvatar,
-  Avatar, Typography, Box
-} from "@mui/material";
+import { ListItemButton, TextField, InputAdornment, List, ListItem, Divider, Typography, Box } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 
 import Loading from "../general/loading/loading";

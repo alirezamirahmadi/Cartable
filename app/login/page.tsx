@@ -32,12 +32,13 @@ export default function Login(): React.JSX.Element {
     }).then(res => {
       switch (res.status) {
         case 200:
-          router.replace("/")
+          router.replace("/");
           break;
         case 404:
           setSnackProps({ context: "نام کاربری یا رمزعبور نادرست است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
       }
-    });
+      return res.status;
+    }).then(status => status === 200 && router.refresh())
   }
 
   return (

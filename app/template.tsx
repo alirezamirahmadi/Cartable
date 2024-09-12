@@ -1,6 +1,6 @@
 // import { headers } from "next/headers";
 
-import NavBar from "@/components/navbar/navBar";
+import NavBar from "@/components/navbar/NavBar";
 
 export default function RootTemplate({ children }: Readonly<{ children: React.ReactNode; }>): React.JSX.Element {
 

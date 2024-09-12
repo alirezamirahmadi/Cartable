@@ -2,21 +2,22 @@
 
 import { useState, useEffect, memo } from "react";
 import dynamic from "next/dynamic";
-import { Box, IconButton, Typography, Menu, Avatar, Tooltip, MenuItem, ListItemText } from "@mui/material";
+import { Box, IconButton, Typography, Menu, Avatar, MenuItem, ListItemText } from "@mui/material";
 import { useCookies } from "react-cookie";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
 const Modal = dynamic(() => import("../modal/modal"));
 const Snack = dynamic(() => import("../snack/snack"));
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { getMe, clearMe } from "@/lib/features/me/meSlice";
+const MyRoles = dynamic(() => import("../myRoles/myRoles"));
+import { useAppDispatch } from "@/lib/hooks";
+import { setMe, clearMe } from "@/lib/features/me/meSlice";
 import { changeMode } from "@/lib/features/darkMode/darkSlice";
 import ChangePassword from "@/components/changePassword/changePassword";
-import MyRoles from "../myRoles/myRoles";
 import type { SnackProps } from "@/types/generalType";
+import { MeType } from "@/types/authType";
 
-const MyAccount = memo((): React.JSX.Element => {
+const MyAccount = memo(({ me }: { me: MeType }): React.JSX.Element => {
 
   const [isOpenPasswordModal, setIsOpenPasswordModal] = useState<boolean>(false);
   const [isOpenRolesModal, setIsOpenRolesModal] = useState<boolean>(false);
@@ -25,12 +26,19 @@ const MyAccount = memo((): React.JSX.Element => {
   const { resolvedTheme, setTheme } = useTheme();
   const [cookies, setCookie,] = useCookies(["dark-mode"]);
   const dispatch = useAppDispatch();
-  const me = useAppSelector(state => state.me);
   const router = useRouter();
 
   useEffect(() => {
     dispatch(changeMode(cookies["dark-mode"] ?? false));
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    me && dispatch(setMe(me));
+  }, []);
+
+  useEffect(() => {
+    me && dispatch(setMe(me));
+  }, [me]);
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -54,7 +62,9 @@ const MyAccount = memo((): React.JSX.Element => {
           dispatch(clearMe());
           router.replace("login");
         }
+        return res.status;
       })
+      .then(status => status === 200 && router.refresh())
     setAnchorElUser(null);
   }
 
@@ -66,8 +76,7 @@ const MyAccount = memo((): React.JSX.Element => {
   const handleChangeRole = (isChange: boolean) => {
     if (isChange) {
       setIsOpenRolesModal(false);
-      dispatch(getMe())
-        .then(() => router.replace("/"));
+      router.refresh();
     }
   }
 
@@ -93,21 +102,19 @@ const MyAccount = memo((): React.JSX.Element => {
   return (
     <>
       <Box sx={{ flexGrow: 0 }}>
-        <Tooltip title="کاربری من">
-          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-            <Avatar />
+        <Box sx={{ display: "flex", columnGap: 1 }}>
+          <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }} title="کاربری من">
+            <Avatar alt={me?.firstName} src={me?.avatar} />
           </IconButton>
-        </Tooltip>
+          <ListItemText primary={`${me?.firstName} ${me?.lastName}`} secondary={me?.defaultRole?.title} sx={{ display: { xs: "none", md: "block" } }} />
+        </Box>
         <Menu sx={{ mt: "45px" }} anchorEl={anchorElUser} anchorOrigin={{ vertical: "top", horizontal: "right" }} keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
+          transformOrigin={{ vertical: "top", horizontal: "right", }}
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
         >
           <MenuItem >
-            <ListItemText primary={`${me.firstName} ${me.lastName}`} secondary={me.defaultRole.title} />
+            <ListItemText primary={`${me?.firstName} ${me?.lastName}`} secondary={me?.defaultRole?.title} sx={{ display: { xs: "block", md: "none" } }} />
           </MenuItem>
           <MenuItem onClick={handleMyRoles}>
             <Typography textAlign="right">سمت های من</Typography>

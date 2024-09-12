@@ -10,7 +10,7 @@ import { prefixer } from 'stylis';
 
 import theme from './theme';
 
-export default function ThemeRegistry({ options, children }: { options: any, children: any }) {
+export default function ThemeRegistry({ options, children, darkMode }: { options: any, children: any, darkMode: boolean }) {
 
   const [{ cache, flush }] = useState(() => {
     const cache = createCache({ ...options, stylisPlugins: [prefixer, rtlPlugin] });
@@ -56,7 +56,7 @@ export default function ThemeRegistry({ options, children }: { options: any, chi
   return (
     <CacheProvider value={cache}>
       <NextThemeProvider attribute="class" storageKey="theme" defaultTheme="light">
-        <ThemeProvider theme={theme()}>
+        <ThemeProvider theme={theme(darkMode)}>
           {children}
         </ThemeProvider>
       </NextThemeProvider>
