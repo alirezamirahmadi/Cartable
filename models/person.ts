@@ -48,7 +48,7 @@ const schema = new mongoose.Schema({
     type: Boolean,
     require: true,
   },
-  image:{
+  avatar:{
     type:String,
   },
   sign:{

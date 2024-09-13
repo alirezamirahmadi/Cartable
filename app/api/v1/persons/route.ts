@@ -27,7 +27,7 @@ const GET = async (request: Request) => {
   else if (limited === "true") {
     person = await personModel.aggregate()
       .match({ isActive: true })
-      .project({ "code": 1, "firstName": 1, "lastName": 1, "gender": 1, "phone": 1, "image": 1, "sign": 1 })
+      .project({ "code": 1, "firstName": 1, "lastName": 1, "gender": 1, "phone": 1, "avatar": 1, "sign": 1 })
   }
   else if (username && password) {
     person = await personModel.find({ account: { username, password, isActive: true } }).exec();
@@ -58,7 +58,7 @@ const POST = async (request: Request) => {
   const address = formData.get("address");
   const description = formData.get("description");
   const isActive = formData.get("isActive");
-  const image = formData.get("image");
+  const avatar = formData.get("avatar");
   const sign = formData.get("sign");
   const username = formData.get("username");
   const password = formData.get("password");
@@ -81,15 +81,15 @@ const POST = async (request: Request) => {
   // hash password
   const hashedPassword = typeof password === "string" ? await hashPassword(password) : "";
 
-  const imagePath = (typeof image !== "string" && image !== null) ? "/persons/images/" + Date.now() + image.name : ""
+  const avatarPath = (typeof avatar !== "string" && avatar !== null) ? "/persons/avatars/" + Date.now() + avatar.name : ""
   const signPath = (typeof sign !== "string" && sign !== null) ? "/persons/signs/" + Date.now() + sign.name : "";
 
-  const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, image: imagePath, sign: signPath, account: { username, password: hashedPassword } });
+  const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, avatar: avatarPath, sign: signPath, account: { username, password: hashedPassword } });
 
   if (person) {
-    if (typeof image !== "string" && image !== null) {
-      const imageBuffer = Buffer.from(await image.arrayBuffer());
-      image && await writeFile(path.join(process.cwd(), "/public" + imagePath), imageBuffer);
+    if (typeof avatar !== "string" && avatar !== null) {
+      const avatarBuffer = Buffer.from(await avatar.arrayBuffer());
+      avatar && await writeFile(path.join(process.cwd(), "/public" + avatarPath), avatarBuffer);
     }
     if (typeof sign !== "string" && sign !== null) {
       const signBuffer = Buffer.from(await sign.arrayBuffer());

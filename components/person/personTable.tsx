@@ -29,7 +29,7 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
   const columns: ColumnType[] = [
     { field: { title: "id" }, label: "ID", options: { display: false } },
     {
-      field: { title: "image" }, label: "تصویر", kind: "component", options: {
+      field: { title: "avatar" }, label: "تصویر", kind: "component", options: {
         component: (value, onChange, rowData) => (<Avatar sx={{mx:"auto"}} alt={rowData.firstName} src={value} />)
       }
     },

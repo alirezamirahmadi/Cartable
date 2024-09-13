@@ -31,14 +31,14 @@ export default function Circulation({ refCollection, refDocument }: { refCollect
     {
       field: { title: "sender" }, label: "فرستنده", kind: "component", options: {
         component: (value, onChange, rowData) => (
-          <RoleAvatar primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} src={rowData.sender.image} />
+          <RoleAvatar primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} src={rowData.sender.avatar} />
         )
       }
     },
     {
       field: { title: "receiver" }, label: "گیرنده", kind: "component", options: {
         component: (value, onChange, rowData) => (
-          <RoleAvatar primary={`${rowData.receiver.firstName} ${rowData.receiver.lastName}`} secondary={rowData.receiverRole.title} src={rowData.receiver.image} />
+          <RoleAvatar primary={`${rowData.receiver.firstName} ${rowData.receiver.lastName}`} secondary={rowData.receiverRole.title} src={rowData.receiver.avatar} />
         )
       }
     },

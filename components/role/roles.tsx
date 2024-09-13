@@ -82,7 +82,7 @@ export default function Roles({ roles, onAction, add, edit, omit, selectRole }:
           filteredRoles?.map((role: any) => (
             <Box key={role._id}>
               <ListItem alignItems="center">
-                <RoleAvatar primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} src={role.person.image} />
+                <RoleAvatar primary={`${role.person.firstName} ${role.person.lastName}`} secondary={role.title} src={role.person.avatar} />
                 <ModifyButtons add={add} edit={edit} omit={omit} rowData={role} onAction={handleAction} omitMessage={`آیا از حذف "${role.title}" اطمینان دارید؟`} />
               </ListItem>
               <Divider variant="middle" />

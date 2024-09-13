@@ -17,7 +17,7 @@ const GET = async (request: Request, { params }: { params: { permissionId: strin
     .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" })
     .project({
       "title": 1, "root": 1, "isActive": 1,
-      "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.image": 1
+      "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.avatar": 1
     })
     .unwind("person")
 

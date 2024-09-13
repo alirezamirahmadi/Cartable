@@ -24,7 +24,7 @@ const GET = async (request: Request) => {
     .match({ "groupmember.refGroup": new mongoose.Types.ObjectId(refGroup ?? "") })
     .project({
       "title": 1, "root": 1, "isActive": 1,
-      "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.image": 1
+      "person._id": 1, "person.firstName": 1, "person.lastName": 1, "person.avatar": 1
     })
     .unwind("person")
 

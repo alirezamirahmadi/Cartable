@@ -29,7 +29,7 @@ async function inboxDocuments(collectionId: string, tokenPayload: string | JwtPa
       .match({ "recieverRole.isDefault": true })
       .match({ "send.refCollection": new mongoose.Types.ObjectId(collectionId) })
       .project({
-        "sender.firstName": 1, "sender.lastName": 1, "sender.image": 1, "senderRole.title": 1, "collection.showTitle": 1, "urgency.title": 1, "send.sendDate": 1,
+        "sender.firstName": 1, "sender.lastName": 1, "sender.avatar": 1, "senderRole.title": 1, "collection.showTitle": 1, "urgency.title": 1, "send.sendDate": 1,
         "observed": 1, "viewDate": 1, "lastViewedDate": 1, "send.refDocument": 1,
       })
       .unwind("$sender")

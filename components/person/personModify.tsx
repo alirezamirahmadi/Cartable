@@ -35,7 +35,7 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
   const router = useRouter();
   const [birthday, setBirthday] = useState<DatePickerType>(person?.birthday ?? "");
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
-  const [image, setImage] = useState<Blob | string>();
+  const [avatar, setAvatar] = useState<Blob | string>();
   const [sign, setSign] = useState<Blob | string>();
 
   const { register, handleSubmit, reset, formState: { errors }, getValues } = useForm({
@@ -52,8 +52,8 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
       address: person?.address ?? "",
       description: person?.description ?? "",
       isActive: person?.isActive ?? false,
-      image: null,
-      sign: null,
+      // avatar: null,
+      // sign: null,
       username: person?.account?.username ?? "",
       password: "",
     }
@@ -74,7 +74,7 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
     formData.append("address", data.address);
     formData.append("description", data.description);
     formData.append("isActive", data.isActive);
-    formData.append("image", image ?? "");
+    formData.append("avatar", avatar ?? "");
     formData.append("sign", sign ?? "");
     formData.append("username", data.username);
     formData.append("password", data.password);
@@ -115,18 +115,18 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
                 <>
                   <IconButton component="label">
                     <EditIcon fontSize="small" />
-                    <VisuallyHiddenInput type="file" onChange={event => setImage(event.target.files ? event.target.files[0] : undefined)} />
+                    <VisuallyHiddenInput type="file" onChange={event => setAvatar(event.target.files ? event.target.files[0] : undefined)} />
                   </IconButton>
                 </>
               }
             >
-              <Avatar alt={person?.firstName ?? ""} src={(person?.image && image !== "Delete") ? person?.image : ""} sx={{ width: 52, height: 52 }}>
-                {!image && image !== "Delete" && <PersonIcon fontSize="large" />}
-                {image && image !== "Delete" && <HowToRegIcon fontSize="large" />}
-                {image === "Delete" && <DeleteForeverIcon fontSize="large" />}
+              <Avatar alt={person?.firstName ?? ""} src={(person?.avatar && avatar !== "Delete") ? person?.avatar : ""} sx={{ width: 52, height: 52 }}>
+                {!avatar && avatar !== "Delete" && <PersonIcon fontSize="large" />}
+                {avatar && avatar !== "Delete" && <HowToRegIcon fontSize="large" />}
+                {avatar === "Delete" && <DeleteForeverIcon fontSize="large" />}
               </Avatar>
             </Badge>
-            {person?.image && <ModifyButtons onAction={(data: any, action: string) => setImage(action)} omit omitMessage={`آیا از حذف تصویر ${person?.firstName} مطمئن هستید؟`} />}
+            {person?.avatar && <ModifyButtons onAction={(data: any, action: string) => setAvatar(action)} omit omitMessage={`آیا از حذف تصویر ${person?.firstName} مطمئن هستید؟`} />}
           </Box>
           <TextField {...register("code")} size="small" error={errors.code ? true : false} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>کد</Typography>} />
           <TextField {...register("firstName", { required: true, pattern: regex.flName })} size="small" error={errors.firstName ? true : false} required helperText={errors.firstName && "نام می بایست بین 3 تا 50 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام</Typography>} />
@@ -157,7 +157,7 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
           <div className="grid grid-rows-2 justify-items-center gap-y-2 col-span-3">
             <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", rowGap: 2, columnGap: 4 }}>
               <TextField {...register("username", { required: true, pattern: regex.username })} size="small" error={errors.username ? true : false} required helperText={errors.username && "نام کاربری می بایست بین 4 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>نام کاربری</Typography>} />
-              <TextField {...register("password", { required: true, pattern: regex.password })} size="small" error={errors.password ? true : false} required helperText={errors.password && "رمز عبور می بایست بین 8 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>رمز عبور</Typography>} type="password" />
+              <TextField {...register("password", { required: person ? false : true, pattern: regex.password })} size="small" error={errors.password ? true : false} required={person ? false : true} helperText={errors.password && "رمز عبور می بایست بین 8 تا 20 کاراکتر باشد"} variant="outlined" label={<Typography variant="body1" sx={{ display: "inline" }}>رمز عبور</Typography>} type="password" />
             </Box>
             {(person || me.permissions.includes("/persons.new")) &&
               <Button variant="contained" color="primary" onClick={handleSubmit(submitPerson)} startIcon={<KeyboardArrowUpOutlinedIcon />}>ذخیره</Button>

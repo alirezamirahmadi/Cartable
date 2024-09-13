@@ -47,7 +47,7 @@ const PUT = async (request: Request, { params }: { params: { personId: string } 
   const address = formData.get("address");
   const description = formData.get("description");
   const isActive = formData.get("isActive");
-  const image = formData.get("image");
+  const avatar = formData.get("avatar");
   const sign = formData.get("sign");
   const username = formData.get("username");
   const password = formData.get("password");
@@ -56,31 +56,39 @@ const PUT = async (request: Request, { params }: { params: { personId: string } 
   if ((typeof firstName === "string" && firstName?.trim().length < 2) ||
     (typeof lastName === "string" && lastName?.trim().length < 2) ||
     (typeof username === "string" && username?.trim().length < 4) ||
-    (typeof password === "string" && password?.trim().length < 8)) {
+    (password && typeof password === "string" && password?.trim().length < 8)) {
 
     return Response.json({ message: "Data is invalid" }, { status: 422 });
-  }
-
-  const selectedPerson = await personModel.findById(params.personId);
-  if (image && selectedPerson && selectedPerson.image) {
-    await rm(path.join(process.cwd(), `/public${selectedPerson.image}`));
-  }
-  if (sign && selectedPerson && selectedPerson.sign) {
-    await rm(path.join(process.cwd(), `/public${selectedPerson.sign}`));
   }
 
   // hash password
   const hashedPassword = typeof password === "string" ? await hashPassword(password) : "";
 
-  const imagePath = (typeof image !== "string" && image !== null) ? "/persons/images/" + Date.now() + image.name : ""
-  const signPath = (typeof sign !== "string" && sign !== null) ? "/persons/signs/" + Date.now() + sign.name : "";
+  // delete old avatar and sign
+  const selectedPerson = await personModel.findById(params.personId);
+  if (avatar && selectedPerson && selectedPerson.avatar) {
+    await rm(path.join(process.cwd(), `/public${selectedPerson.avatar}`));
+  }
+  if (sign && selectedPerson && selectedPerson.sign) {
+    await rm(path.join(process.cwd(), `/public${selectedPerson.sign}`));
+  }
 
-  const person = await personModel.findByIdAndUpdate(params.personId, { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, image: imagePath, sign: signPath, account: { username, password: hashedPassword } });
+
+  // set avatar and sign path
+  let avatarPath = (typeof avatar !== "string" && avatar !== null) ? "/persons/avatars/" + Date.now() + avatar.name : selectedPerson.avatar
+  avatar === "Delete" ? avatarPath = "" : "";
+
+  let signPath = (typeof sign !== "string" && sign !== null) ? "/persons/signs/" + Date.now() + sign.name : selectedPerson.sign;
+  sign === "Delete" ? signPath = "" : "";
+
+  const account = password ? { username, password: hashedPassword } : { username };
+
+  const person = await personModel.findByIdAndUpdate(params.personId, { $set: { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, avatar: avatarPath, sign: signPath, account } });
 
   if (person) {
-    if (typeof image !== "string" && image !== null) {
-      const imageBuffer = Buffer.from(await image.arrayBuffer());
-      image && await writeFile(path.join(process.cwd(), "/public" + imagePath), imageBuffer);
+    if (typeof avatar !== "string" && avatar !== null) {
+      const avatarBuffer = Buffer.from(await avatar.arrayBuffer());
+      avatar && await writeFile(path.join(process.cwd(), "/public" + avatarPath), avatarBuffer);
     }
     if (typeof sign !== "string" && sign !== null) {
       const signBuffer = Buffer.from(await sign.arrayBuffer());
@@ -109,8 +117,8 @@ const DELETE = async (request: Request, { params }: { params: { personId: string
     return Response.json({ message: "This Person used in roles/send/receive" }, { status: 403 })
   }
 
-  if (personUsed[0].image) {
-    await rm(path.join(process.cwd(), `/public${personUsed[0].image}`));
+  if (personUsed[0].avatar) {
+    await rm(path.join(process.cwd(), `/public${personUsed[0].avatar}`));
   }
   if (personUsed[0].sign) {
     await rm(path.join(process.cwd(), `/public${personUsed[0].sign}`));

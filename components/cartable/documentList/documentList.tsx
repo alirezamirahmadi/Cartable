@@ -51,7 +51,7 @@ export default function DocumentList({ documents }: { documents: any[] }): React
         {
           field: { title: "sender" }, label: "فرستنده", kind: "component", options: {
             component: (value, onChange, rowData) => (
-              <RoleAvatar primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} src={rowData.sender.image} />
+              <RoleAvatar primary={`${rowData.sender.firstName} ${rowData.sender.lastName}`} secondary={rowData.senderRole.title} src={rowData.sender.avatar} />
             )
           }
         },

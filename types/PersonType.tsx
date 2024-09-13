@@ -13,7 +13,7 @@ type PersonType = {
   address?: string,
   description?: string,
   isActive?: boolean,
-  image?: string,
+  avatar?: string,
   sign?: string,
   account: AccountType,
 }

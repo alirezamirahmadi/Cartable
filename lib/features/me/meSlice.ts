@@ -10,7 +10,7 @@ const getMe = createAsyncThunk(
     return await fetch("api/v1/auth/me")
       .then(res => res.status === 200 && res.json())
       .then(data => {
-        return data ? { isLogin: true, _id: data._id, firstName: data.firstName, lastName: data.lastName, defaultRole: { _id: data.roles._id, title: data.roles.title, root: data.roles.root }, permissions: [...data.permissions], avatar: data.image } : initialState
+        return data ? { isLogin: true, _id: data._id, firstName: data.firstName, lastName: data.lastName, defaultRole: { _id: data.roles._id, title: data.roles.title, root: data.roles.root }, permissions: [...data.permissions], avatar: data.avatar } : initialState
       })
       .catch(() => initialState);
   }
