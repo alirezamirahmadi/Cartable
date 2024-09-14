@@ -1,6 +1,7 @@
 // import { headers } from "next/headers";
 
 import NavBar from "@/components/navbar/NavBar";
+import BottomNavigation from "@/components/bottomNavigation/bottomNavigation";
 
 export default function RootTemplate({ children }: Readonly<{ children: React.ReactNode; }>): React.JSX.Element {
 
@@ -10,6 +11,7 @@ export default function RootTemplate({ children }: Readonly<{ children: React.Re
     <>
       <NavBar />
       {children}
+      <BottomNavigation />
     </>
   )
 }
