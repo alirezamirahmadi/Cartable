@@ -16,7 +16,7 @@ const SelectRoleGroup = memo(({ rolesAndGroups }: { rolesAndGroups: RoleGroupTyp
   const groupId = searchParams.get("groupId");
 
   const handleChange = (value: RoleGroupType | null) => {
-    router.push(value ? `/permissions?${value?.kind === 1 ? "roleId" : "groupId"}=${value?._id}&now=${Date.now()}` : "/permissions");
+    router.push(value ? `/permissions?${value?.kind === 1 ? "roleId" : "groupId"}=${value?._id}` : "/permissions");
   }
 
   return (
