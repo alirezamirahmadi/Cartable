@@ -15,13 +15,17 @@ const SelectRoleGroup = memo(({ rolesAndGroups }: { rolesAndGroups: RoleGroupTyp
   const roleId = searchParams.get("roleId");
   const groupId = searchParams.get("groupId");
 
+  const handleChange = (value: RoleGroupType | null) => {
+    router.push(value ? `/permissions?${value?.kind === 1 ? "roleId" : "groupId"}=${value?._id}&now=${Date.now()}` : "/permissions");
+  }
+
   return (
     <>
       <Autocomplete sx={{ width: 400 }} options={rolesAndGroups} autoHighlight
         getOptionLabel={(option) => option.title}
         defaultValue={rolesAndGroups.filter(roleGroup => roleGroup._id === roleId || roleGroup._id === groupId)[0]}
         groupBy={(option => option.kind === 1 ? "سمت ها" : "گروه ها")}
-        onChange={(event, value) => router.replace(value ? `/permissions?${value?.kind === 1 ? "roleId" : "groupId"}=${value?._id}` : "/permissions")}
+        onChange={(event, value) => handleChange(value)}
         renderOption={(props, option) => {
           const { ...optionProps } = props;
           return (

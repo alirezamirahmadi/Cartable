@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   ListItem, ListItemText, ListItemButton, List, Box, IconButton, Checkbox,
   Breadcrumbs, Button, Collapse, Tooltip
@@ -20,18 +20,18 @@ import { useAppSelector } from "@/lib/hooks";
 import type { SnackProps } from "@/types/generalType";
 import type { PermissionType } from "@/types/permissionType";
 
-export default function PermissionTree({ permissions }: { permissions: PermissionType[] }): React.JSX.Element {
+export default function PermissionTree({ permissions, permissionsByGroups, oldPermissions }:
+  { permissions: PermissionType[], permissionsByGroups: string[], oldPermissions: string[] }): React.JSX.Element {
 
   const me = useAppSelector(state => state.me);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const roleId = searchParams.get("roleId");
   const groupId = searchParams.get("groupId");
   const [permissionsList, setPermissionsList] = useState<PermissionType[]>([]);
   const [permissionItems, setPermissionItems] = useState<PermissionType[]>([]);
   const [roots, setRoots] = useState<PermissionType[]>([{ _id: null, title: "", showTitle: "خانه", root: "-1", kind: 1 }])
   const [newPermissions, setNewPermissions] = useState<string[]>([]);
-  const [oldPermissions, setOldPermissions] = useState<string[]>([]);
-  const [roleInGroupsPermissions, setRoleInGroupsPermissions] = useState<string[]>([]);
   const [selectedPermission, setSelectedPermission] = useState<PermissionType>();
   const [openPermissionItems, setopenPermissionItems] = useState<string>("");
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
@@ -47,37 +47,6 @@ export default function PermissionTree({ permissions }: { permissions: Permissio
   useEffect(() => {
     setNewPermissions(oldPermissions ?? []);
   }, [oldPermissions]);
-
-  useEffect(() => {
-    (roleId || groupId) !== undefined && Promise.all([
-      loadRoleGroupPermission(),
-      loadRoleInGroupPermission(),
-    ])
-  }, [roleId, groupId]);
-
-  const loadRoleInGroupPermission = async () => {
-    roleId ?
-      await fetch(`api/v1/groupPermissions?roleId=${roleId}`)
-        .then(res => res.status === 200 && res.json())
-        .then(data => {
-          const tempPermissions: string[] = [];
-          data.map((groupPermission: any) => {
-            tempPermissions.push(...groupPermission.permissions)
-          })
-          setRoleInGroupsPermissions(tempPermissions);
-        })
-      :
-      setRoleInGroupsPermissions([]);
-  }
-
-  const loadRoleGroupPermission = async () => {
-    (roleId || groupId) ?
-      await fetch(`api/v1/${roleId ? "rolePermissions?roleId" : "groupPermissions?groupId"}=${roleId ?? groupId}`)
-        .then(res => res.status === 200 && res.json())
-        .then(data => setOldPermissions(data[0]?.permissions))
-      :
-      setOldPermissions([]);
-  }
 
   const handleToggle = (permissionId: string) => {
     const index = newPermissions.indexOf(permissionId);
@@ -122,12 +91,12 @@ export default function PermissionTree({ permissions }: { permissions: Permissio
       addNewPermissons()
         .then(() => deleteTakenPermissons()
           .then(() => {
-            loadRoleGroupPermission();
+            router.refresh();
             setSnackProps({ context: `مجوزهای مورد نظر اعمال شد`, isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
           })
         )
         .catch(() => {
-          setSnackProps({ context: "ذخیره مجوزها با خطا موچه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
+          setSnackProps({ context: "ذخیره مجوزها با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } });
         })
     }
   }
@@ -200,7 +169,7 @@ export default function PermissionTree({ permissions }: { permissions: Permissio
                   <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permission._id} onClick={() => setSelectedPermission(permission)}>
                     <ListItemText primary={permission.showTitle} />
                   </ListItemButton>
-                  {roleInGroupsPermissions.includes(permission._id ?? "") && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
+                  {permissionsByGroups.includes(permission._id ?? "") && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
                 </ListItem>
                 {permission.kind === 2 &&
                   <Collapse in={openPermissionItems === permission._id} timeout="auto" unmountOnExit>
@@ -211,7 +180,7 @@ export default function PermissionTree({ permissions }: { permissions: Permissio
                           <ListItemButton sx={{ py: 0, px: 1 }} selected={selectedPermission?._id === permissionItem._id} onClick={() => setSelectedPermission(permissionItem)}>
                             <ListItemText secondary={permissionItem.showTitle} />
                           </ListItemButton>
-                          {roleInGroupsPermissions.includes(permissionItem._id ?? "") && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
+                          {permissionsByGroups.includes(permissionItem._id ?? "") && <Tooltip title="داشتن مجوز با عضویت در گروه"><GroupIcon fontSize="small" /></Tooltip>}
                         </ListItem>
                       ))}
                     </List>
