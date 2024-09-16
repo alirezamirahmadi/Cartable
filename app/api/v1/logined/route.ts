@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 import { verifyToken } from "@/utils/token";
-import loginedModel from "@/models/logined";
+import loggedModel from "@/models/logged";
 import connectToDB from "@/utils/db";
 
 const GET = async (request: Request) => {
@@ -16,13 +16,12 @@ const GET = async (request: Request) => {
   let login;
 
   if (searchParams.size === 0) {
-    login = await loginedModel.aggregate()
+    login = await loggedModel.aggregate()
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" });
   }
   else {
     let token = searchParams.get('token');
-    // login = await loginedModel.find({ token }).exec();
-    login = await loginedModel.aggregate()
+    login = await loggedModel.aggregate()
       .match({ token })
       .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" });
   }
@@ -40,7 +39,7 @@ const POST = async (request: Request) => {
 
   const { refPerson, ipAddress, loginDate, token } = await request.json();
 
-  const logined = await loginedModel.create({ refPerson, ipAddress, loginDate, token });
+  const logined = await loggedModel.create({ refPerson, ipAddress, loginDate, token });
 
   if (logined) {
     return Response.json({ message: "Person logged in successfully" }, { status: 201 });

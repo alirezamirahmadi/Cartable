@@ -1,17 +1,17 @@
-import mongoose from "mongoose";
+import { Schema, model, models } from "mongoose";
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   code: {
     type: String,
   },
   firstName: {
     type: String,
-    require: true,
+    required: true,
     minLength: 2,
   },
   lastName: {
     type: String,
-    require: true,
+    required: true,
     minLength: 2,
   },
   nationalCode: {
@@ -23,6 +23,7 @@ const schema = new mongoose.Schema({
   },
   gender: {
     type: Number,
+    enum: [1, 2], // 1-man, 2-woman
   },
   maritalStatus: {
     type: Boolean,
@@ -36,6 +37,7 @@ const schema = new mongoose.Schema({
   },
   email: {
     type: String,
+    match: /(\w+[\.-]?\w+)@\w+([\.-]?\w+)*(\.\w{2,3})/,
   },
   address: {
     type: String,
@@ -46,20 +48,29 @@ const schema = new mongoose.Schema({
   },
   isActive: {
     type: Boolean,
-    require: true,
+    required: true,
   },
-  avatar:{
-    type:String,
+  avatar: {
+    type: String,
   },
-  sign:{
-    type:String,
+  sign: {
+    type: String,
   },
   account: {
-    username: { type: String, require: true, minLength: 4 },
-    password: { type: String, require: true, minLength: 8 },
+    username: { type: String, required: true, minLength: 4 },
+    password: { type: String, required: true, minLength: 8 },
   }
-})
+},
+  {
+    toJSON: { virtuals: true },
+    virtuals: {
+      fullName: {
+        get() { return this.firstName + " " + this.lastName; }
+      }
+    }
+  }
+)
 
-const personModel = mongoose.models.person || mongoose.model('person', schema);
+const personModel = models.person || model('person', schema);
 
 export default personModel;

@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import {Schema, models, model} from "mongoose";
 require("./person");
 require("./collection");
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   title: {
     type: String,
     required: true,
@@ -20,21 +20,21 @@ const schema = new mongoose.Schema({
     immutable: false,
   },
   refPerson: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: "person",
   },
   refCollection: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: "collection",
   },
   refDocument: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
   },
 })
 
-const attachmentModel = mongoose.models.attachment || mongoose.model("attachment", schema);
+const attachmentModel = models.attachment || model("attachment", schema);
 
 export default attachmentModel;

@@ -1,20 +1,20 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   refPerson: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   refRole: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   refCollection: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   refDocument: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   ipAddress: {
@@ -23,12 +23,14 @@ const schema = new mongoose.Schema({
   sendDate: {
     type: Date,
     required: true,
+    default: () => Date.now(),
+    immutable: false,
   },
   parentReceive: {
     type: String,
   }
 })
 
-const sendModel = mongoose.models.send || mongoose.model('send', schema);
+const sendModel = models.send || model('send', schema);
 
 export default sendModel;

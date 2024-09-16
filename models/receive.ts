@@ -1,29 +1,37 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
+require("./send");
+require("./person");
+require("./role");
+require("./urgency");
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   refSend: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "send",
   },
   refPerson: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "person",
   },
   refRole: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "role",
   },
   refUrgency: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "urgency",
   },
   viewDate: {
     type: Date,
-    null: true,
+    nullable: true,
   },
   lastViewedDate: {
     type: Date,
-    null: true,
+    nullable: true,
   },
   comment: {
     type: String,
@@ -34,6 +42,6 @@ const schema = new mongoose.Schema({
   }
 })
 
-const receiveModel = mongoose.models.receive || mongoose.model("receive", schema);
+const receiveModel = models.receive || model("receive", schema);
 
 export default receiveModel;

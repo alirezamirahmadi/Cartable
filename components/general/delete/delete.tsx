@@ -1,15 +1,15 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Typography, Box } from "@mui/material";
 
 export default function Delete({ message, onDelete }: { message: string, onDelete: (isDelete: boolean) => void }): React.JSX.Element {
   return (
     <>
-      <div className="">
+      <Box>
         <Typography variant="body1">{message}</Typography>
-        <div className="flex flex-wrap justify-end gap-x-2 mt-4">
+        <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "end", columnGap: 1, mt: 2 }} >
           <Button variant="outlined" color="secondary" onClick={() => onDelete(false)}>انصراف</Button>
           <Button variant="contained" color="error" onClick={() => onDelete(true)}>حذف</Button>
-        </div>
-      </div>
+        </Box>
+      </Box>
     </>
   )
 }

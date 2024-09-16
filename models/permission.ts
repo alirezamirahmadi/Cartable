@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   title: {
     type: String,
     required: true,
@@ -10,14 +10,16 @@ const schema = new mongoose.Schema({
     required: true,
   },
   root: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
+    nullable: true,
   },
   kind: {
-    type: Number, // 1- Category, 2- Header, 3- Item
+    type: Number,
     required: true,
+    enum: [1, 2, 3], // 1- Category, 2- Header, 3- Item
   }
 })
 
-const permissionModel = mongoose.models.permission || mongoose.model("permission", schema);
+const permissionModel = models.permission || model("permission", schema);
 
 export default permissionModel;

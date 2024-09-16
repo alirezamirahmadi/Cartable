@@ -1,16 +1,20 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
+require("./permission");
+require("./group");
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   refPermission: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "permission",
   },
   refGroup: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "group",
   }
 })
 
-const groupPermissionModel = mongoose.models.groupPermission || mongoose.model("groupPermission", schema);
+const groupPermissionModel = models.groupPermission || model("groupPermission", schema);
 
 export default groupPermissionModel;

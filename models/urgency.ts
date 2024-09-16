@@ -1,12 +1,12 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   title: {
     type: String,
-    require: true,
+    required: true,
   }
 })
 
-const urgencyModel = mongoose.models.urgency || mongoose.model('urgency', schema);
+const urgencyModel = models.urgency || model('urgency', schema);
 
 export default urgencyModel;

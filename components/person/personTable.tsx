@@ -8,7 +8,7 @@ import { useTheme, Avatar } from "@mui/material";
 import ReactDataTable, { ColumnType } from "react-datatable-responsive";
 
 import Loading from "../general/loading/loading";
-const Modal = dynamic(() => import("@/components/general/modal/modal"), {loading:() => <Loading />});
+const Modal = dynamic(() => import("@/components/general/modal/modal"), { loading: () => <Loading /> });
 const Snack = dynamic(() => import("@/components/general/snack/snack"));
 import ModifyButtons from "@/components/general/modifyButtons/modifyButtons";
 import defaultDataTableOptions from "@/utils/defaultDataTable";
@@ -23,18 +23,16 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
   const router = useRouter();
   const [rowData, setRowData] = useState<PersonType>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
-  const [isOpenRolesModal, setIsOpenRolesModal] = useState<boolean>(false);
   const [snackProps, setSnackProps] = useState<SnackProps>({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } });
 
   const columns: ColumnType[] = [
     { field: { title: "id" }, label: "ID", options: { display: false } },
     {
       field: { title: "avatar" }, label: "تصویر", kind: "component", options: {
-        component: (value, onChange, rowData) => (<Avatar sx={{mx:"auto"}} alt={rowData.firstName} src={value} />)
+        component: (value, onChange, rowData) => (<Avatar sx={{ mx: "auto" }} alt={rowData.firstName} src={value} />)
       }
     },
-    { field: { title: "firstName" }, label: "نام" },
-    { field: { title: "lastName" }, label: "نام خانوادگی" },
+    { field: { title: "fullName" }, label: "نام و نام خانوادگی" },
     { field: { title: "code" }, label: "کد" },
     { field: { title: "isActive" }, label: "فعال", kind: "boolean" },
     { field: { title: "account.username" }, label: "نام کاربری" },

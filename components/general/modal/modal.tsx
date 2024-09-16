@@ -36,7 +36,6 @@ const Modal = memo(({ title, isOpen, body, fullWidth, onCloseModal }:
   }, [isOpen])
 
   return (
-    <div>
       <MUIModal open={open} onClose={handleClose}>
         <Box sx={style}>
           <div className="flex justify-between items-center">
@@ -51,7 +50,6 @@ const Modal = memo(({ title, isOpen, body, fullWidth, onCloseModal }:
           </Suspense>
         </Box>
       </MUIModal>
-    </div>
   );
 },
   (prevProps, nextProps) => prevProps.title === nextProps.title && prevProps.isOpen === nextProps.isOpen

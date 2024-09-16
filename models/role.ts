@@ -1,16 +1,16 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   title: {
     type: String,
     required: true,
   },
   refPerson: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
   },
   root: {
-    type: mongoose.Schema.ObjectId,
-    null: true,
+    type: Schema.Types.ObjectId,
+    nullable: true,
   },
   isDefault: {
     type: Boolean
@@ -20,10 +20,10 @@ const schema = new mongoose.Schema({
     required: true,
   },
   permissions: {
-    type: [mongoose.Types.ObjectId],
+    type: [Schema.Types.ObjectId],
   }
 })
 
-const roleModel = mongoose.models.role || mongoose.model('role', schema);
+const roleModel = models.role || model('role', schema);
 
 export default roleModel;

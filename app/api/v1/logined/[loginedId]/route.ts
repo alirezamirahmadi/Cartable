@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import mongoose from "mongoose";
 
 import { verifyToken } from "@/utils/token";
-import loginedModel from "@/models/logined";
+import loggedModel from "@/models/logged";
 import connectToDB from "@/utils/db";
 
 const GET = async (request: Request, { params }: { params: { loginedId: string } }) => {
@@ -12,7 +12,7 @@ const GET = async (request: Request, { params }: { params: { loginedId: string }
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
 
-  const logined = await loginedModel.aggregate()
+  const logined = await loggedModel.aggregate()
     .match({ _id: { $eq: new mongoose.Types.ObjectId(params.loginedId) } })
     .lookup({ from: "people", localField: "refPerson", foreignField: "_id", as: "person" });
 
@@ -29,7 +29,7 @@ const DELETE = async (request: Request, { params }: { params: { loginedId: strin
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
 
-  const logined = await loginedModel.findByIdAndDelete(params.loginedId);
+  const logined = await loggedModel.findByIdAndDelete(params.loginedId);
 
   if (logined) {
     return Response.json({ message: "The person is logged out" }, { status: 200 });

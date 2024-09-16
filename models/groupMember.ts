@@ -1,16 +1,20 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
+require("./group");
+require("./role");
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   refGroup: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "group",
   },
   refRole: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
+    ref: "role",
   }
 })
 
-const groupMemberModel = mongoose.models.groupMember || mongoose.model("groupMember", schema);
+const groupMemberModel = models.groupMember || model("groupMember", schema);
 
 export default groupMemberModel;

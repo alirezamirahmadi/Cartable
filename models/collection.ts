@@ -1,35 +1,35 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   title: {
     type: String,
-    require: true,
+    required: true,
   },
   showTitle: {
     type: String,
-    require: true,
+    required: true,
   },
   route: {
     type: String,
   },
   numberRule: {
     type: String,
-    require: true,
+    required: true,
   },
   numberIdentity: {
     type: Number,
-    require: true,
+    required: true,
   },
   stepNumber: {
     type: Number,
-    require: true,
+    required: true,
   },
   isActive: {
     type: Boolean,
-    require: true,
+    required: true,
   }
 })
 
-const collectionModel = mongoose.models.collection || mongoose.model("collection", schema);
+const collectionModel = models.collection || model("collection", schema);
 
 export default collectionModel;

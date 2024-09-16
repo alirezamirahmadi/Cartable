@@ -1,22 +1,24 @@
-import mongoose from "mongoose";
+import { Schema, models, model } from "mongoose";
 
-const schema = new mongoose.Schema({
+const schema = new Schema({
   title: {
     type: String,
     required: true,
   },
   root: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.ObjectId,
+    nullable: true,
   },
   kind: {
-    type: Number, // 1- category, 2- user group
+    type: Number,
     required: true,
+    enum: [1, 2], // 1- category, 2- user group
   },
   permissions: {
-    type: [mongoose.Types.ObjectId],
+    type: [Schema.Types.ObjectId],
   }
 })
 
-const groupModel = mongoose.models.group || mongoose.model("group", schema);
+const groupModel = models.group || model("group", schema);
 
 export default groupModel;
