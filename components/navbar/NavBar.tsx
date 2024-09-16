@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { AppBar, Toolbar, Typography, Container } from "@mui/material";
 import AdbIcon from "@mui/icons-material/Adb";
 
@@ -27,12 +28,16 @@ export default async function NavBar() {
             <Toolbar disableGutters>
               <HamburgerMenu menuItems={menuItems} />
               <AdbIcon sx={{ display: "flex", mr: 1 }} />
-              <Typography variant="h6" noWrap component="a" href="/"
+              <Typography variant="h6" noWrap
                 sx={{
                   mr: 2, display: "flex", flexGrow: 1, fontFamily: "monospace", fontWeight: 700, letterSpacing: ".3rem",
                   color: "inherit", textDecoration: "none",
                 }}
-              >LOGO</Typography>
+              >
+                <Link href="/">
+                  LOGO
+                </Link>
+              </Typography>
               <Menu menuItems={menuItems} />
               <MyAccount me={me} />
             </Toolbar>
