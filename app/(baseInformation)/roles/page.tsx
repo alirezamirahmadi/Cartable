@@ -1,3 +1,6 @@
+import { Suspense } from "react";
+
+import Loading from "@/components/general/loading/loading";
 import RoleTree from "@/components/role/roleTree";
 import connectToDB from "@/utils/db";
 import roleModel from "@/models/role";
@@ -19,7 +22,9 @@ export default async function RolesPage() {
 
   return (
     <>
-      <RoleTree roles={roles} />
+      <Suspense fallback={<Loading />}>
+        <RoleTree roles={roles} />
+      </Suspense>
     </>
   )
 }

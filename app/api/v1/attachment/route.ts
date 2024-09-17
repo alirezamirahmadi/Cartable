@@ -2,10 +2,18 @@ import mongoose from "mongoose";
 import { writeFile } from "fs/promises";
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
+import { zfd } from "zod-form-data";
 
 import connectToDB from "@/utils/db";
 import attachmentModel from "@/models/attachment";
 import collectionModel from "@/models/collection";
+
+const formDataSchema = zfd.formData({
+  file: zfd.file(),
+  description: zfd.text(),
+  refCollection: zfd.text(),
+  refDocument: zfd.text(),
+})
 
 const GET = async (request: Request) => {
   connectToDB();
@@ -32,11 +40,7 @@ const GET = async (request: Request) => {
 const POST = async (request: Request) => {
   connectToDB();
 
-  const formData = await request.formData();
-  const file = formData.get("file");
-  const description = formData.get("description");
-  const refCollection = formData.get("refCollection");
-  const refDocument = formData.get("refDocument");
+  const { file, description, refCollection, refDocument, } = formDataSchema.parse(await request.formData());
 
   if (!file) {
     return Response.json({ message: "File is required" }, { status: 403 });
@@ -51,7 +55,7 @@ const POST = async (request: Request) => {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
 
-  const filePath = (typeof file !== "string" && file !== null) ? `/attachment/${collection[0].title}/${year}/${month}/${Date.now()}${file.name}` : ""
+  const filePath = `/attachment/${collection[0].title}/${year}/${month}/${Date.now()}${file.name}`;
   const writePath = path.join(process.cwd(), `/public/attachment/${collection[0].title}`);
 
   if (!existsSync(writePath)) {
@@ -64,13 +68,12 @@ const POST = async (request: Request) => {
     mkdirSync(`${writePath}/${year}/${month}`);
   }
 
-  const attachment = await attachmentModel.create({ title: (typeof file !== "string" && file !== null) ? file.name : "", description, path: filePath, refPerson: "66b1c26a4af25da311437999", refCollection, refDocument })
+  const attachment = await attachmentModel.create({ title: file.name, description, path: filePath, refPerson: "66b1c26a4af25da311437999", refCollection, refDocument })
 
   if (attachment) {
-    if (typeof file !== "string" && file !== null) {
-      const fileBuffer = Buffer.from(await file.arrayBuffer());
-      file && await writeFile(path.join(process.cwd(), `/public${filePath}`), fileBuffer);
-    }
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    file && await writeFile(path.join(process.cwd(), `/public${filePath}`), fileBuffer);
+
     return Response.json({ message: "File attached successfully" }, { status: 201 });
   }
   return Response.json({ message: "File is not attach" }, { status: 500 });

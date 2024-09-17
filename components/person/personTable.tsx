@@ -38,7 +38,7 @@ export default function PersonTable({ persons }: { persons: PersonType[] }): Rea
     { field: { title: "account.username" }, label: "نام کاربری" },
     {
       field: { title: "ویرایش" }, label: "ویرایش", kind: "component", options: {
-        component: (value, onChange, rowData) => (<ModifyButtons rowData={rowData} onAction={handleAction} edit={me.permissions.includes("/persons.edit")} omit={me.permissions.includes("/persons.delete")} omitMessage={`آیا از حذف ${rowData?.firstName} مطمئن هستید؟`} />)
+        component: (value, onChange, rowData) => (<ModifyButtons rowData={rowData} onAction={handleAction} edit={me.permissions.includes("/persons.edit")} omit={me.permissions.includes("/persons.delete")} omitMessage={`آیا از حذف ${rowData?.fullName} مطمئن هستید؟`} />)
       }
     },
   ]

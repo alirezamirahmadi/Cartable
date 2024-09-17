@@ -1,3 +1,6 @@
+import { Suspense } from "react";
+
+import Loading from "@/components/general/loading/loading";
 import GroupTree from "@/components/group/groupTree";
 import groupModel from "@/models/group";
 import connectToDB from "@/utils/db";
@@ -15,7 +18,9 @@ export default async function GroupsPage() {
 
   return (
     <>
-      <GroupTree groups={groups} />
+      <Suspense fallback={<Loading />}>
+        <GroupTree groups={groups} />
+      </Suspense>
     </>
   )
 }

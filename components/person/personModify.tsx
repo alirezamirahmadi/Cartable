@@ -52,8 +52,6 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
       address: person?.address ?? "",
       description: person?.description ?? "",
       isActive: person?.isActive ?? false,
-      // avatar: null,
-      // sign: null,
       username: person?.account?.username ?? "",
       password: "",
     }
@@ -92,6 +90,10 @@ export default function PersonModify({ person, onModify }: { person?: PersonType
           setSnackProps({ context: "شخص جدید با موفقیت ایجاد شد", isOpen: true, severity: "success", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
           :
           setSnackProps({ context: "عملیات مورد نظر با خطا مواجه شده است", isOpen: true, severity: "error", onCloseSnack: () => { setSnackProps({ context: "", isOpen: false, severity: "success", onCloseSnack: () => { } }) } })
+      })
+      .then(()=>{
+        setAvatar("");
+        setSign("");
       })
       .then(() => router.refresh())
     reset();

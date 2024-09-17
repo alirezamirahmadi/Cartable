@@ -1,11 +1,33 @@
 import { cookies } from "next/headers";
 import { writeFile } from "fs/promises";
 import path from "path";
+import { z } from "zod";
+import { zfd } from "zod-form-data";
 
 import { verifyToken } from "@/utils/token";
 import { hashPassword } from "@/utils/crypto";
 import personModel from "@/models/person";
 import connectToDB from "@/utils/db";
+
+const formDataSchema = zfd.formData({
+  code: zfd.text(z.string().optional()),
+  firstName: zfd.text(),
+  lastName: zfd.text(),
+  nationalCode: zfd.text(z.string().optional()),
+  birthday: zfd.text(z.string().optional()),
+  gender: zfd.text(z.string().optional()),
+  maritalStatus: zfd.text(z.string().optional()),
+  education: zfd.text(z.string().optional()),
+  phone: zfd.text(z.string().optional()),
+  email: zfd.text(z.string().optional()),
+  address: zfd.text(z.string().optional()),
+  description: zfd.text(z.string().optional()),
+  isActive: zfd.text(z.string().optional()),
+  avatar: zfd.file(z.instanceof(File).optional()).or(zfd.text(z.string().optional())),
+  sign: zfd.file(z.instanceof(File).optional()).or(zfd.text(z.string().optional())),
+  username: zfd.text(),
+  password: zfd.text(),
+})
 
 const GET = async (request: Request) => {
   connectToDB();
@@ -44,31 +66,10 @@ const POST = async (request: Request) => {
     return Response.json({ message: "Person is not login" }, { status: 401 });
   }
 
-  const formData = await request.formData();
-  const code = formData.get("code");
-  const firstName = formData.get("firstName");
-  const lastName = formData.get("lastName");
-  const nationalCode = formData.get("nationalCode");
-  const birthday = formData.get("birthday");
-  const gender = formData.get("gender");
-  const maritalStatus = formData.get("maritalStatus");
-  const education = formData.get("education");
-  const phone = formData.get("phone");
-  const email = formData.get("email");
-  const address = formData.get("address");
-  const description = formData.get("description");
-  const isActive = formData.get("isActive");
-  const avatar = formData.get("avatar");
-  const sign = formData.get("sign");
-  const username = formData.get("username");
-  const password = formData.get("password");
+  const { code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, avatar, sign, username, password } = formDataSchema.parse(await request.formData());
 
   // data check
-  if ((typeof firstName === "string" && firstName?.trim().length < 2) ||
-    (typeof lastName === "string" && lastName?.trim().length < 2) ||
-    (typeof username === "string" && username?.trim().length < 4) ||
-    (typeof password === "string" && password?.trim().length < 8)) {
-
+  if (firstName?.trim().length < 2 || lastName?.trim().length < 2 || username?.trim().length < 4 || password?.trim().length < 8) {
     return Response.json({ message: "Data is invalid" }, { status: 422 });
   }
 
@@ -79,21 +80,21 @@ const POST = async (request: Request) => {
   }
 
   // hash password
-  const hashedPassword = typeof password === "string" ? await hashPassword(password) : "";
+  const hashedPassword = await hashPassword(password);
 
-  const avatarPath = (typeof avatar !== "string" && avatar !== null) ? "/persons/avatars/" + Date.now() + avatar.name : ""
-  const signPath = (typeof sign !== "string" && sign !== null) ? "/persons/signs/" + Date.now() + sign.name : "";
+  const avatarPath = (typeof avatar !== "string" && avatar) ? "/persons/avatars/" + Date.now() + avatar.name : ""
+  const signPath = (typeof sign !== "string" && sign) ? "/persons/signs/" + Date.now() + sign.name : "";
 
   const person = await personModel.create({ code, firstName, lastName, nationalCode, birthday, gender, maritalStatus, education, phone, email, address, description, isActive, avatar: avatarPath, sign: signPath, account: { username, password: hashedPassword } });
 
   if (person) {
-    if (typeof avatar !== "string" && avatar !== null) {
+    if (typeof avatar !== "string" && avatar) {
       const avatarBuffer = Buffer.from(await avatar.arrayBuffer());
-      avatar && await writeFile(path.join(process.cwd(), "/public" + avatarPath), avatarBuffer);
+      await writeFile(path.join(process.cwd(), "/public" + avatarPath), avatarBuffer);
     }
-    if (typeof sign !== "string" && sign !== null) {
+    if (typeof sign !== "string" && sign) {
       const signBuffer = Buffer.from(await sign.arrayBuffer());
-      sign && await writeFile(path.join(process.cwd(), "/public" + signPath), signBuffer);
+      await writeFile(path.join(process.cwd(), "/public" + signPath), signBuffer);
     }
 
     return Response.json({ message: "Person created successfully" }, { status: 201 });

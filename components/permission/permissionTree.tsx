@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -13,6 +13,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import GroupIcon from '@mui/icons-material/Group';
 
 const Snack = dynamic(() => import("@/components/general/snack/snack"));
+import Loading from "../general/loading/loading";
 import ModifyButtons from "../general/modifyButtons/modifyButtons";
 import TreeActions from "../general/treeActions/treeActions";
 import RolesGroups from "./rolesGroups";
@@ -190,7 +191,9 @@ export default function PermissionTree({ permissions, permissionsByGroups, oldPe
             ))}
           </List>
         </Box >
-        <RolesGroups selectedPermission={selectedPermission} />
+        <Suspense fallback={<Loading />}>
+          <RolesGroups selectedPermission={selectedPermission} />
+        </Suspense>
       </Box>
 
       {snackProps.isOpen && <Snack {...snackProps} />}

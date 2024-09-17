@@ -29,6 +29,8 @@ const meSlice = createSlice({
       me.avatar = action.payload.avatar;
       me.defaultRole = action.payload.defaultRole;
       me.permissions = action.payload.permissions;
+
+      return me;
     },
     clearMe: (me: MeType) => {
       return me = initialState
