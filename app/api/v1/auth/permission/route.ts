@@ -15,10 +15,11 @@ const GET = async (request: Request) => {
   const permissionInRole = await personModel.aggregate()
     .match({ "account.username": username })
     .lookup({ from: "roles", localField: "_id", foreignField: "refPerson", as: "roles" })
-    .lookup({ from: "permissions", localField: "roles.permissions", foreignField: "_id", as: "rolepermissions" })
     .unwind("roles")
-    .match({ "rolepermissions.title": { $in: [title] } })
+    .match({ "roles.isActive": true })
     .match({ "roles.isDefault": true })
+    .lookup({ from: "permissions", localField: "roles.permissions", foreignField: "_id", as: "rolepermissions" })
+    .match({ "rolepermissions.title": { $in: [title] } })
     .project({ "_id": 0, "rolepermissions.title": 1 })
 
   if (permissionInRole.length > 0) {
@@ -29,6 +30,7 @@ const GET = async (request: Request) => {
     .match({ "account.username": username })
     .lookup({ from: "roles", localField: "_id", foreignField: "refPerson", as: "roles" })
     .unwind("roles")
+    .match({ "roles.isActive": true })
     .match({ "roles.isDefault": true })
     .lookup({ from: "groupmembers", localField: "roles._id", foreignField: "refRole", as: "groupmembers" })
     .lookup({ from: "groups", localField: "groupmembers.refGroup", foreignField: "_id", as: "groups" })
